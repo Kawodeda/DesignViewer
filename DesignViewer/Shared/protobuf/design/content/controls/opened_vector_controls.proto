@@ -1,0 +1,24 @@
+
+// An OpenedVectorControls represents an abstract opened vector controls
+// and contains one of concrete controls available for opened vector.
+
+syntax = "proto3";
+
+package design.content.controls;
+
+import "content/controls/line_controls.proto";
+import "content/controls/polyline_controls.proto";
+import "content/controls/path_controls.proto";
+
+option csharp_namespace = "Aurigma.Design.Content.Controls";
+
+message OpenedVectorControls
+{
+  // Only one concrete controls is stored at a time.
+  oneof controls
+  {
+    LineControls line = 1;
+    PolylineControls polyline = 2;
+    PathControls path = 3;
+  }
+}

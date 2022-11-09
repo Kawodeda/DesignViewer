@@ -1,0 +1,16 @@
+
+syntax = "proto3";
+
+package design.appearance.color;
+
+import "appearance/color/process_color.proto";
+
+option csharp_namespace = "Aurigma.Design.Appearance.Color";
+
+message SpotColor
+{
+  string ink_name = 1;
+  appearance.color.ProcessColor ink_color = 2;
+  uint32 ink_solidity = 3;
+  uint32 tint = 4;
+}

@@ -1,0 +1,99 @@
+﻿@page "/"
+@using ApiClient
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+
+<PageTitle>Designs</PageTitle>
+
+<h1>Designs:</h1>
+
+<div style="height: 500px; width: 500px; overflow-y: scroll; margin: 1em">
+    <Virtualize @ref="_virtualizeComponent" Context="design" ItemsProvider="@LoadDesigns">
+        <div style="border: 2px outset black; padding: 10px; margin: 5px">
+            <h5>@design.Name</h5>
+            <button class="btn btn-light" @onclick="() => EditDesign(design)">
+                <span class="oi oi-pencil"></span>
+                Edit
+                </button>
+            <button class="btn btn-danger" @onclick="() => DeleteDesign(design)">
+                <span class="oi oi-trash"></span>
+                Delete
+                </button>
+        </div>
+    </Virtualize>
+</div>
+<button class="btn btn-primary" @onclick="CreateDesign"
+    style="width: 500px; margin: 0 0 0 1em">
+    <span class="oi oi-plus"></span>
+    New
+</button>
+<p>
+    <label style="margin: 1em 0">@_message</label>
+</p>
+
+@code {
+    private IDesignsApiClient _designsApiClient;
+    private Virtualize<DesignDto> _virtualizeComponent;
+
+    private const string ErrorMessage 
+        = "An error has occured";
+    private const string DeleteMessage 
+        = "File \"{0}\" has been successfully removed";
+    private const string DeleteConfirmationMessage
+        = "Are you really want to delete file \"{0}\"?";
+
+    private string _message = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _designsApiClient = new DesignsApiClient(
+            "https://localhost:7091", 
+            new HttpClient());
+
+        await base.OnInitializedAsync();
+    }
+
+    private void EditDesign(DesignDto design)
+    {
+        NavigationManager.NavigateTo($"/editor/{design.Name}");
+    }
+
+    private void CreateDesign()
+    {
+        NavigationManager.NavigateTo("/editor");
+    }
+
+    private async Task DeleteDesign(DesignDto design)
+    {
+        try
+        {
+            bool confirmed = await JsRuntime.InvokeAsync<bool>(
+                "confirm", 
+                string.Format(DeleteConfirmationMessage, design.Name));
+            if(confirmed)
+            {
+                await _designsApiClient.DeleteDesignAsync(design.Name);
+                await ReloadDesigns();
+                _message = string.Format(DeleteMessage, design.Name);
+            }
+        }
+        catch
+        {
+            _message = ErrorMessage;
+        }
+    }
+
+    private async ValueTask<ItemsProviderResult<DesignDto>> LoadDesigns(
+        ItemsProviderRequest request)
+    {
+        var designs = await _designsApiClient.ListDesignsAsync();
+
+        return new ItemsProviderResult<DesignDto>(designs, designs.Count);
+    }
+
+    private async Task ReloadDesigns()
+    {
+        await _virtualizeComponent.RefreshDataAsync();
+        StateHasChanged();
+    }
+}

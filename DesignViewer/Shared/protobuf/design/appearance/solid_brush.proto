@@ -1,0 +1,15 @@
+
+// A SolidBrush represents solid one-color fill.
+
+syntax = "proto3";
+
+package design.appearance;
+
+import "appearance/color/color.proto";
+
+option csharp_namespace = "Aurigma.Design.Appearance";
+
+message SolidBrush
+{
+  appearance.color.Color color = 1; 
+}

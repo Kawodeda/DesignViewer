@@ -1,0 +1,15 @@
+
+// A Size represents the size of two-dimensional rectangular area
+// storing its width and height.
+
+syntax = "proto3";
+
+package design.math;
+
+option csharp_namespace = "Aurigma.Design.Math";
+
+message Size
+{
+  float width = 1;
+  float height = 2;
+}

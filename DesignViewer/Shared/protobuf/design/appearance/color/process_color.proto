@@ -1,0 +1,19 @@
+
+syntax = "proto3";
+
+package design.appearance.color;
+
+import "appearance/color/cmyk_color.proto";
+import "appearance/color/rgb_color.proto";
+
+option csharp_namespace = "Aurigma.Design.Appearance.Color";
+
+message ProcessColor
+{
+  uint32 alpha = 1;
+  oneof value
+  {
+    appearance.color.RgbColor rgb = 2;
+    appearance.color.CmykColor cmyk = 3;
+  }
+}

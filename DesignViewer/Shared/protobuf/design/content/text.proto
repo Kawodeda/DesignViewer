@@ -1,0 +1,13 @@
+
+// A Text
+
+syntax = "proto3";
+
+package design.content;
+
+option csharp_namespace = "Aurigma.Design.Content";
+
+message Text
+{
+  // To be defined
+}

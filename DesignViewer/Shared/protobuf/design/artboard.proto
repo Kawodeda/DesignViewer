@@ -1,0 +1,23 @@
+
+// An Artboard represents an area on a surface that defines which design
+// elements will be eventually printed.
+
+syntax = "proto3";
+
+package design;
+
+import "appearance/brush.proto";
+import "math/affine_2d_matrix.proto";
+import "math/size.proto";
+import "trim_settings.proto";
+
+option csharp_namespace = "Aurigma.Design";
+
+message Artboard
+{
+  string name = 1;
+  appearance.Brush background = 2;
+  math.Affine2DMatrix basis = 3;
+  math.Size size = 4;
+  TrimSettings trim_settings = 5;
+}

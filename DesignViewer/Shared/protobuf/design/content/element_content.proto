@@ -1,0 +1,26 @@
+
+// An ElementContent represents an abstract content of a design element
+// and contains one of concrete element content.
+
+syntax = "proto3";
+
+package design.content;
+
+import "content/opened_vector.proto";
+import "content/closed_vector.proto";
+import "content/image.proto";
+import "content/text.proto";
+
+option csharp_namespace = "Aurigma.Design.Content";
+
+message ElementContent
+{
+  // Only one of concrete content is stored at a time.
+  oneof element_content
+  {
+    OpenedVector opened_vector = 1;
+    ClosedVector closed_vector = 2;
+    Image image = 3;
+    Text text = 4;
+  }
+}

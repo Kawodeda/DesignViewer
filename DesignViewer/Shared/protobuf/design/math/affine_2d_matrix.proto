@@ -1,0 +1,32 @@
+
+// An Affine2DMatrix represents a 3 by 3 matrix that defines an affine 
+// transformation on a two-dimensional plane. It contains a matrix for
+// two-dimensional linear transformation and a translation vector.
+//
+// # Example:
+//
+// |  m11  m12  d1  |
+// |  m21  m22  d2  |
+// |  0    0    1   |
+//
+// Where (m11, ..., m22) are elements of linear transformation matrix
+// and (d1, d2) are the components of shift vector.
+//
+// Thus, you can perform an affine transformation just by multiplying your
+// position vector by an Affine2DMatrix.
+
+syntax = "proto3";
+
+package design.math;
+
+option csharp_namespace = "Aurigma.Design.Math";
+
+message Affine2DMatrix
+{
+  float m11 = 1;
+  float m12 = 2;
+  float m21 = 3;
+  float m22 = 4;
+  float d1 = 5;
+  float d2 = 6;
+}

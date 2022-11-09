@@ -1,0 +1,21 @@
+
+// An RgbColor represents a color in RGB color space, i.e. it is encoded as
+// red, green and blue components.
+
+syntax = "proto3";
+
+package design.appearance.color;
+
+option csharp_namespace = "Aurigma.Design.Appearance.Color";
+
+message RgbColor
+{
+  // Red component
+  uint32 r = 1;
+
+  // Green component
+  uint32 g = 2;
+
+  // Blue component
+  uint32 b = 3;
+}

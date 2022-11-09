@@ -1,0 +1,20 @@
+
+// A LineControls represents a section of a straight two-dimensional line
+// and is defined by its start and end points.
+
+syntax = "proto3";
+
+package design.content.controls;
+
+import "math/point.proto";
+
+option csharp_namespace = "Aurigma.Design.Content.Controls";
+
+message LineControls
+{
+  // The strat point of a line section
+  math.Point start = 1;
+
+  // The end point of a line section
+  math.Point end = 2;
+}

@@ -1,0 +1,362 @@
+﻿@using Aurigma.Design
+@using Aurigma.Design.Math
+@using Blazor.Extensions
+@using Blazor.Extensions.Canvas
+@using Blazor.Extensions.Canvas.Canvas2D
+@using BlazorExtensions.Commands;
+@using BlazorExtensions.Commands.Context;
+@using BlazorExtensions.InputHandling;
+@using BlazorExtensions.Viewports;
+@inject IJSRuntime JsRuntime
+@implements IDesignViewer
+
+<div style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
+    <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
+</div>
+
+<!--Doesn't capture keyboard events without tabindex-->
+<div style="position: absolute; width: @(Width)px; height: @(Height)px"
+    tabindex="0"
+    @onclick="OnClick"
+    @onmousedown="OnMouseDown" 
+    @onmouseup="OnMouseUp" 
+    @onmousemove="OnMouseMove"
+    @onmouseover="OnMouseOver"
+    @onmouseout="OnMouseOut"
+    @onwheel="OnWheel"
+    @onkeydown="OnKeyDown"
+    @onkeyup="OnKeyUp"
+    @onkeypress="OnKeyPress">
+    <BECanvas Width="@Width" Height="@Height" @ref="_uiCanvasReference"></BECanvas>
+</div>
+
+@code {
+    private Design _design;
+    private int _currentSurfaceIndex;
+    private BECanvasComponent _canvasReference;
+    private BECanvasComponent _uiCanvasReference;
+    private Canvas2DContext _outputCanvasContext;
+    private Canvas2DContext _uiCanvasContext;
+    private IJSObjectReference _module;
+    private DotNetObjectReference<DesignViewer> _instanceRef;
+    private Renderer _renderer;
+    private IInputHandlingBuilder _inputHandler;
+    private IViewport _viewport;
+
+    [Parameter]
+    public long Width { get; set; } = 256;
+
+    [Parameter]
+    public long Height { get; set; } = 256;
+
+    [Parameter]
+    public Sides ArtboardScrollMargin { get; set; } = new Sides(0f);
+
+    public IViewport Viewport
+    {
+        get
+        {
+            if(_viewport == null)
+            {
+                var viewportSize = new Size()
+                {
+                    Width = Width,
+                    Height = Height
+                };
+
+                _viewport = new Viewport(
+                    viewportSize, 
+                    new Size(), 
+                    ArtboardScrollMargin);
+            }
+
+            return _viewport;
+        }
+    }
+
+    public Surface CurrentSurface
+    {
+        get
+        {
+            return _design.Surfaces[_currentSurfaceIndex];
+        }
+    }
+
+    public Element? SelectedElement { get; set; }
+
+    public Affine2DMatrix Transform
+    {
+        get
+        {
+            Size size = CurrentArtboard.Size;
+            Point shiftToCenter = new Point(
+                (Width - size.Width * Viewport.Zoom) / 2, 
+                (Height - size.Height * Viewport.Zoom) / 2);
+            Point scroll = new Point(Viewport.ScrollX, Viewport.ScrollY);
+
+            return CurrentArtboard.Basis
+                .Translate(shiftToCenter)
+                .Translate(scroll)
+                .Scale(Viewport.Zoom);
+        }
+    }
+
+    public Design Design
+    {
+        get
+        {
+            return _design;
+        }
+        set
+        {
+            _design = value;
+            Viewport.ContentSize = CurrentArtboard.ActualSize;
+
+            if(_renderer != null)
+            {
+                _renderer.SetDesign(_design);
+            }
+
+            RequestRendering();
+        }
+    }
+
+    public int CurrentSurfaceIndex
+    {
+        get
+        {
+            return _currentSurfaceIndex;
+        }
+        set
+        {
+            _currentSurfaceIndex = value;
+            Viewport.ContentSize = CurrentArtboard.ActualSize;
+            RequestRendering();
+        }
+    }
+
+    [JSInvokable]
+    public async ValueTask ViewerRenderLoop(float timeStamp)
+    {
+        await RedrawCanvasAsync(timeStamp);
+        await RedrawUiCanvasAsync(timeStamp);
+
+        RequestRendering();
+    }
+
+    protected override void OnInitialized()
+    {
+        _inputHandler = new DesignViewerInputHandler(this);
+        _inputHandler.UseHandler<ViewPortInputHandler>();
+        _inputHandler.UseHandler<DesignInputHandler>();
+
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _outputCanvasContext = await _canvasReference.CreateCanvas2DAsync();
+            _uiCanvasContext = await _uiCanvasReference.CreateCanvas2DAsync();
+
+            _renderer = new Renderer(_outputCanvasContext, _design, _currentSurfaceIndex);
+            _renderer.SetDesign(_design);
+
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
+                "import", "./_content/BlazorExtensions/DesignViewer.razor.js");
+
+            _instanceRef = DotNetObjectReference.Create(this);
+
+            RequestRendering();
+        }
+        await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private Artboard CurrentArtboard
+    {
+        get
+        {
+            return CurrentSurface.Artboards.First();
+        }
+    }
+
+    private void RequestRendering()
+    {
+        if (_module == null || _instanceRef == null)
+        {
+            return;
+        }
+
+        _module.InvokeVoidAsync("callRequestAnimationFrame", _instanceRef);
+    }
+
+    private void OnClick(MouseEventArgs e)
+    {
+        ICommand result = _inputHandler.OnClick(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnMouseDown(MouseEventArgs e)
+    {
+        ICommand result = _inputHandler.OnMouseDown(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnMouseMove(MouseEventArgs e)
+    {
+        ICommand result = _inputHandler.OnMouseMove(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnMouseUp(MouseEventArgs e)
+    {
+        ICommand result = _inputHandler.OnMouseUp(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnMouseOver(MouseEventArgs e)
+    {
+        ICommand result = _inputHandler.OnMouseOver(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnMouseOut(MouseEventArgs e)
+    {
+        ICommand result = _inputHandler.OnMouseOut(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnWheel(WheelEventArgs e)
+    {
+        ICommand result = _inputHandler.OnWheel(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnKeyPress(KeyboardEventArgs e)
+    {
+        ICommand result = _inputHandler.OnKeyPress(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        ICommand result = _inputHandler.OnKeyDown(e);
+        ExecuteCommand(result);
+    }
+
+    private void OnKeyUp(KeyboardEventArgs e)
+    {
+        ICommand result = _inputHandler.OnKeyUp(e);
+        ExecuteCommand(result);
+    }
+
+    private void ExecuteCommand(ICommand command)
+    {
+        if(command.CanExecute())
+        {
+            command.Execute(new ExecutionContext(this));
+        }
+    }
+
+    private async Task RedrawCanvasAsync(float timeStamp)
+    {
+        Size size = CurrentArtboard.Size;
+        Affine2DMatrix transform = Transform;
+
+        await _outputCanvasContext.SetTransformAsync(1, 0, 0, 1, 0, 0);
+        await _outputCanvasContext.ClearRectAsync(0, 0, Width, Height);
+
+        await _outputCanvasContext.SetTransformAsync(
+            transform.M11,
+            transform.M12,
+            transform.M21,
+            transform.M22,
+            transform.D1,
+            transform.D2);
+
+        await _outputCanvasContext.SetFillStyleAsync("lightgray");
+        await _outputCanvasContext.FillRectAsync(0, 0, size.Width, size.Height);    
+
+        await _renderer.Render();     //отрисовываем дизайн
+        
+        await _renderer.RenderSelection(SelectedElement);  //отрисовка выделения для выбранного элемента
+    }
+
+    private async Task RedrawUiCanvasAsync(float timeStamp)
+    {
+        await _uiCanvasContext.SetGlobalAlphaAsync(0.66f);
+        await _uiCanvasContext.ClearRectAsync(0, 0, Width, Height);
+
+        await _uiCanvasContext.SetStrokeStyleAsync("red");
+        await _uiCanvasContext.StrokeRectAsync(0, 0, Width, Height);
+
+        if(Viewport.IsHorizontalScrollbarShown)
+        {
+            await RedrawHorizontalScrollbarAsync();
+        }
+        if(Viewport.IsVerticalScrollbarShown)
+        {
+            await RedrawVerticalScrollbarAsync();
+        }   
+
+        await _uiCanvasContext.SetFillStyleAsync("black");
+        await _uiCanvasContext.SetFontAsync("10px verdana");
+        var selected = SelectedElement?.Content.ClosedVector.Controls.ControlsCase;
+        await _uiCanvasContext.FillTextAsync($"SelectedElement: {selected}", 5, 10);
+        
+        await _uiCanvasContext.FillTextAsync($"scrollX: {Viewport.ScrollX.ToString("N2")}", Width - 80, 10);
+        await _uiCanvasContext.FillTextAsync($"scrollY: {Viewport.ScrollY.ToString("N2")}", Width - 80, 30);
+        await _uiCanvasContext.FillTextAsync($"zoom: {Viewport.Zoom.ToString("N2")}", Width - 80, 50);   
+    }
+
+    private async Task RedrawVerticalScrollbarAsync()
+    {
+        float verticalScrollbarX = Width - Viewport.ScrollbarSize;
+
+        await _uiCanvasContext.SetFillStyleAsync("#F4D3FF");
+        await _uiCanvasContext.FillRectAsync(
+            verticalScrollbarX, 
+            0, 
+            Viewport.ScrollbarSize, 
+            Height - Viewport.ScrollbarSize);
+
+        await _uiCanvasContext.SetFillStyleAsync("#C182D6");
+        await _uiCanvasContext.FillRectAsync(
+            verticalScrollbarX,
+            Viewport.VerticalScrollbarBodyPos,
+            Viewport.ScrollbarSize,
+            Viewport.VerticalScrollbarBodyHeight);
+    }
+
+    private async Task RedrawHorizontalScrollbarAsync()
+    {
+        float horizontalScrollbarY = Height - Viewport.ScrollbarSize;
+
+        await _uiCanvasContext.SetFillStyleAsync("#F4D3FF");
+        await _uiCanvasContext.FillRectAsync(
+            0, 
+            horizontalScrollbarY, 
+            Width - Viewport.ScrollbarSize, 
+            Viewport.ScrollbarSize);
+
+        await _uiCanvasContext.SetFillStyleAsync("#C182D6");
+        await _uiCanvasContext.FillRectAsync(
+            Viewport.HorizontalScrollbarBodyPos,
+            horizontalScrollbarY,
+            Viewport.HorizontalScrollbarBodyWidth,
+            Viewport.ScrollbarSize);
+    }
+
+    public void ChangeSelectedElementColor(string value)
+    {
+        System.Drawing.Color color = System.Drawing.ColorTranslator.FromHtml(value);
+        int r = Convert.ToInt16(color.R);
+        int g = Convert.ToInt16(color.G);
+        int b = Convert.ToInt16(color.B);
+
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.R = (uint)r;
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.G = (uint)g;
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.B = (uint)b;
+    }
+}

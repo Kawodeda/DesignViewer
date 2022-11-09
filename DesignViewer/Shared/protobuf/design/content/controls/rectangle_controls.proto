@@ -1,0 +1,20 @@
+
+// A RectangleControls represents a two-dimensional rectangle defined by its
+// corner points: the top-left corner point and the bottom-right one.
+
+syntax = "proto3";
+
+package design.content.controls;
+
+import "math/point.proto";
+
+option csharp_namespace = "Aurigma.Design.Content.Controls";
+
+message RectangleControls
+{
+  // Represents the top-left corner of a rectangle
+  math.Point corner1 = 1;
+
+  // Represents the bootom-right corner of a rectangle
+  math.Point corner2 = 2;
+}

@@ -1,0 +1,38 @@
+
+syntax = "proto3";
+
+package design;
+
+import "content/element_content.proto";
+import "math/affine_2d_matrix.proto";
+import "math/point.proto";
+
+option csharp_namespace = "Aurigma.Design";
+
+// ReferencePointType defines how we interpret the position property of 
+// an Element, whether it be its top-left corner, center, etc.
+enum ReferencePointType
+{
+  UNSPECIFIED = 0;
+  TOP_LEFT_CORNER = 1;
+  CENTER = 2;
+}
+
+// An Element represents a concrete graphical object such as shape, image,
+// text, etc., located at a specific surface on a specific layer and transformed
+// in a specific way. The concrete type of an Element is defined by its content
+// property.
+message Element
+{
+  // Defines the position of an element relative to the surface
+  math.Point position = 1;
+
+  // Defines the transformation of an element
+  math.Affine2DMatrix transform = 2;
+
+  // Defines the location of the reference point of an element
+  ReferencePointType reference_point = 3;
+
+  // Defines the concrete content of an element
+  content.ElementContent content = 4;
+}

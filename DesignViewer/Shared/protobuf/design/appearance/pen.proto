@@ -1,0 +1,42 @@
+
+// A Pen describes the appearance of vector's stroke.
+
+syntax = "proto3";
+
+package design.appearance;
+
+import "appearance/brush.proto";
+import "appearance/color/color.proto";
+
+option csharp_namespace = "Aurigma.Design.Appearance";
+
+enum LineCap
+{
+  LINE_CAP_UNSPECIFIED = 0;
+  LINE_CAP_BUTTON = 1;
+  LINE_CAP_ROUND = 2;
+  LINE_CAP_SQUARE = 3;
+}
+
+enum LineJoin
+{
+  LINE_JOIN_UNSPECIFIED = 0;
+  LINE_JOIN_BEVEL = 1;
+  LINE_JOIN_MITER = 2;
+  LINE_JOIN_ROUND = 3;
+}
+
+message Pen
+{
+  float width = 1;
+  LineCap line_cap = 2;
+  LineJoin line_join = 3;
+  float miter_limit = 4;
+  float dash_offset = 5;
+  repeated float dashes = 6;
+  oneof appearance
+  {
+    appearance.color.Color color = 7;
+    appearance.Brush fill = 8;
+  };
+}

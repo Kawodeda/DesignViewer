@@ -1,0 +1,23 @@
+
+// An OpenedVector represents an open vector element such as line, broken line,
+// path etc. It is defined by control points, which define the type of an
+// opened vector element, and by stroke property, which represents the
+// appearance of stroke.
+
+syntax = "proto3";
+
+package design.content;
+
+import "content/controls/opened_vector_controls.proto";
+import "appearance/pen.proto";
+
+option csharp_namespace = "Aurigma.Design.Content";
+
+message OpenedVector
+{
+  // Contains opened vector's control points.
+  controls.OpenedVectorControls controls = 1;
+
+  // Defines the appearance of stroke.
+  appearance.Pen stroke = 2;
+}

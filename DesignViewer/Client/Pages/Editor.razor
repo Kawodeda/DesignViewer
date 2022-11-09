@@ -1,0 +1,149 @@
+﻿@page "/editor"
+@page "/editor/{DesignName}"
+@using Aurigma.Design
+@using Aurigma.Design.Math
+@using Aurigma.Design.Appearance
+@using Aurigma.Design.Content
+@using Aurigma.Design.Appearance.Color
+@using Aurigma.Design.Content.Controls
+@using ApiClient;
+@using BlazorColorPicker
+@using BlazorExtensions
+@using DesignViewer.Client.Models
+@using Google.Protobuf
+
+<PageTitle>Editor</PageTitle>
+
+<h1>Editor</h1>
+
+<button class="btn btn-primary" @onclick = "OpenColorPicker">Сhange color</button>
+<ColorPicker Title="ColorPicker" IsOpened="colorPickerOpened" Closed="CloseColorPicker"></ColorPicker>
+
+<div style="width: 700px; height: 480px">
+    <DesignViewer Width="700" Height="480" ArtboardScrollMargin="@(new Sides(150))" @ref="_designViewer"></DesignViewer>
+</div>
+
+<EditForm Model="@_saveDesignModel" 
+    OnValidSubmit="@HandleSaveDesignSubmitAsync" 
+    OnInvalidSubmit="@HandleSaveDesignInvalidSubmit"
+    style="margin: 1em">
+    <InputText @bind-Value="_saveDesignModel.Name"/>
+
+    <button type="submit">Save</button>
+
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
+    
+    <p>
+        <label style="margin: 1em 0">@_saveFormMessage</label>
+    </p>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? DesignName { get; set; }
+
+    private IDesignViewer _designViewer;
+    private IDesignsApiClient _designsApiClient;
+    private SaveDesignModel _saveDesignModel = new();
+    private bool colorPickerOpened = false;
+
+
+    private const string ErrorMessage = "An error has occured";
+    private const string SaveMessage = "File \"{0}\" has been successfully saved";
+    private const string UpdateMessage = "File \"{0}\" has been successfully updated";
+
+    private string _saveFormMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        _designsApiClient = new DesignsApiClient("https://localhost:7091", new HttpClient());
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if(DesignName == null)
+        {
+            return;
+        }
+
+        var response = await _designsApiClient.GetDesignContentAsync(DesignName);
+        Design design = Design.Parser.ParseFrom(response.Stream);
+
+        _designViewer.Design = design;
+        _designViewer.CurrentSurfaceIndex = 0;
+
+        _saveDesignModel.Name = DesignName;
+
+        await base.OnParametersSetAsync();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if(firstRender && DesignName == null)
+        {
+            Design design = Design.CreateBlank();
+            _designViewer.Design = design;
+            _designViewer.CurrentSurfaceIndex = 0;
+        }
+
+        base.OnAfterRender(firstRender);
+    }
+
+    private async Task HandleSaveDesignSubmitAsync()
+    {
+        try
+        {
+            var designStream = new MemoryStream();
+            _designViewer.Design.WriteTo(designStream);
+            designStream.Position = 0;
+            var designFile = new FileParameter(designStream);
+
+            DesignDto result;
+
+            if(string.IsNullOrEmpty(_saveDesignModel.Name))
+            {
+                result = await _designsApiClient.UploadDesignAutoNameAsync(designFile);
+                _saveFormMessage = string.Format(SaveMessage, result.Name);
+                return;
+            }
+            
+            var designs = await _designsApiClient.ListDesignsAsync();
+            var designNames = designs.Select(x => x.Name);
+            if (designNames.Contains(_saveDesignModel.Name))
+            {
+                result = await _designsApiClient.UpdateDesignAsync(_saveDesignModel.Name, designFile);
+                _saveFormMessage = string.Format(UpdateMessage, result.Name);
+                return;
+            }
+
+            result = await _designsApiClient.UploadDesignAsync(_saveDesignModel.Name, designFile);
+            _saveFormMessage = string.Format(SaveMessage, result.Name);
+        }
+        catch
+        {
+            _saveFormMessage = ErrorMessage;
+        }
+    }
+
+    private void HandleSaveDesignInvalidSubmit()
+    {
+        _saveFormMessage = "";
+    }
+
+    private void OpenColorPicker()
+    {
+        if(_designViewer.SelectedElement != null)
+            colorPickerOpened = true;
+    }
+
+    private void CloseColorPicker(string colorPickerValue)
+    {
+        if(_designViewer.SelectedElement != null)
+            _designViewer.ChangeSelectedElementColor(colorPickerValue);
+
+        colorPickerOpened = false;
+    }
+}

@@ -1,0 +1,20 @@
+
+// A Color is an abstract color.
+
+syntax = "proto3";
+
+package design.appearance.color;
+
+import "appearance/color/spot_color.proto";
+import "appearance/color/process_color.proto";
+
+option csharp_namespace = "Aurigma.Design.Appearance.Color";
+
+message Color
+{
+  oneof value
+  {
+    appearance.color.ProcessColor process = 1;
+    appearance.color.SpotColor spot = 2;
+  }
+}

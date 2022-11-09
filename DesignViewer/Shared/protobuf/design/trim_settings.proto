@@ -1,0 +1,16 @@
+
+// A TrimSettings is a part of Artboard that defines its shape and trim.
+
+syntax = "proto3";
+
+package design;
+
+import "math/sides.proto";
+
+option csharp_namespace = "Aurigma.Design";
+
+message TrimSettings
+{
+  math.Sides bleed = 1;
+  math.Sides slug = 2;
+}

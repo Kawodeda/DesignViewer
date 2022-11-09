@@ -1,0 +1,28 @@
+
+// A ClosedVector represents a closed vector element such as rectangle,
+// filled path, polygons etc. It is defined by control points, which 
+// define the type of a closed vector element, by fill property, which
+// represents the appearance of filled inner area of closed vector, and by
+// stroke property, which represents the appearance of its outline.
+
+syntax = "proto3";
+
+package design.content;
+
+import "content/controls/closed_vector_controls.proto";
+import "appearance/pen.proto";
+import "appearance/brush.proto";
+
+option csharp_namespace = "Aurigma.Design.Content";
+
+message ClosedVector
+{
+  // Contains closed vector's control points.
+  controls.ClosedVectorControls controls = 1;
+
+  // Defines the filling of the inner area of a closed vector.
+  appearance.Brush fill = 2;
+
+  // Defines closed vector outline appearance.
+  appearance.Pen stroke = 3;
+}

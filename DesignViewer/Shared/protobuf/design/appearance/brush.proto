@@ -1,0 +1,22 @@
+
+// A Brush is an abstract description of brush for filling closed vectors.
+
+syntax = "proto3";
+
+package design.appearance;
+
+import "appearance/solid_brush.proto";
+
+option csharp_namespace = "Aurigma.Design.Appearance";
+
+message Brush
+{
+  oneof Brush
+  {
+    appearance.SolidBrush solid = 1;
+    
+    // To be added:
+    // GradientBrush gradient = 2;
+    // ImageBrush image = 3;
+  };
+}

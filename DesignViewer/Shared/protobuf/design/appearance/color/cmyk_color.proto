@@ -1,0 +1,24 @@
+
+// A CmykColor represents a color in CMYK color space, i.e. it is encoded as
+// cyan, magenta, yellow and key components.
+
+syntax = "proto3";
+
+package design.appearance.color;
+
+option csharp_namespace = "Aurigma.Design.Appearance.Color";
+
+message CmykColor
+{
+  // Cyan component
+  uint32 c = 1;
+
+  // Magenta component
+  uint32 m = 2;
+
+  // Yellow component
+  uint32 y = 3;
+
+  // Key (or Black) component
+  uint32 k = 4;
+}

@@ -1,0 +1,15 @@
+
+// To be described
+
+syntax = "proto3";
+
+package design.content.controls;
+
+import "math/point.proto";
+
+option csharp_namespace = "Aurigma.Design.Content.Controls";
+
+message PathControls
+{
+  repeated math.Point controls = 1;
+}

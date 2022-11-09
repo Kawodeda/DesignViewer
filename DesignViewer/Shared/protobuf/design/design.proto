@@ -1,0 +1,17 @@
+
+// Design is a key entity of the entire model that represents the final
+// result of the user's effort. A Design by itself is the set of Surfaces
+// that contain Artboards and Layers that contain design elements.
+
+syntax = "proto3";
+
+package design;
+
+import "surface.proto";
+
+option csharp_namespace = "Aurigma.Design";
+
+message Design
+{
+  repeated Surface surfaces = 1;
+}

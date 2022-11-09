@@ -1,0 +1,19 @@
+
+// A Layer serves as a container for design elements that user can work with
+// at a time.
+
+syntax = "proto3";
+
+package design;
+
+import "element.proto";
+
+option csharp_namespace = "Aurigma.Design";
+
+message Layer
+{
+  string name = 1;
+
+  // Contains the elements located on a layer
+  repeated Element elements = 2;
+}
