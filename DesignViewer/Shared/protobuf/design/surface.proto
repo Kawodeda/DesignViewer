@@ -12,7 +12,7 @@ package design;
 import "artboard.proto";
 import "layer.proto";
 
-option csharp_namespace = "Aurigma.Design";
+option csharp_namespace = "Model.Design";
 
 message Surface
 {

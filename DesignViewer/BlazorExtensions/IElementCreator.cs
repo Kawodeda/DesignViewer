@@ -1,4 +1,4 @@
-﻿using Aurigma.Design;
+﻿using Model.Design;
 
 namespace BlazorExtensions
 {

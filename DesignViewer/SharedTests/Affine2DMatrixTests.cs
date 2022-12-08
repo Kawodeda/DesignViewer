@@ -1,5 +1,5 @@
 using System;
-using Aurigma.Design.Math;
+using Model.Design.Math;
 using NUnit.Framework;
 
 namespace SharedTests

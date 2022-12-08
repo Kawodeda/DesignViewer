@@ -11,7 +11,7 @@ package design.content;
 import "content/controls/opened_vector_controls.proto";
 import "appearance/pen.proto";
 
-option csharp_namespace = "Aurigma.Design.Content";
+option csharp_namespace = "Model.Design.Content";
 
 message OpenedVector
 {

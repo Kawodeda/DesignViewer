@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Aurigma.Design.Math
+﻿namespace Model.Design.Math
 {
     public sealed partial class Affine2DMatrix
     {

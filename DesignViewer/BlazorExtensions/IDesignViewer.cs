@@ -1,5 +1,5 @@
-﻿using Aurigma.Design;
-using Aurigma.Design.Math;
+﻿using Model.Design;
+using Model.Design.Math;
 
 namespace BlazorExtensions
 {

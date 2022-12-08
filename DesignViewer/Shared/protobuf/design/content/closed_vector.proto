@@ -13,7 +13,7 @@ import "content/controls/closed_vector_controls.proto";
 import "appearance/pen.proto";
 import "appearance/brush.proto";
 
-option csharp_namespace = "Aurigma.Design.Content";
+option csharp_namespace = "Model.Design.Content";
 
 message ClosedVector
 {

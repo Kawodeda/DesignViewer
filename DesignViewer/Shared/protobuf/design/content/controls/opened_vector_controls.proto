@@ -10,7 +10,7 @@ import "content/controls/line_controls.proto";
 import "content/controls/polyline_controls.proto";
 import "content/controls/path_controls.proto";
 
-option csharp_namespace = "Aurigma.Design.Content.Controls";
+option csharp_namespace = "Model.Design.Content.Controls";
 
 message OpenedVectorControls
 {

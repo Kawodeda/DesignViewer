@@ -5,7 +5,7 @@ syntax = "proto3";
 
 package design.content;
 
-option csharp_namespace = "Aurigma.Design.Content";
+option csharp_namespace = "Model.Design.Content";
 
 message Text
 {

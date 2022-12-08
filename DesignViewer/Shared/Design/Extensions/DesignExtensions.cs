@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Aurigma.Design.Appearance;
-using Aurigma.Design.Appearance.Color;
-using Aurigma.Design.Content;
-using Aurigma.Design.Content.Controls;
-using Aurigma.Design.Math;
+using Model.Design.Appearance;
+using Model.Design.Appearance.Color;
+using Model.Design.Content;
+using Model.Design.Content.Controls;
+using Model.Design.Math;
 
-namespace Aurigma.Design
+namespace Model.Design
 {
     public sealed partial class Design
     {

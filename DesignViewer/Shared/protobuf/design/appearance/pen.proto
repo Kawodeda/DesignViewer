@@ -8,7 +8,7 @@ package design.appearance;
 import "appearance/brush.proto";
 import "appearance/color/color.proto";
 
-option csharp_namespace = "Aurigma.Design.Appearance";
+option csharp_namespace = "Model.Design.Appearance";
 
 enum LineCap
 {

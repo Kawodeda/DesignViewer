@@ -1,6 +1,6 @@
-﻿using Aurigma.Design;
-using Aurigma.Design.Content.Controls;
-using Aurigma.Design.Math;
+﻿using Model.Design;
+using Model.Design.Content.Controls;
+using Model.Design.Math;
 using BlazorExtensions.Commands;
 using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;

@@ -1,23 +1,32 @@
 ﻿@page "/editor"
 @page "/editor/{DesignName}"
-@using Aurigma.Design
-@using Aurigma.Design.Math
-@using Aurigma.Design.Appearance
-@using Aurigma.Design.Content
-@using Aurigma.Design.Appearance.Color
-@using Aurigma.Design.Content.Controls
 @using ApiClient;
 @using BlazorColorPicker
 @using BlazorExtensions
 @using DesignViewer.Client.Models
 @using Google.Protobuf
+@using Model.Design
+@using Model.Design.Math
+@using Model.Design.Appearance
+@using Model.Design.Content
+@using Model.Design.Appearance.Color
+@using Model.Design.Content.Controls
 
 <PageTitle>Editor</PageTitle>
 
 <h1>Editor</h1>
 
-<button class="btn btn-primary" @onclick = "OpenColorPicker">Сhange color</button>
-<ColorPicker Title="ColorPicker" IsOpened="colorPickerOpened" Closed="CloseColorPicker"></ColorPicker>
+<div>
+    <button class="btn btn-light" style="margin: 5px 0" @onclick="OpenColorPicker">
+        <span class="oi oi-brush"></span>
+        Сhange color
+        </button>
+    <ColorPicker Title="ColorPicker" IsOpened="colorPickerOpened" Closed="CloseColorPicker"></ColorPicker>
+</div>
+
+<div>
+    <input type="color" @bind-value="HexColor">
+</div>
 
 <div style="width: 700px; height: 480px">
     <DesignViewer Width="700" Height="480" ArtboardScrollMargin="@(new Sides(150))" @ref="_designViewer"></DesignViewer>
@@ -48,12 +57,29 @@
     private SaveDesignModel _saveDesignModel = new();
     private bool colorPickerOpened = false;
 
-
     private const string ErrorMessage = "An error has occured";
     private const string SaveMessage = "File \"{0}\" has been successfully saved";
     private const string UpdateMessage = "File \"{0}\" has been successfully updated";
 
     private string _saveFormMessage = "";
+
+    private string _hexColor = "";
+
+    private string HexColor 
+    {
+        get 
+        {
+            return _hexColor;
+        }
+        set
+        {
+            _hexColor = value;
+            Console.WriteLine(_hexColor);
+
+            if (_designViewer.SelectedElement != null)
+                _designViewer.ChangeSelectedElementColor(_hexColor);
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

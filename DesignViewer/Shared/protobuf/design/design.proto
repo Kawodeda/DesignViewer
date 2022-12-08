@@ -9,7 +9,7 @@ package design;
 
 import "surface.proto";
 
-option csharp_namespace = "Aurigma.Design";
+option csharp_namespace = "Model.Design";
 
 message Design
 {

@@ -2,13 +2,13 @@
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using Aurigma.Design;
 using BlazorViewer.Server.Dtos;
 using BlazorViewer.Server.Exceptions;
 using BlazorViewer.Server.Options;
 using BlazorViewer.Server.Services;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
+using Model.Design;
 using Moq;
 using NUnit.Framework;
 

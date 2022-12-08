@@ -7,7 +7,7 @@ package design.appearance;
 
 import "appearance/solid_brush.proto";
 
-option csharp_namespace = "Aurigma.Design.Appearance";
+option csharp_namespace = "Model.Design.Appearance";
 
 message Brush
 {

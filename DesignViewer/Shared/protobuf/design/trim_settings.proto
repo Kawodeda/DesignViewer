@@ -7,7 +7,7 @@ package design;
 
 import "math/sides.proto";
 
-option csharp_namespace = "Aurigma.Design";
+option csharp_namespace = "Model.Design";
 
 message TrimSettings
 {

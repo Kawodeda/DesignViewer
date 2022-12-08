@@ -1,11 +1,4 @@
-﻿using Aurigma.Design;
-using Aurigma.Design.Appearance;
-using Aurigma.Design.Appearance.Color;
-using Aurigma.Design.Content;
-using Aurigma.Design.Content.Controls;
-using Aurigma.Design.Math;
-using Google.Protobuf;
-using ApiClient;
+﻿using ApiClient;
 
 namespace DesignUsageExample
 {

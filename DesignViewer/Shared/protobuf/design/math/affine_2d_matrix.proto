@@ -19,7 +19,7 @@ syntax = "proto3";
 
 package design.math;
 
-option csharp_namespace = "Aurigma.Design.Math";
+option csharp_namespace = "Model.Design.Math";
 
 message Affine2DMatrix
 {

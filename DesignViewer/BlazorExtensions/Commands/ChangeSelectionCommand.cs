@@ -1,5 +1,5 @@
-﻿using Aurigma.Design;
-using BlazorExtensions.Commands.Context;
+﻿using BlazorExtensions.Commands.Context;
+using Model.Design;
 
 namespace BlazorExtensions.Commands
 {

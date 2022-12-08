@@ -1,4 +1,4 @@
-﻿namespace Aurigma.Design.Math
+﻿namespace Model.Design.Math
 {
     public static class FloatExtensions
     {

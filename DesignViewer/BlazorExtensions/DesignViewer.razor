@@ -1,12 +1,13 @@
-﻿@using Aurigma.Design
-@using Aurigma.Design.Math
-@using Blazor.Extensions
+﻿@using Blazor.Extensions
 @using Blazor.Extensions.Canvas
 @using Blazor.Extensions.Canvas.Canvas2D
-@using BlazorExtensions.Commands;
-@using BlazorExtensions.Commands.Context;
-@using BlazorExtensions.InputHandling;
-@using BlazorExtensions.Viewports;
+@using BlazorExtensions.Commands
+@using BlazorExtensions.Commands.Context
+@using BlazorExtensions.InputHandling
+@using BlazorExtensions.Rendering
+@using BlazorExtensions.Viewports
+@using Model.Design
+@using Model.Design.Math
 @inject IJSRuntime JsRuntime
 @implements IDesignViewer
 
@@ -39,7 +40,7 @@
     private Canvas2DContext _uiCanvasContext;
     private IJSObjectReference _module;
     private DotNetObjectReference<DesignViewer> _instanceRef;
-    private Renderer _renderer;
+    private IDesignRenderer _renderer;
     private IInputHandlingBuilder _inputHandler;
     private IViewport _viewport;
 
@@ -112,11 +113,6 @@
             _design = value;
             Viewport.ContentSize = CurrentArtboard.ActualSize;
 
-            if(_renderer != null)
-            {
-                _renderer.SetDesign(_design);
-            }
-
             RequestRendering();
         }
     }
@@ -160,8 +156,7 @@
             _outputCanvasContext = await _canvasReference.CreateCanvas2DAsync();
             _uiCanvasContext = await _uiCanvasReference.CreateCanvas2DAsync();
 
-            _renderer = new Renderer(_outputCanvasContext, _design, _currentSurfaceIndex);
-            _renderer.SetDesign(_design);
+            _renderer = new DesignRenderer(_outputCanvasContext);
 
             _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/BlazorExtensions/DesignViewer.razor.js");
@@ -278,9 +273,12 @@
         await _outputCanvasContext.SetFillStyleAsync("lightgray");
         await _outputCanvasContext.FillRectAsync(0, 0, size.Width, size.Height);    
 
-        await _renderer.Render();     //отрисовываем дизайн
-        
-        await _renderer.RenderSelection(SelectedElement);  //отрисовка выделения для выбранного элемента
+        await _renderer.Render(CurrentSurface);
+
+        if(SelectedElement != null)
+        {
+            await _renderer.RenderSelection(SelectedElement);
+        }
     }
 
     private async Task RedrawUiCanvasAsync(float timeStamp)
@@ -351,12 +349,9 @@
     public void ChangeSelectedElementColor(string value)
     {
         System.Drawing.Color color = System.Drawing.ColorTranslator.FromHtml(value);
-        int r = Convert.ToInt16(color.R);
-        int g = Convert.ToInt16(color.G);
-        int b = Convert.ToInt16(color.B);
 
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.R = (uint)r;
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.G = (uint)g;
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.B = (uint)b;
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.R = (uint)color.R;
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.G = (uint)color.G;
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.B = (uint)color.B;
     }
 }

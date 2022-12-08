@@ -8,7 +8,7 @@ package design;
 
 import "element.proto";
 
-option csharp_namespace = "Aurigma.Design";
+option csharp_namespace = "Model.Design";
 
 message Layer
 {

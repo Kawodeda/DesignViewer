@@ -9,7 +9,7 @@ package design.content.controls;
 import "content/controls/rectangle_controls.proto";
 import "content/controls/path_controls.proto";
 
-option csharp_namespace = "Aurigma.Design.Content.Controls";
+option csharp_namespace = "Model.Design.Content.Controls";
 
 message ClosedVectorControls
 {

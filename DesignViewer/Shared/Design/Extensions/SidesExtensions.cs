@@ -1,5 +1,5 @@
 ﻿
-namespace Aurigma.Design.Math
+namespace Model.Design.Math
 {
     public partial class Sides
     {

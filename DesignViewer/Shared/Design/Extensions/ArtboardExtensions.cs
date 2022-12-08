@@ -1,6 +1,6 @@
-﻿using Aurigma.Design.Math;
+﻿using Model.Design.Math;
 
-namespace Aurigma.Design
+namespace Model.Design
 {
     public sealed partial class Artboard
     {

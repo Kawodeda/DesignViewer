@@ -11,7 +11,7 @@ import "math/affine_2d_matrix.proto";
 import "math/size.proto";
 import "trim_settings.proto";
 
-option csharp_namespace = "Aurigma.Design";
+option csharp_namespace = "Model.Design";
 
 message Artboard
 {

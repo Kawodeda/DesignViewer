@@ -1,4 +1,4 @@
-﻿using Aurigma.Design.Math;
+﻿using Model.Design.Math;
 
 namespace BlazorExtensions.Viewports
 {
