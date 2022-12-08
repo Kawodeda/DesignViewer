@@ -302,7 +302,7 @@
         await _uiCanvasContext.SetFontAsync("10px verdana");
         var selected = SelectedElement?.Content.ClosedVector.Controls.ControlsCase;
         await _uiCanvasContext.FillTextAsync($"SelectedElement: {selected}", 5, 10);
-        
+
         await _uiCanvasContext.FillTextAsync($"scrollX: {Viewport.ScrollX.ToString("N2")}", Width - 80, 10);
         await _uiCanvasContext.FillTextAsync($"scrollY: {Viewport.ScrollY.ToString("N2")}", Width - 80, 30);
         await _uiCanvasContext.FillTextAsync($"zoom: {Viewport.Zoom.ToString("N2")}", Width - 80, 50);   
@@ -348,10 +348,6 @@
 
     public void ChangeSelectedElementColor(string value)
     {
-        System.Drawing.Color color = System.Drawing.ColorTranslator.FromHtml(value);
-
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.R = (uint)color.R;
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.G = (uint)color.G;
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color.Process.Rgb.B = (uint)color.B;
+        SelectedElement.Content.ClosedVector.Fill.Solid.Color = ColorConverter.FromHtml(value);
     }
 }

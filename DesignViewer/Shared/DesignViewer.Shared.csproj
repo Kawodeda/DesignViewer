@@ -18,8 +18,4 @@
   <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
     
   </Target>
-
-  <Target Name="PreBuild" BeforeTargets="PreBuildEvent">
-    <Exec Command="call $(MSBuildProjectDirectory)\protobuf\generate_cs_files.bat" />
-  </Target>
 </Project>

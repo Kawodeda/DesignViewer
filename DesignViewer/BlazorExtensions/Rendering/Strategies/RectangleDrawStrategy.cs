@@ -20,7 +20,7 @@ namespace BlazorExtensions.Rendering.Strategies
             RgbColor color = _element.Content.ClosedVector.Fill.Solid.Color.Process.Rgb;
             uint alpha = _element.Content.ClosedVector.Fill.Solid.Color.Process.Alpha;
 
-            await context.SetFillStyleAsync(WebColorConverter.ToWebColor(color, alpha));
+            await context.SetFillStyleAsync(ColorConverter.ToHtml(color, alpha));
             await context.FillRectAsync(x, y, width, height);
         }
     }
