@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using Model.Design.Appearance.Color;
 using NUnit.Framework;
 using Color = Model.Design.Appearance.Color.Color;
@@ -135,6 +134,13 @@ namespace SharedTests
             "cmyk(10%,60%,99%,0%)",
             "rgba(11, 22, 33)"
         };
+        private static readonly IReadOnlyList<object> _toHexCases = new List<object>()
+        {
+            new RgbColor() { R = 255, G = 200, B = 100 },
+            new RgbColor() { R = 0, G = 0, B = 1 },
+            new RgbColor() { R = 0, G = 255, B = 0 },
+            new RgbColor() { R = 111, G = 1, B = 198 }
+        };
 
         [Test]
         [TestCaseSource(nameof(_toGdiCases))]
@@ -215,6 +221,16 @@ namespace SharedTests
         public void When_PassIncorrectStringIntoFromHtml_Expect_NotSupportedExceptionIsThrown(string htmlColor)
         {
             Assert.Throws<NotSupportedException>(() => ColorConverter.FromHtml(htmlColor));
+        }
+
+        [Test]
+        [TestCaseSource(nameof(_toHexCases))]
+        public void For_ToHex_Expect_ResultIsCorrespondingHexColor(RgbColor rgb)
+        {
+            string expected = $"#{rgb.R:x2}{rgb.G:x2}{rgb.B:x2}";
+            string actual = ColorConverter.ToHex(rgb);
+
+            Assert.AreEqual(expected, actual);
         }
     }
 }

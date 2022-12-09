@@ -65,6 +65,11 @@ namespace Model.Design
             return entry.Value(entry.Key.Match(htmlColor));
         }
 
+        public static string ToHex(RgbColor rgb)
+        {
+            return $"#{rgb.R:x2}{rgb.G:x2}{rgb.B:x2}";
+        }
+
         private static Color ParseHex(Match hexMatch)
         {
             var color = ColorTranslator.FromHtml(hexMatch.Value);
