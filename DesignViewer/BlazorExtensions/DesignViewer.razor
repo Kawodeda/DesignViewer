@@ -44,6 +44,8 @@
     private IInputHandlingBuilder _inputHandler;
     private IViewport _viewport;
 
+    private Element? _selectedElement;
+
     [Parameter]
     public long Width { get; set; } = 256;
 
@@ -52,6 +54,9 @@
 
     [Parameter]
     public Sides ArtboardScrollMargin { get; set; } = new Sides(0f);
+
+    [Parameter]
+    public EventCallback<Element?> SelectedElementChanged { get; set; }
 
     public IViewport Viewport
     {
@@ -83,7 +88,18 @@
         }
     }
 
-    public Element? SelectedElement { get; set; }
+    public Element? SelectedElement 
+    { 
+        get
+        {
+            return _selectedElement;
+        }
+        set
+        {
+            _selectedElement = value;
+            SelectedElementChanged.InvokeAsync(_selectedElement);
+        }
+    }
 
     public Affine2DMatrix Transform
     {
