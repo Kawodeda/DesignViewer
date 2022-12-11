@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using Model.Design.Appearance.Color;
 using NUnit.Framework;
 using Color = Model.Design.Appearance.Color.Color;
@@ -126,6 +127,18 @@ namespace SharedTests
                     }
                 }
             },
+            new object[]
+            {
+                "rgba(100,255,9, 0)",
+                new Color()
+                {
+                    Process = new ProcessColor()
+                    {
+                        Rgb = new RgbColor() { R = 100, G = 255, B = 9 },
+                        Alpha = 0
+                    }
+                }
+            },
         };
         private static readonly IReadOnlyList<object> _fromHtmlIncorrectCases = new List<object>()
         {
@@ -188,9 +201,12 @@ namespace SharedTests
         [TestCaseSource(nameof(_toHtmlCases))]
         public void For_ToHtml_Expect_ResultIsCorrespondingHtmlColor(RgbColor rgb, uint alpha)
         {
+            var format = new NumberFormatInfo();
+            format.NumberDecimalSeparator = ".";
+
             string expected = alpha >= 255
                 ? $"rgb({rgb.R},{rgb.G},{rgb.B})"
-                : $"rgba({rgb.R},{rgb.G},{rgb.B},{alpha / 255})";
+                : $"rgba({rgb.R},{rgb.G},{rgb.B},{(alpha / 255f).ToString(format)})";
 
             string actual = ColorConverter.ToHtml(rgb, alpha);
 

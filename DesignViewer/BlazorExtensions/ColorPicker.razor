@@ -1,0 +1,87 @@
+﻿@using Model.Design.Appearance.Color;
+@using Model.Design;
+
+<div class="container" style="width: @(Width)px">
+    <div class="color-container">
+        <input class="input-color" style="--color-opacity: @_opacity" type="color" value="@_hexColor" @oninput="OnColorInputChanged">
+    </div>
+    <div class="alpha-container">
+        <input class="input-alpha" type="range" value="@Alpha" min="0" max="255" @oninput="OnAlphaInputChanged">
+    </div>
+</div>
+
+@code {
+    private const string DefaultHexColor = "#000000";
+    private const uint DefaultAlpha = 255;
+
+    private string _hexColor = DefaultHexColor;
+    private string _opacity = ColorUtils.AlphaToRelativeString(DefaultAlpha);
+    private uint _alpha = DefaultAlpha;
+    private Color _color = ColorConverter.FromHtml(DefaultHexColor);
+
+    [Parameter]
+    public Color Color 
+    { 
+        get
+        {
+            return _color;
+        }
+        set
+        {
+            _color = value;
+            if (_color == null)
+            {
+                _hexColor = DefaultHexColor;
+                Alpha = DefaultAlpha;
+
+                return;
+            }
+
+            _hexColor = ColorConverter.ToHex(_color.Process.Rgb);
+            Alpha = _color.Process.Alpha;
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Color> ColorChanged { get; set; }
+
+    [Parameter]
+    public int Width { get; set; }
+
+    private uint Alpha
+    {
+        get
+        {
+            return _alpha;
+        }
+        set
+        {
+            _alpha = value;
+            _opacity = ColorUtils.AlphaToRelativeString(_alpha);
+        }
+    }
+
+    private async Task OnColorInputChanged(ChangeEventArgs e)
+    {
+        _hexColor = e.Value?.ToString() ?? DefaultHexColor;
+
+        await UpdateColor();
+    }
+
+    private async Task OnAlphaInputChanged(ChangeEventArgs e)
+    {
+        Alpha = e.Value == null
+            ? DefaultAlpha 
+            : Convert.ToUInt32(e.Value?.ToString());
+
+        await UpdateColor();
+    }
+
+    private async Task UpdateColor()
+    {
+        _color = ColorConverter.FromHtml(_hexColor);
+        _color.Process.Alpha = Alpha;
+
+        await ColorChanged.InvokeAsync(_color);
+    }
+}

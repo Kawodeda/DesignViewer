@@ -6,10 +6,7 @@ namespace BlazorExtensions.Rendering.Strategies
 {
     internal class RectangleDrawStrategy : BaseElementDrawStrategy
     {
-        public RectangleDrawStrategy(Element element) : base(element)
-        {
-
-        }
+        public RectangleDrawStrategy(Element element) : base(element) { }
 
         public override async Task Draw(Canvas2DContext context)
         {

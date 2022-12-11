@@ -1,7 +1,4 @@
-﻿using BlazorExtensions.Commands;
-using Microsoft.AspNetCore.Components.Web;
-
-namespace BlazorExtensions.InputHandling
+﻿namespace BlazorExtensions.InputHandling
 {
     public class DesignViewerInputHandler : InputHandlerBase, IInputHandlingBuilder
     {

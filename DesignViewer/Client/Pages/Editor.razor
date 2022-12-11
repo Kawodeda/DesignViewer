@@ -1,7 +1,6 @@
 ﻿@page "/editor"
 @page "/editor/{DesignName}"
-@using ApiClient;
-@using BlazorColorPicker
+@using ApiClient
 @using BlazorExtensions
 @using DesignViewer.Client.Models
 @using Google.Protobuf
@@ -16,20 +15,17 @@
 
 <h1>Editor</h1>
 
-<div>
-    <button class="btn btn-light" style="margin: 5px 0" @onclick="OpenColorPicker">
-        <span class="oi oi-brush"></span>
-        Сhange color
-        </button>
-    <ColorPicker Title="ColorPicker" IsOpened="colorPickerOpened" Closed="CloseColorPicker"></ColorPicker>
-</div>
-
-<div>
-    <input type="color" @bind-value="HexColor">
+<div style="margin-bottom: 5px">
+    <ColorPicker Width="300" @bind-Color="Color"></ColorPicker>
 </div>
 
 <div style="width: 700px; height: 480px">
-    <DesignViewer Width="700" Height="480" ArtboardScrollMargin="@(new Sides(150))" @ref="_designViewer"></DesignViewer>
+    <DesignViewer 
+        Width="700" 
+        Height="480" 
+        ArtboardScrollMargin="@(new Sides(150))"
+        SelectedElementChanged="OnSelectedElementChanged"
+        @ref="_designViewer"></DesignViewer>
 </div>
 
 <EditForm Model="@_saveDesignModel" 
@@ -38,7 +34,7 @@
     style="margin: 1em">
     <InputText @bind-Value="_saveDesignModel.Name"/>
 
-    <button type="submit">Save</button>
+    <button class="btn btn-light" type="submit">Save</button>
 
     <DataAnnotationsValidator/>
     <ValidationSummary/>
@@ -63,22 +59,31 @@
 
     private string _saveFormMessage = "";
 
-    private string _hexColor = "";
+    private Color _color;
 
-    private string HexColor 
+    private Color Color
     {
         get 
         {
-            return _hexColor;
+            return _color;
         }
         set
         {
-            _hexColor = value;
-            Console.WriteLine(_hexColor);
+            _color = value;
 
             if (_designViewer.SelectedElement != null)
-                _designViewer.ChangeSelectedElementColor(_hexColor);
+                _designViewer.ChangeSelectedElementColor(ColorConverter.ToHtml(_color.Process.Rgb, _color.Process.Alpha));
         }
+    }
+
+    private void OnSelectedElementChanged(Element? element)
+    {
+        if(element == null || element.Content.ElementContentCase != ElementContent.ElementContentOneofCase.ClosedVector)
+        {
+            return;
+        }
+
+        Color = element.Content.ClosedVector.Fill.Solid.Color;
     }
 
     protected override async Task OnInitializedAsync()
@@ -157,19 +162,5 @@
     private void HandleSaveDesignInvalidSubmit()
     {
         _saveFormMessage = "";
-    }
-
-    private void OpenColorPicker()
-    {
-        if(_designViewer.SelectedElement != null)
-            colorPickerOpened = true;
-    }
-
-    private void CloseColorPicker(string colorPickerValue)
-    {
-        if(_designViewer.SelectedElement != null)
-            _designViewer.ChangeSelectedElementColor(colorPickerValue);
-
-        colorPickerOpened = false;
     }
 }

@@ -11,7 +11,7 @@ namespace Model.Design
         private static readonly string _htmlRgbTemplate = "rgb({0},{1},{2})";
         private static readonly string _htmlRgbaTemplate = "rgba({0},{1},{2},{3})";
         private static readonly Regex _rgbRegex = new Regex("rgb\\((\\d{1,3}),\\s*(\\d{1,3}),\\s*(\\d{1,3})\\)");
-        private static readonly Regex _rgbaRegex = new Regex("rgba\\((\\d{1,3}),\\s*(\\d{1,3}),\\s*(\\d{1,3}),\\s*([01]\\.\\d+)\\)");
+        private static readonly Regex _rgbaRegex = new Regex("rgba\\((\\d{1,3}),\\s*(\\d{1,3}),\\s*(\\d{1,3}),\\s*([01](\\.\\d+)?)\\)");
         private static readonly Regex _hexRegex = new Regex("#(?:[a-f]|\\d){6}");
 
         private static readonly IReadOnlyDictionary<Regex, Func<Match, Color>> _parsers
@@ -51,7 +51,7 @@ namespace Model.Design
                 return string.Format(_htmlRgbTemplate, rgb.R, rgb.G, rgb.B);
             }
 
-            return string.Format(_htmlRgbaTemplate, rgb.R, rgb.G, rgb.B, alpha / 255);
+            return string.Format(_htmlRgbaTemplate, rgb.R, rgb.G, rgb.B, ColorUtils.AlphaToRelativeString(alpha));
         }
 
         public static Color FromHtml(string htmlColor)
@@ -59,7 +59,7 @@ namespace Model.Design
             var entry = _parsers.FirstOrDefault(entry => entry.Key.IsMatch(htmlColor));
             if (entry.Equals(default(KeyValuePair<Regex, Func<Match, Color>>)))
             {
-                throw new NotSupportedException($"Couldn't parse given color: ${htmlColor}");
+                throw new NotSupportedException($"Couldn't parse given color: {htmlColor}");
             }
 
             return entry.Value(entry.Key.Match(htmlColor));
