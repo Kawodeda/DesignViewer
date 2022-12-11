@@ -1,6 +1,8 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
 using Model.Design;
 using Model.Design.Appearance.Color;
+using Model.Design.Content.Controls;
+using Model.Design.Math;
 
 namespace BlazorExtensions.Rendering.Strategies
 {
@@ -10,14 +12,17 @@ namespace BlazorExtensions.Rendering.Strategies
 
         public override async Task Draw(Canvas2DContext context)
         {
-            float x = _element.Position.X + _element.Content.ClosedVector.Controls.Rectangle.Corner1.X;
-            float y = _element.Position.Y + _element.Content.ClosedVector.Controls.Rectangle.Corner1.Y;
-            float width = _element.Content.ClosedVector.Controls.Rectangle.Corner2.X - _element.Content.ClosedVector.Controls.Rectangle.Corner1.X;
-            float height = _element.Content.ClosedVector.Controls.Rectangle.Corner2.Y - _element.Content.ClosedVector.Controls.Rectangle.Corner1.Y;
-            RgbColor color = _element.Content.ClosedVector.Fill.Solid.Color.Process.Rgb;
-            uint alpha = _element.Content.ClosedVector.Fill.Solid.Color.Process.Alpha;
+            RectangleControls rectangle = _element.Content.ClosedVector.Controls.Rectangle;
+            ProcessColor fillColor = _element.Content.ClosedVector.Fill.Solid.Color.Process;
+            Point position = _element.Position.Clone();
+            float x = position.X + rectangle.Corner1.X;
+            float y = position.Y + rectangle.Corner1.Y;
+            float width = rectangle.Width;
+            float height = rectangle.Height;
+            RgbColor rgb = fillColor.Rgb;
+            uint alpha = fillColor.Alpha;
 
-            await context.SetFillStyleAsync(ColorConverter.ToHtml(color, alpha));
+            await context.SetFillStyleAsync(ColorConverter.ToHtml(rgb, alpha));
             await context.FillRectAsync(x, y, width, height);
         }
     }

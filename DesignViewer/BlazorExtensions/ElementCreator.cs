@@ -9,25 +9,31 @@ namespace BlazorExtensions
 {
     public class ElementCreator : IElementCreator
     {
-        private readonly Brush Lavender = new Brush()
+        private Brush Lavender
         {
-            Solid = new SolidBrush()
+            get
             {
-                Color = new Color()
+                return new Brush()
                 {
-                    Process = new ProcessColor()
+                    Solid = new SolidBrush()
                     {
-                        Alpha = 255,
-                        Rgb = new RgbColor()
+                        Color = new Color()
                         {
-                            R = 230,
-                            G = 230,
-                            B = 250
+                            Process = new ProcessColor()
+                            {
+                                Alpha = 255,
+                                Rgb = new RgbColor()
+                                {
+                                    R = 230,
+                                    G = 230,
+                                    B = 250
+                                }
+                            }
                         }
                     }
-                }
+                };
             }
-        };
+        }
 
         private Random _random = new Random();
 

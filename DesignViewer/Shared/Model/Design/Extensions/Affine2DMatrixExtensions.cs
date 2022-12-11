@@ -185,6 +185,32 @@
                 && D2.NearlyEquals(other.D2, epsilon);
         }
 
+        public float Rotation
+        {
+            get
+            {
+                return MathF.Atan2(M21, M11);
+            }
+        }
+
+        public Point ScaleFactor
+        {
+            get
+            {
+                return new Point(
+                    MathF.Sqrt(M11 * M11 + M21 * M21),
+                    MathF.Sqrt(M12 * M12 + M22 * M22));
+            }
+        }
+
+        public Affine2DMatrix RotationMatrix
+        {
+            get
+            {
+                return CreateIdentity().Rotate(Rotation);
+            }
+        }
+
         // Makes a matrix the identity matrix when the parameterless
         // constructor is called
         partial void OnConstruction()

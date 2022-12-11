@@ -91,11 +91,9 @@ namespace BlazorExtensions.InputHandling
                     transform.D2 = 0f;
 
                     var elementTransform = _designViewer.SelectedElement.Transform;
-                    elementTransform.D1 = 0f;
-                    elementTransform.D2 = 0f;
 
                     var shift = new Point(
-                        mouse.X - _prevMouseX, 
+                        mouse.X - _prevMouseX,
                         mouse.Y - _prevMouseY)
                         * transform.Inverse()
                         * elementTransform;
@@ -171,7 +169,7 @@ namespace BlazorExtensions.InputHandling
         {
             _state = DesignState.Default;
             Element element = _elementCreator.CreateRandomRectangle();
-            element.Position = ViewportToSurface(mouse, element);
+            element.Position = ViewportToSurface(mouse, element) - element.Center;
             _capturedElement = element;
             StartTranslate(mouse);
 
@@ -210,7 +208,7 @@ namespace BlazorExtensions.InputHandling
             var elementTransform = element.Transform;
             elementTransform.D1 = 0f;
             elementTransform.D2 = 0f;
-
+            
             return inViewport 
                 * transform.Inverse() 
                 * elementTransform;
