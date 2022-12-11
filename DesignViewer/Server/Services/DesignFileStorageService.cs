@@ -8,17 +8,17 @@ namespace BlazorViewer.Server.Services
 {
     public class DesignFileStorageService : IDesignStorageService
     {
-        private readonly FileStorageOptions _options;
+        private readonly DesignsStorageOptions _options;
         private readonly INameGeneratorService _nameGeneratorService;
         private readonly IFileSystem _fileSystem;
 
         public DesignFileStorageService(
-            IOptions<FileStorageOptions> options,
+            IOptions<DesignsStorageOptions> options,
             INameGeneratorService nameGeneratorService) 
             : this(options, nameGeneratorService, new FileSystem()) {}
 
         public DesignFileStorageService(
-            IOptions<FileStorageOptions> options,
+            IOptions<DesignsStorageOptions> options,
             INameGeneratorService nameGeneratorService,
             IFileSystem fileSystem)
         {

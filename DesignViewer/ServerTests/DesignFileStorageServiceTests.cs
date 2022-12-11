@@ -18,14 +18,14 @@ namespace ServerTests
     {
         private const string DefaultFilename = "design";
 
-        private FileStorageOptions _options;
-        private IOptions<FileStorageOptions> _wrappedOptions;
+        private DesignsStorageOptions _options;
+        private IOptions<DesignsStorageOptions> _wrappedOptions;
         private INameGeneratorService _nameGeneratorService;
 
         [SetUp]
         public void Init()
         {
-            _options = new FileStorageOptions
+            _options = new DesignsStorageOptions
             {
                 Path = "Storage/Designs",
                 FileExtension = ".dat"
