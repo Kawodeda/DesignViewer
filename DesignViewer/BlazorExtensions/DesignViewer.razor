@@ -10,6 +10,7 @@
 @using Model.Design.Appearance.Color
 @using Model.Design.Math
 @inject IJSRuntime JsRuntime
+@inject IDesignRenderer _renderer
 @implements IDesignViewer
 
 <div style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
@@ -40,7 +41,6 @@
     private Canvas2DContext _uiCanvasContext;
     private IJSObjectReference _module;
     private DotNetObjectReference<DesignViewer> _instanceRef;
-    private IDesignRenderer _renderer;
     private IInputHandlingBuilder _inputHandler;
     private IViewport _viewport;
 
@@ -189,7 +189,7 @@
             _outputCanvasContext = await _canvasReference.CreateCanvas2DAsync();
             _uiCanvasContext = await _uiCanvasReference.CreateCanvas2DAsync();
 
-            _renderer = new DesignRenderer(_outputCanvasContext);
+            _renderer.Context = _outputCanvasContext;
 
             _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/BlazorExtensions/DesignViewer.razor.js");

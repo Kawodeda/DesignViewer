@@ -1,6 +1,5 @@
 using BlazorViewer.Server.Services;
 using BlazorViewer.Server.Options;
-using Microsoft.AspNetCore.ResponseCompression;
 using DesignViewer.Server.Options;
 
 var builder = WebApplication.CreateBuilder(args);

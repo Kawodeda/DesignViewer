@@ -1,4 +1,5 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
+using Microsoft.AspNetCore.Components;
 using Model.Design;
 using Model.Design.Appearance.Color;
 using Model.Design.Content.Controls;

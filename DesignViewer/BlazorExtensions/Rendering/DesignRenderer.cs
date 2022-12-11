@@ -1,20 +1,37 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
+using BlazorExtensions.Rendering.Exceptions;
+using Microsoft.JSInterop;
 using Model.Design;
 using Model.Design.Math;
+using System.Reflection;
 
 namespace BlazorExtensions.Rendering
 {
     public class DesignRenderer : IDesignRenderer
     {
-        private readonly Canvas2DContext _context;
+        private const string ContextNotSetMessage = "Rendering context was not set";
 
-        public DesignRenderer(Canvas2DContext context)
+        private Canvas2DContext? _context;
+
+        public Canvas2DContext? Context
         {
-            _context = context;
+            get
+            {
+                return _context;
+            }
+            set
+            {
+                _context = value;
+            }
         }
 
         public async Task Render(Surface surface)
         {
+            if (_context == null)
+            {
+                throw new ContextNotSetException(ContextNotSetMessage);
+            }
+
             foreach (var layer in surface.Layers)
             {
                 foreach (Element element in layer.Elements)
@@ -37,6 +54,11 @@ namespace BlazorExtensions.Rendering
 
         public async Task RenderSelection(Element element)
         {
+            if (_context == null)
+            {
+                throw new ContextNotSetException(ContextNotSetMessage);
+            }
+
             await _context.SaveAsync();
             Affine2DMatrix transform = element.Transform;
 
