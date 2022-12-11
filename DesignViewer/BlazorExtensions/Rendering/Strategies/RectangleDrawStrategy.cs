@@ -6,10 +6,7 @@ namespace BlazorExtensions.Rendering.Strategies
 {
     internal class RectangleDrawStrategy : BaseElementDrawStrategy
     {
-        public RectangleDrawStrategy(Element element) : base(element)
-        {
-
-        }
+        public RectangleDrawStrategy(Element element) : base(element) { }
 
         public override async Task Draw(Canvas2DContext context)
         {
@@ -20,7 +17,7 @@ namespace BlazorExtensions.Rendering.Strategies
             RgbColor color = _element.Content.ClosedVector.Fill.Solid.Color.Process.Rgb;
             uint alpha = _element.Content.ClosedVector.Fill.Solid.Color.Process.Alpha;
 
-            await context.SetFillStyleAsync(WebColorConverter.ToWebColor(color, alpha));
+            await context.SetFillStyleAsync(ColorConverter.ToHtml(color, alpha));
             await context.FillRectAsync(x, y, width, height);
         }
     }

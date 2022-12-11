@@ -14,7 +14,7 @@ namespace BlazorExtensions.Rendering.Strategies
 
         protected BaseElementDrawStrategy(Element element)
         {
-            this._element = element;
+            _element = element;
         }
 
         public abstract Task Draw(Canvas2DContext context);
