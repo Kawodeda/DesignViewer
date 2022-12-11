@@ -25,11 +25,6 @@ namespace BlazorExtensions.InputHandling
             }
         }
 
-        public virtual ICommand OnClick(MouseEventArgs e)
-        {
-            return HandleByDefault(() => Next?.OnClick(e));
-        }
-
         public virtual ICommand OnMouseDown(MouseEventArgs e)
         {
             return HandleByDefault(() => Next?.OnMouseDown(e));

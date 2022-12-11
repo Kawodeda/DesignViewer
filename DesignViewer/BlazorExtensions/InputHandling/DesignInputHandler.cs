@@ -4,6 +4,8 @@ using Model.Design.Math;
 using BlazorExtensions.Commands;
 using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;
+using System.Xml.Linq;
+using System.Threading;
 
 namespace BlazorExtensions.InputHandling
 {
@@ -12,6 +14,13 @@ namespace BlazorExtensions.InputHandling
         Default = 0,
         Translate = 1,
         ElementPlacing = 2
+    }
+
+    public enum MouseButton
+    {
+        Left = 0,
+        Middle = 1,
+        Right = 2
     }
 
     public class DesignInputHandler : InputHandlerBase
@@ -23,6 +32,7 @@ namespace BlazorExtensions.InputHandling
         private IElementCreator _elementCreator = new ElementCreator();
         private float _prevMouseX;
         private float _prevMouseY;
+        private Element? _capturedElement;
 
         public DesignInputHandler(IDesignViewer designViewer)
         {
@@ -30,59 +40,44 @@ namespace BlazorExtensions.InputHandling
             _state = DesignState.Default;
         }
 
-        public override ICommand OnClick(MouseEventArgs e)
-        {
-            if (e.Button == 0)
-            {
-                float mouseX = (float)e.OffsetX;
-                float mouseY = (float)e.OffsetY;
-                var mouse = new Point(mouseX, mouseY);
-
-                Element? element = _designViewer.CurrentSurface.Layers
-                    .SelectMany(x => x.Elements)
-                    .FirstOrDefault(x => IsWithinElement(x, mouse));
-
-                if (element != _designViewer.SelectedElement)
-                {
-                    return new ChangeSelectionCommand(element);
-                }
-            }
-
-            return base.OnClick(e);
-        }
-
         public override ICommand OnMouseDown(MouseEventArgs e)
         {
-            float mouseX = (float)e.OffsetX;
-            float mouseY = (float)e.OffsetY;
-            var mouse = new Point(mouseX, mouseY);
+            var mouse = new Point((float)e.OffsetX, (float)e.OffsetY);
 
             if (_state == DesignState.ElementPlacing)
             {
-                _state = DesignState.Default;
-                Element element = _elementCreator.CreateRandomRectangle();
-                element.Position = ViewportToSurface(mouse, element);
-                return new AddElementCommand(element);
+                return HandleElementPlacing(mouse);
             }
+
+            Element? element = _designViewer.CurrentSurface.Layers
+                    .SelectMany(x => x.Elements)
+                    .Reverse()
+                    .FirstOrDefault(x => IsWithinElement(x, mouse));
+
+            if (element != _designViewer.SelectedElement)
+            {
+                _capturedElement = element;
+            }
+
             if (_designViewer.SelectedElement == null)
             {
                 return base.OnMouseDown(e);
             }
-            if (IsWithinElement(_designViewer.SelectedElement, mouse)
-                == false)
+            if (!IsWithinElement(_designViewer.SelectedElement, mouse) 
+                || _capturedElement != _designViewer.SelectedElement)
             {
                 return base.OnMouseDown(e);
             }
 
-            _state = DesignState.Translate;
-            _prevMouseX = mouseX;
-            _prevMouseY = mouseY;
+            StartTranslate(mouse);
 
             return new EmptyCommand();
         }
 
         public override ICommand OnMouseMove(MouseEventArgs e)
         {
+            var mouse = new Point((float)e.OffsetX, (float)e.OffsetY);
+
             switch (_state)
             {
                 case DesignState.Translate:
@@ -90,9 +85,6 @@ namespace BlazorExtensions.InputHandling
                     {
                         return base.OnMouseMove(e);
                     }
-
-                    float mouseX = (float)e.OffsetX;
-                    float mouseY = (float)e.OffsetY;
 
                     var transform = _designViewer.Transform;
                     transform.D1 = 0f;
@@ -103,18 +95,29 @@ namespace BlazorExtensions.InputHandling
                     elementTransform.D2 = 0f;
 
                     var shift = new Point(
-                        mouseX - _prevMouseX, 
-                        mouseY - _prevMouseY)
+                        mouse.X - _prevMouseX, 
+                        mouse.Y - _prevMouseY)
                         * transform.Inverse()
                         * elementTransform;
 
-                    _prevMouseX = mouseX;
-                    _prevMouseY = mouseY;
+                    _prevMouseX = mouse.X;
+                    _prevMouseY = mouse.Y;
 
                     return new TranslateElementCommand(
                         new TranslateElementCommandParams(
                             _designViewer.SelectedElement,
                             shift));
+
+                case DesignState.Default:
+                    if(_capturedElement == null 
+                        || _capturedElement == _designViewer.SelectedElement)
+                    {
+                        return base.OnMouseMove(e);
+                    }
+
+                    StartTranslate(mouse);
+
+                    return new ChangeSelectionCommand(_capturedElement);
 
                 default:
                     return base.OnMouseMove(e);
@@ -123,9 +126,14 @@ namespace BlazorExtensions.InputHandling
 
         public override ICommand OnMouseUp(MouseEventArgs e)
         {
-            _state = DesignState.Default;
+            if(_state != DesignState.Default)
+            {
+                _state = DesignState.Default;
 
-            return base.OnMouseUp(e);
+                return base.OnMouseUp(e);
+            }
+
+            return new ChangeSelectionCommand(_capturedElement);
         }
 
         public override ICommand OnKeyPress(KeyboardEventArgs e)
@@ -157,6 +165,26 @@ namespace BlazorExtensions.InputHandling
             }
 
             return base.OnKeyDown(e);
+        }
+
+        private ICommand HandleElementPlacing(Point mouse)
+        {
+            _state = DesignState.Default;
+            Element element = _elementCreator.CreateRandomRectangle();
+            element.Position = ViewportToSurface(mouse, element);
+            _capturedElement = element;
+            StartTranslate(mouse);
+
+            return new CompositeCommand(
+                new AddElementCommand(element),
+                new ChangeSelectionCommand(element));
+        }
+
+        private void StartTranslate(Point mouse)
+        {
+            _state = DesignState.Translate;
+            _prevMouseX = mouse.X;
+            _prevMouseY = mouse.Y;
         }
 
         private bool IsWithinElement(Element element, Point point)

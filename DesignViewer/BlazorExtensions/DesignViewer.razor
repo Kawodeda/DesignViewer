@@ -18,7 +18,6 @@
 <!--Doesn't capture keyboard events without tabindex-->
 <div style="position: absolute; width: @(Width)px; height: @(Height)px"
     tabindex="0"
-    @onclick="OnClick"
     @onmousedown="OnMouseDown" 
     @onmouseup="OnMouseUp" 
     @onmousemove="OnMouseMove"
@@ -200,12 +199,6 @@
         }
 
         _module.InvokeVoidAsync("callRequestAnimationFrame", _instanceRef);
-    }
-
-    private void OnClick(MouseEventArgs e)
-    {
-        ICommand result = _inputHandler.OnClick(e);
-        ExecuteCommand(result);
     }
 
     private void OnMouseDown(MouseEventArgs e)

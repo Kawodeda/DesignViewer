@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BlazorExtensions.Commands;
+﻿using BlazorExtensions.Commands;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorExtensions.InputHandling
@@ -11,8 +6,6 @@ namespace BlazorExtensions.InputHandling
     public interface IInputHandler
     {
         public IInputHandler? Next { get; set; }
-
-        public ICommand OnClick(MouseEventArgs e);
 
         public ICommand OnMouseDown(MouseEventArgs e);
         
