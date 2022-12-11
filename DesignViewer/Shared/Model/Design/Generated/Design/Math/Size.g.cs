@@ -37,6 +37,10 @@ namespace Model.Design.Math {
 
   }
   #region Messages
+  /// <summary>
+  /// A Size represents the size of two-dimensional rectangular area
+  /// storing its width and height.
+  /// </summary>
   public sealed partial class Size : pb::IMessage<Size>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

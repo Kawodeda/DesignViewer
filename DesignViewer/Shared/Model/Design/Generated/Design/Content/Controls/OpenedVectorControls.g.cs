@@ -44,6 +44,10 @@ namespace Model.Design.Content.Controls {
 
   }
   #region Messages
+  /// <summary>
+  /// An OpenedVectorControls represents an abstract opened vector controls
+  /// and contains one of concrete controls available for opened vector.
+  /// </summary>
   public sealed partial class OpenedVectorControls : pb::IMessage<OpenedVectorControls>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

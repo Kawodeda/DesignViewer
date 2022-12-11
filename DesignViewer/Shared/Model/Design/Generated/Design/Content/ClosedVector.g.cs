@@ -42,6 +42,13 @@ namespace Model.Design.Content {
 
   }
   #region Messages
+  /// <summary>
+  /// A ClosedVector represents a closed vector element such as rectangle,
+  /// filled path, polygons etc. It is defined by control points, which 
+  /// define the type of a closed vector element, by fill property, which
+  /// represents the appearance of filled inner area of closed vector, and by
+  /// stroke property, which represents the appearance of its outline.
+  /// </summary>
   public sealed partial class ClosedVector : pb::IMessage<ClosedVector>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

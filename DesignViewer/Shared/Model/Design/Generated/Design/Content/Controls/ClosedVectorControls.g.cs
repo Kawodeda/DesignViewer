@@ -42,6 +42,10 @@ namespace Model.Design.Content.Controls {
 
   }
   #region Messages
+  /// <summary>
+  /// A ClosedVectorControls represents an abstract closed vector controls
+  /// and contains one of concrete controls available for closed vector.
+  /// </summary>
   public sealed partial class ClosedVectorControls : pb::IMessage<ClosedVectorControls>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

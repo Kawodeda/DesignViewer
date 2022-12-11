@@ -38,6 +38,23 @@ namespace Model.Design.Math {
 
   }
   #region Messages
+  /// <summary>
+  /// An Affine2DMatrix represents a 3 by 3 matrix that defines an affine 
+  /// transformation on a two-dimensional plane. It contains a matrix for
+  /// two-dimensional linear transformation and a translation vector.
+  ///
+  /// # Example:
+  ///
+  /// |  m11  m12  d1  |
+  /// |  m21  m22  d2  |
+  /// |  0    0    1   |
+  ///
+  /// Where (m11, ..., m22) are elements of linear transformation matrix
+  /// and (d1, d2) are the components of shift vector.
+  ///
+  /// Thus, you can perform an affine transformation just by multiplying your
+  /// position vector by an Affine2DMatrix.
+  /// </summary>
   public sealed partial class Affine2DMatrix : pb::IMessage<Affine2DMatrix>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -1,9 +1,4 @@
 
-// An OpenedVector represents an open vector element such as line, broken line,
-// path etc. It is defined by control points, which define the type of an
-// opened vector element, and by stroke property, which represents the
-// appearance of stroke.
-
 syntax = "proto3";
 
 package design.content;
@@ -13,6 +8,10 @@ import "appearance/pen.proto";
 
 option csharp_namespace = "Model.Design.Content";
 
+// An OpenedVector represents an open vector element such as line, broken line,
+// path etc. It is defined by control points, which define the type of an
+// opened vector element, and by stroke property, which represents the
+// appearance of stroke.
 message OpenedVector
 {
   // Contains opened vector's control points.

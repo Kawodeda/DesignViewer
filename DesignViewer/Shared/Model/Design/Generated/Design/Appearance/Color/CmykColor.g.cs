@@ -38,6 +38,10 @@ namespace Model.Design.Appearance.Color {
 
   }
   #region Messages
+  /// <summary>
+  /// A CmykColor represents a color in CMYK color space, i.e. it is encoded as
+  /// cyan, magenta, yellow and key components.
+  /// </summary>
   public sealed partial class CmykColor : pb::IMessage<CmykColor>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

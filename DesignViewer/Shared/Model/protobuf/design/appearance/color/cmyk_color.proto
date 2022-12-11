@@ -1,13 +1,12 @@
 
-// A CmykColor represents a color in CMYK color space, i.e. it is encoded as
-// cyan, magenta, yellow and key components.
-
 syntax = "proto3";
 
 package design.appearance.color;
 
 option csharp_namespace = "Model.Design.Appearance.Color";
 
+// A CmykColor represents a color in CMYK color space, i.e. it is encoded as
+// cyan, magenta, yellow and key components.
 message CmykColor
 {
   // Cyan component

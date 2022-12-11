@@ -39,6 +39,10 @@ namespace Model.Design.Content.Controls {
 
   }
   #region Messages
+  /// <summary>
+  /// A RectangleControls represents a two-dimensional rectangle defined by its
+  /// corner points: the top-left corner point and the bottom-right one.
+  /// </summary>
   public sealed partial class RectangleControls : pb::IMessage<RectangleControls>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

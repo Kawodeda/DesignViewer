@@ -1,10 +1,4 @@
 
-// A Surface is a some sort of space that contains the set of design elements
-// that user can interact with at a time. A Surface can represent the side of
-// a physical item, such as a page, a book spread and so on. A Surface defines
-// the frame of reference for all design elements it contains. It contains
-// artboards and layers that separate it along the Z-axis.
-
 syntax = "proto3";
 
 package design;
@@ -14,6 +8,11 @@ import "layer.proto";
 
 option csharp_namespace = "Model.Design";
 
+// A Surface is a some sort of space that contains the set of design elements
+// that user can interact with at a time. A Surface can represent the side of
+// a physical item, such as a page, a book spread and so on. A Surface defines
+// the frame of reference for all design elements it contains. It contains
+// artboards and layers that separate it along the Z-axis.
 message Surface
 {
   string name = 1;

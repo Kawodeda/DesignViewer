@@ -24,12 +24,15 @@ namespace Model.Design.Content {
     static ImageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "ChNjb250ZW50L2ltYWdlLnByb3RvEg5kZXNpZ24uY29udGVudCIHCgVJbWFn",
-            "ZUIXqgIUTW9kZWwuRGVzaWduLkNvbnRlbnRiBnByb3RvMw=="));
+            "ChNjb250ZW50L2ltYWdlLnByb3RvEg5kZXNpZ24uY29udGVudBolY29udGVu",
+            "dC9jb250cm9scy9pbWFnZV9jb250cm9scy5wcm90byJVCgVJbWFnZRISCgpz",
+            "dG9yYWdlX2lkGAEgASgJEjgKCGNvbnRyb2xzGAIgASgLMiYuZGVzaWduLmNv",
+            "bnRlbnQuY29udHJvbHMuSW1hZ2VDb250cm9sc0IXqgIUTW9kZWwuRGVzaWdu",
+            "LkNvbnRlbnRiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { },
+          new pbr::FileDescriptor[] { global::Model.Design.Content.Controls.ImageControlsReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Model.Design.Content.Image), global::Model.Design.Content.Image.Parser, null, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Model.Design.Content.Image), global::Model.Design.Content.Image.Parser, new[]{ "StorageId", "Controls" }, null, null, null, null)
           }));
     }
     #endregion
@@ -37,7 +40,8 @@ namespace Model.Design.Content {
   }
   #region Messages
   /// <summary>
-  /// To be defined
+  /// Represents an image which shape is defined by controls, 
+  /// and content is defined by storage_id.
   /// </summary>
   public sealed partial class Image : pb::IMessage<Image>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
@@ -73,6 +77,8 @@ namespace Model.Design.Content {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Image(Image other) : this() {
+      storageId_ = other.storageId_;
+      controls_ = other.controls_ != null ? other.controls_.Clone() : null;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -80,6 +86,36 @@ namespace Model.Design.Content {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public Image Clone() {
       return new Image(this);
+    }
+
+    /// <summary>Field number for the "storage_id" field.</summary>
+    public const int StorageIdFieldNumber = 1;
+    private string storageId_ = "";
+    /// <summary>
+    /// Contains identifier of image content located in storage.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public string StorageId {
+      get { return storageId_; }
+      set {
+        storageId_ = pb::ProtoPreconditions.CheckNotNull(value, "value");
+      }
+    }
+
+    /// <summary>Field number for the "controls" field.</summary>
+    public const int ControlsFieldNumber = 2;
+    private global::Model.Design.Content.Controls.ImageControls controls_;
+    /// <summary>
+    /// Contains control points of an image.
+    /// </summary>
+    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
+    public global::Model.Design.Content.Controls.ImageControls Controls {
+      get { return controls_; }
+      set {
+        controls_ = value;
+      }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -97,6 +133,8 @@ namespace Model.Design.Content {
       if (ReferenceEquals(other, this)) {
         return true;
       }
+      if (StorageId != other.StorageId) return false;
+      if (!object.Equals(Controls, other.Controls)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -104,6 +142,8 @@ namespace Model.Design.Content {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
+      if (StorageId.Length != 0) hash ^= StorageId.GetHashCode();
+      if (controls_ != null) hash ^= Controls.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -122,6 +162,14 @@ namespace Model.Design.Content {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
+      if (StorageId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(StorageId);
+      }
+      if (controls_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Controls);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -132,6 +180,14 @@ namespace Model.Design.Content {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
+      if (StorageId.Length != 0) {
+        output.WriteRawTag(10);
+        output.WriteString(StorageId);
+      }
+      if (controls_ != null) {
+        output.WriteRawTag(18);
+        output.WriteMessage(Controls);
+      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -142,6 +198,12 @@ namespace Model.Design.Content {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
+      if (StorageId.Length != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeStringSize(StorageId);
+      }
+      if (controls_ != null) {
+        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Controls);
+      }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -153,6 +215,15 @@ namespace Model.Design.Content {
     public void MergeFrom(Image other) {
       if (other == null) {
         return;
+      }
+      if (other.StorageId.Length != 0) {
+        StorageId = other.StorageId;
+      }
+      if (other.controls_ != null) {
+        if (controls_ == null) {
+          Controls = new global::Model.Design.Content.Controls.ImageControls();
+        }
+        Controls.MergeFrom(other.Controls);
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -169,6 +240,17 @@ namespace Model.Design.Content {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
+          case 10: {
+            StorageId = input.ReadString();
+            break;
+          }
+          case 18: {
+            if (controls_ == null) {
+              Controls = new global::Model.Design.Content.Controls.ImageControls();
+            }
+            input.ReadMessage(Controls);
+            break;
+          }
         }
       }
     #endif
@@ -184,6 +266,17 @@ namespace Model.Design.Content {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
+          case 10: {
+            StorageId = input.ReadString();
+            break;
+          }
+          case 18: {
+            if (controls_ == null) {
+              Controls = new global::Model.Design.Content.Controls.ImageControls();
+            }
+            input.ReadMessage(Controls);
+            break;
+          }
         }
       }
     }

@@ -40,6 +40,12 @@ namespace Model.Design.Content {
 
   }
   #region Messages
+  /// <summary>
+  /// An OpenedVector represents an open vector element such as line, broken line,
+  /// path etc. It is defined by control points, which define the type of an
+  /// opened vector element, and by stroke property, which represents the
+  /// appearance of stroke.
+  /// </summary>
   public sealed partial class OpenedVector : pb::IMessage<OpenedVector>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

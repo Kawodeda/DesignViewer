@@ -1,4 +1,10 @@
 
+syntax = "proto3";
+
+package design.math;
+
+option csharp_namespace = "Model.Design.Math";
+
 // An Affine2DMatrix represents a 3 by 3 matrix that defines an affine 
 // transformation on a two-dimensional plane. It contains a matrix for
 // two-dimensional linear transformation and a translation vector.
@@ -14,13 +20,6 @@
 //
 // Thus, you can perform an affine transformation just by multiplying your
 // position vector by an Affine2DMatrix.
-
-syntax = "proto3";
-
-package design.math;
-
-option csharp_namespace = "Model.Design.Math";
-
 message Affine2DMatrix
 {
   float m11 = 1;

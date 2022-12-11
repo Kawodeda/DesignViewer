@@ -1,7 +1,4 @@
 
-// A Layer serves as a container for design elements that user can work with
-// at a time.
-
 syntax = "proto3";
 
 package design;
@@ -10,6 +7,8 @@ import "element.proto";
 
 option csharp_namespace = "Model.Design";
 
+// A Layer serves as a container for design elements that user can work with
+// at a time.
 message Layer
 {
   string name = 1;

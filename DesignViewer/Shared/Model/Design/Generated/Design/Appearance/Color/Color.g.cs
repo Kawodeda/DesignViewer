@@ -41,6 +41,9 @@ namespace Model.Design.Appearance.Color {
 
   }
   #region Messages
+  /// <summary>
+  /// A Color is an abstract color.
+  /// </summary>
   public sealed partial class Color : pb::IMessage<Color>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -38,6 +38,9 @@ namespace Model.Design.Appearance {
 
   }
   #region Messages
+  /// <summary>
+  /// A Brush is an abstract description of brush for filling closed vectors.
+  /// </summary>
   public sealed partial class Brush : pb::IMessage<Brush>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

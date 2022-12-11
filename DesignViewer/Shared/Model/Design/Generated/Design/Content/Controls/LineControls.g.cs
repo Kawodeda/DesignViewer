@@ -39,6 +39,10 @@ namespace Model.Design.Content.Controls {
 
   }
   #region Messages
+  /// <summary>
+  /// A LineControls represents a section of a straight two-dimensional line
+  /// and is defined by its start and end points.
+  /// </summary>
   public sealed partial class LineControls : pb::IMessage<LineControls>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage
