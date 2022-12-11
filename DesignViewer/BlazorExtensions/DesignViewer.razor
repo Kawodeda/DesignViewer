@@ -7,6 +7,7 @@
 @using BlazorExtensions.Rendering
 @using BlazorExtensions.Viewports
 @using Model.Design
+@using Model.Design.Appearance.Color
 @using Model.Design.Math
 @inject IJSRuntime JsRuntime
 @implements IDesignViewer
@@ -97,6 +98,23 @@
         {
             _selectedElement = value;
             SelectedElementChanged.InvokeAsync(_selectedElement);
+        }
+    }
+
+    public Color? SelectedElementFillColor
+    {
+        get
+        {
+            return SelectedElement?.Content.ClosedVector.Fill.Solid.Color;
+        }
+        set
+        {
+            if (SelectedElement == null)
+            {
+                return;
+            }
+
+            SelectedElement.Content.ClosedVector.Fill.Solid.Color = value;
         }
     }
 
@@ -353,10 +371,5 @@
             horizontalScrollbarY,
             Viewport.HorizontalScrollbarBodyWidth,
             Viewport.ScrollbarSize);
-    }
-
-    public void ChangeSelectedElementColor(string value)
-    {
-        SelectedElement.Content.ClosedVector.Fill.Solid.Color = ColorConverter.FromHtml(value);
     }
 }

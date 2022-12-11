@@ -65,9 +65,7 @@
         set
         {
             _color = value;
-
-            if (_designViewer.SelectedElement != null)
-                _designViewer.ChangeSelectedElementColor(ColorConverter.ToHtml(_color.Process.Rgb, _color.Process.Alpha));
+            _designViewer.SelectedElementFillColor = _color;
         }
     }
 
@@ -76,13 +74,13 @@
 
     private void OnSelectedElementChanged(Element? element)
     {
-        if(element == null || element.Content.ElementContentCase != ElementContent.ElementContentOneofCase.ClosedVector)
+        if(_designViewer.SelectedElementFillColor == null)
         {
             _isColorPickerVisible = false;
             return;
         }
 
-        Color = element.Content.ClosedVector.Fill.Solid.Color;
+        Color = _designViewer.SelectedElementFillColor;
         _isColorPickerVisible = true;
     }
 
