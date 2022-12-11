@@ -1,7 +1,7 @@
 ﻿@using Model.Design.Appearance.Color;
 @using Model.Design;
 
-<div class="container" style="width: @(Width)px">
+<div class="container" style="width: @(Width)px; visibility: @_visibility">
     <div class="color-container">
         <input class="input-color" style="--color-opacity: @_opacity" type="color" value="@_hexColor" @oninput="OnColorInputChanged">
     </div>
@@ -11,9 +11,12 @@
 </div>
 
 @code {
+    private const string Visible = "visible";
+    private const string Hidden = "hidden";
     private const string DefaultHexColor = "#000000";
     private const uint DefaultAlpha = 255;
 
+    private string _visibility = Visible;
     private string _hexColor = DefaultHexColor;
     private string _opacity = ColorUtils.AlphaToRelativeString(DefaultAlpha);
     private uint _alpha = DefaultAlpha;
@@ -47,6 +50,19 @@
 
     [Parameter]
     public int Width { get; set; }
+
+    [Parameter]
+    public bool IsVisible 
+    { 
+        get
+        {
+            return _visibility == Visible;
+        } 
+        set
+        {
+            _visibility = value ? Visible : Hidden;
+        }
+    }
 
     private uint Alpha
     {

@@ -16,7 +16,7 @@
 <h1>Editor</h1>
 
 <div style="margin-bottom: 5px">
-    <ColorPicker Width="300" @bind-Color="Color"></ColorPicker>
+    <ColorPicker Width="300" IsVisible="@_isColorPickerVisible" @bind-Color="Color"></ColorPicker>
 </div>
 
 <div style="width: 700px; height: 480px">
@@ -45,20 +45,15 @@
 </EditForm>
 
 @code {
-    [Parameter]
-    public string? DesignName { get; set; }
-
-    private IDesignViewer _designViewer;
-    private IDesignsApiClient _designsApiClient;
-    private SaveDesignModel _saveDesignModel = new();
-    private bool colorPickerOpened = false;
-
     private const string ErrorMessage = "An error has occured";
     private const string SaveMessage = "File \"{0}\" has been successfully saved";
     private const string UpdateMessage = "File \"{0}\" has been successfully updated";
 
+    private IDesignViewer _designViewer;
+    private IDesignsApiClient _designsApiClient;
+    private SaveDesignModel _saveDesignModel = new();
+    private bool _isColorPickerVisible = false;
     private string _saveFormMessage = "";
-
     private Color _color;
 
     private Color Color
@@ -76,14 +71,19 @@
         }
     }
 
+    [Parameter]
+    public string? DesignName { get; set; }
+
     private void OnSelectedElementChanged(Element? element)
     {
         if(element == null || element.Content.ElementContentCase != ElementContent.ElementContentOneofCase.ClosedVector)
         {
+            _isColorPickerVisible = false;
             return;
         }
 
         Color = element.Content.ClosedVector.Fill.Solid.Color;
+        _isColorPickerVisible = true;
     }
 
     protected override async Task OnInitializedAsync()
