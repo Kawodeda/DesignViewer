@@ -2,6 +2,7 @@
 using DesignViewer.Server.Dtos;
 using DesignViewer.Server.Options;
 using DesignViewer.Server.Utils;
+using Microsoft.Extensions.Options;
 
 namespace DesignViewer.Server.Services.FileStorage
 {
@@ -12,11 +13,11 @@ namespace DesignViewer.Server.Services.FileStorage
         private readonly IContentTypeService _contentTypeService;
 
         public AssetFileStorageService(
-            AssetsStorageOptions options, 
+            IOptions<AssetsStorageOptions> options, 
             IFileStorageService fileStorageService,
             IContentTypeService contentTypeService)
         {
-            _options = options;
+            _options = options.Value;
             _fileStorageService = fileStorageService;
             _contentTypeService = contentTypeService;
         }
@@ -80,7 +81,7 @@ namespace DesignViewer.Server.Services.FileStorage
 
         private string CreateAssetFilePath(AssetDto assetInfo)
         {
-            return Path.Combine(_options.ImagesPath, assetInfo.StorageId, GetExtension(assetInfo.Type));
+            return Path.Combine(_options.ImagesPath, $"{assetInfo.StorageId}{GetExtension(assetInfo.Type)}");
         }
 
         private AssetDto GetAssetFileInfo(IFileInfo fileInfo)

@@ -16,7 +16,11 @@ builder.Services.Configure<AssetsStorageOptions>(
     builder.Configuration.GetSection(AssetsStorageOptions.AssetsStorage));
 
 builder.Services.AddScoped<IDesignStorageService, DesignFileStorageService>();
+builder.Services.AddScoped<IAssetStorageService, AssetFileStorageService>();
+builder.Services.AddScoped<IFileStorageService, FileStorageService>();
+
 builder.Services.AddSingleton<INameGeneratorService, FileNameGeneratorService>();
+builder.Services.AddSingleton<IContentTypeService, ContentTypeService>();
 
 var app = builder.Build();
 

@@ -2,7 +2,7 @@
 
 namespace DesignViewer.Server.Filters
 {
-    public class DesignsExceptionFilter : IExceptionFilter
+    public class DefaultExceptionFilter : IExceptionFilter
     {
         public void OnException(ExceptionContext context)
         {

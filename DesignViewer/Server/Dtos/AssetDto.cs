@@ -1,4 +1,6 @@
-﻿namespace DesignViewer.Server.Dtos
+﻿using System.ComponentModel;
+
+namespace DesignViewer.Server.Dtos
 {
     public class AssetDto
     {
@@ -12,6 +14,6 @@
         /// <summary>
         /// Stores content length in bytes
         /// </summary>
-        public long Size { get; set; }
+        public long? Size { get; set; }
     }
 }
