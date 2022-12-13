@@ -5,6 +5,6 @@ namespace BlazorExtensions.Rendering
 {
     public interface IDrawStrategyFactory
     {
-        Task<IElementDrawStrategy> Create(Element element);
+        IDrawStrategy Create(Element element);
     }
 }

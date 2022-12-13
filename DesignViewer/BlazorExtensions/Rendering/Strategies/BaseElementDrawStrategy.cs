@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Blazor.Extensions.Canvas.Canvas2D;
 using Model.Design;
-using Blazor.Extensions.Canvas.Canvas2D;
 
 namespace BlazorExtensions.Rendering.Strategies
 {
-    internal abstract class BaseElementDrawStrategy : IElementDrawStrategy
+    public abstract class BaseElementDrawStrategy : IDrawStrategy
     {
         protected Element _element;
 

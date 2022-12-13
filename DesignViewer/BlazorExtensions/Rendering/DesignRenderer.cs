@@ -1,9 +1,5 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorExtensions.Rendering.Exceptions;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using Microsoft.AspNetCore.Components.RenderTree;
-using Microsoft.Extensions.DependencyInjection;
 using Model.Design;
 using Model.Design.Math;
 
@@ -44,7 +40,7 @@ namespace BlazorExtensions.Rendering
             {
                 foreach (Element element in layer.Elements)
                 {
-                    Affine2DMatrix transform = element.Transform;
+                    Affine2DMatrix transform = element.Transform.RotationMatrix;
 
                     await _context.SaveAsync();
                     await _context.TransformAsync(
@@ -54,7 +50,7 @@ namespace BlazorExtensions.Rendering
                         transform.M22,
                         transform.D1,
                         transform.D2);
-                    await (await _factory.Create(element)).Draw(_context);
+                    await _factory.Create(element).Draw(_context);
                     await _context.RestoreAsync();
                 }
             }

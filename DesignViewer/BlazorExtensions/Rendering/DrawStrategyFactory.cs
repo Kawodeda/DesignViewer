@@ -1,16 +1,24 @@
 ﻿using Model.Design;
 using Model.Design.Content;
 using BlazorExtensions.Rendering.Strategies;
-using Microsoft.JSInterop;
-using System.Reflection;
+using BlazorExtensions.Services;
 
 namespace BlazorExtensions.Rendering
 {
     public class DrawStrategyFactory : IDrawStrategyFactory
     {
-        private Task<IJSObjectReference> _jsRendering;
+        private readonly IJsModulesProvider _jsModulesProvider;
+        private readonly IImageContentService _imageContentService;
 
-        public async Task<IElementDrawStrategy> Create(Element element)
+        public DrawStrategyFactory(
+            IJsModulesProvider jsModulesProvider, 
+            IImageContentService imageContentService)
+        {
+            _jsModulesProvider = jsModulesProvider;
+            _imageContentService = imageContentService;
+        }
+
+        public IDrawStrategy Create(Element element)
         {
             switch (element.Content.ElementContentCase)
             {
@@ -24,6 +32,9 @@ namespace BlazorExtensions.Rendering
                                 throw new NotSupportedException();
                         }
                     }
+
+                case ElementContent.ElementContentOneofCase.Image:
+                    return new ImageDrawStrategy(element, _imageContentService, _jsModulesProvider);
 
                 default:
                     throw new NotSupportedException();
