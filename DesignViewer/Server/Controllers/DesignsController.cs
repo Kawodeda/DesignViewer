@@ -1,10 +1,10 @@
-﻿using BlazorViewer.Server.Dtos;
-using BlazorViewer.Server.Exceptions;
-using BlazorViewer.Server.Filters;
-using BlazorViewer.Server.Services;
+﻿using DesignViewer.Server.Dtos;
+using DesignViewer.Server.Exceptions;
+using DesignViewer.Server.Filters;
+using DesignViewer.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BlazorViewer.Server.Controllers
+namespace DesignViewer.Server.Controllers
 {
     [ApiController]
     [Route("api/storage/v1/[controller]")]

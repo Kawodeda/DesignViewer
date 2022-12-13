@@ -10,6 +10,7 @@
 @using Model.Design.Content
 @using Model.Design.Appearance.Color
 @using Model.Design.Content.Controls
+@inject IDesignsApiClient _designsApiClient;
 
 <PageTitle>Editor</PageTitle>
 
@@ -50,7 +51,6 @@
     private const string UpdateMessage = "File \"{0}\" has been successfully updated";
 
     private IDesignViewer _designViewer;
-    private IDesignsApiClient _designsApiClient;
     private SaveDesignModel _saveDesignModel = new();
     private bool _isColorPickerVisible = false;
     private string _saveFormMessage = "";
@@ -86,8 +86,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _designsApiClient = new DesignsApiClient("https://localhost:7091", new HttpClient());
-
         await base.OnInitializedAsync();
     }
 

@@ -1,4 +1,4 @@
-﻿namespace BlazorViewer.Server.Dtos
+﻿namespace DesignViewer.Server.Dtos
 {
     public class FileErrorDto
     {

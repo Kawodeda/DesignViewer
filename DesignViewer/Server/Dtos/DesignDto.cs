@@ -1,8 +1,8 @@
-﻿namespace BlazorViewer.Server.Dtos
+﻿namespace DesignViewer.Server.Dtos
 {
     public class DesignDto
     {
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         public override bool Equals(object? other)
         {

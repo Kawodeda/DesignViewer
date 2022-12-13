@@ -1,6 +1,6 @@
-﻿using BlazorViewer.Server.Dtos;
+﻿using DesignViewer.Server.Dtos;
 
-namespace BlazorViewer.Server.Services
+namespace DesignViewer.Server.Services
 {
     public interface IDesignStorageService
     {

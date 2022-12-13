@@ -1,6 +1,6 @@
-using BlazorViewer.Server.Services;
-using BlazorViewer.Server.Options;
 using DesignViewer.Server.Options;
+using DesignViewer.Server.Services;
+using DesignViewer.Server.Services.FileStorage;
 
 var builder = WebApplication.CreateBuilder(args);
 

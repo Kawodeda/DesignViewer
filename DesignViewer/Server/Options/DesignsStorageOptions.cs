@@ -1,4 +1,4 @@
-﻿namespace BlazorViewer.Server.Options
+﻿namespace DesignViewer.Server.Options
 {
     public class DesignsStorageOptions
     {

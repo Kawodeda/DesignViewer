@@ -7,8 +7,7 @@ namespace DesignUsageExample
         public static async Task Main(string[] args)
         {
             IDesignsApiClient client = new DesignsApiClient(
-                "https://localhost:7091/", 
-                new HttpClient());
+                "https://localhost:7091/");
 
             try
             {

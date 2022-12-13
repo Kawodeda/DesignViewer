@@ -7,8 +7,8 @@ import "content/controls/image_controls.proto";
 
 option csharp_namespace = "Model.Design.Content";
 
-// Represents an image which shape is defined by controls, 
-// and content is defined by storage_id.
+// Represents an image which content is located in storage, 
+// and shape is defined by controls.
 message Image
 {
   // Contains identifier of image content located in storage.

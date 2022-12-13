@@ -1,4 +1,4 @@
-﻿namespace BlazorViewer.Server.Services
+﻿namespace DesignViewer.Server.Services
 {
     public interface INameGeneratorService
     {

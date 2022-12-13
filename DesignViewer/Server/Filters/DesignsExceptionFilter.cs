@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace BlazorViewer.Server.Filters
+namespace DesignViewer.Server.Filters
 {
     public class DesignsExceptionFilter : IExceptionFilter
     {

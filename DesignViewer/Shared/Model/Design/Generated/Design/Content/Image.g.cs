@@ -40,8 +40,8 @@ namespace Model.Design.Content {
   }
   #region Messages
   /// <summary>
-  /// Represents an image which shape is defined by controls, 
-  /// and content is defined by storage_id.
+  /// Represents an image which content is located in storage, 
+  /// and shape is defined by controls.
   /// </summary>
   public sealed partial class Image : pb::IMessage<Image>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
