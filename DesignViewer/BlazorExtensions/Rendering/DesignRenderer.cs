@@ -1,9 +1,11 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorExtensions.Rendering.Exceptions;
-using Microsoft.JSInterop;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.RenderTree;
+using Microsoft.Extensions.DependencyInjection;
 using Model.Design;
 using Model.Design.Math;
-using System.Reflection;
 
 namespace BlazorExtensions.Rendering
 {
@@ -11,7 +13,13 @@ namespace BlazorExtensions.Rendering
     {
         private const string ContextNotSetMessage = "Rendering context was not set";
 
+        private IDrawStrategyFactory _factory;
         private Canvas2DContext? _context;
+
+        public DesignRenderer(IDrawStrategyFactory factory)
+        {
+            _factory = factory;
+        }
 
         public Canvas2DContext? Context
         {
@@ -46,7 +54,7 @@ namespace BlazorExtensions.Rendering
                         transform.M22,
                         transform.D1,
                         transform.D2);
-                    await DrawStrategyFactory.Create(element).Draw(_context);
+                    await (await _factory.Create(element)).Draw(_context);
                     await _context.RestoreAsync();
                 }
             }

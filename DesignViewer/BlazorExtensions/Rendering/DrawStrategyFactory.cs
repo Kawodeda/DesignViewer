@@ -1,12 +1,16 @@
 ﻿using Model.Design;
 using Model.Design.Content;
 using BlazorExtensions.Rendering.Strategies;
+using Microsoft.JSInterop;
+using System.Reflection;
 
 namespace BlazorExtensions.Rendering
 {
-    public class DrawStrategyFactory
+    public class DrawStrategyFactory : IDrawStrategyFactory
     {
-        public static IElementDrawStrategy Create(Element element)
+        private Task<IJSObjectReference> _jsRendering;
+
+        public async Task<IElementDrawStrategy> Create(Element element)
         {
             switch (element.Content.ElementContentCase)
             {

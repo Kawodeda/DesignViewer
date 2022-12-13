@@ -1,5 +1,6 @@
 using ApiClient;
 using BlazorExtensions.Rendering;
+using BlazorExtensions.Services;
 using DesignViewer.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -14,5 +15,7 @@ builder.Services.AddScoped<IAssetsApiClient>(sp => new AssetsApiClient(builder.H
 builder.Services.AddScoped<IDrawStrategyFactory, DrawStrategyFactory>();
 
 builder.Services.AddTransient<IDesignRenderer, DesignRenderer>();
+
+builder.Services.AddSingleton<IJsModulesProvider, JsModulesProvider>();
 
 await builder.Build().RunAsync();

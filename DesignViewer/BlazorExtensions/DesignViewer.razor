@@ -5,15 +5,17 @@
 @using BlazorExtensions.Commands.Context
 @using BlazorExtensions.InputHandling
 @using BlazorExtensions.Rendering
+@using BlazorExtensions.Services
 @using BlazorExtensions.Viewports
 @using Model.Design
 @using Model.Design.Appearance.Color
 @using Model.Design.Math
 @inject IJSRuntime JsRuntime
 @inject IDesignRenderer _renderer
+@inject IJsModulesProvider _jsModules
 @implements IDesignViewer
 
-<div style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
+<div id="ora" style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
     <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
 </div>
 
@@ -39,7 +41,7 @@
     private BECanvasComponent _uiCanvasReference;
     private Canvas2DContext _outputCanvasContext;
     private Canvas2DContext _uiCanvasContext;
-    private IJSObjectReference _module;
+    private IJSObjectReference? _module;
     private DotNetObjectReference<DesignViewer> _instanceRef;
     private IInputHandlingBuilder _inputHandler;
     private IViewport _viewport;
@@ -191,14 +193,28 @@
 
             _renderer.Context = _outputCanvasContext;
 
-            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
-                "import", "./_content/BlazorExtensions/DesignViewer.razor.js");
+            InitJsModule();
 
             _instanceRef = DotNetObjectReference.Create(this);
 
             RequestRendering();
         }
         await base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void InitJsModule()
+    {
+        if (_jsModules.IsInitialized)
+        {
+            _module = _jsModules.DesignViewer;
+            return;
+        }
+
+        _jsModules.Initialized += (sender, args) => 
+        {
+            _module = _jsModules.DesignViewer;
+            RequestRendering();
+        };
     }
 
     private Artboard CurrentArtboard
