@@ -3,6 +3,7 @@ using Model.Design.Content;
 using BlazorExtensions.Rendering.Strategies;
 using BlazorExtensions.Services;
 using BlazorExtensions.Rendering.Strategies.Selection;
+using BlazorExtensions.Services.JsInterop;
 
 namespace BlazorExtensions.Rendering
 {

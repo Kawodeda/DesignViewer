@@ -1,4 +1,9 @@
-﻿<div class="modal" style="display: @_displayModal">
+﻿@using ApiClient
+@using BlazorExtensions.Services.JsInterop
+@inject IAssetsApiClient _assetsApi
+@inject IJsModulesProvider _jsModulesProvider
+
+<div class="modal" style="display: @_displayModal">
     <div class="modal-content">
         @if (_displayContent)
         {
@@ -7,9 +12,8 @@
                 <span class="oi oi-x close" @onclick="(args) => Close()"></span>
             </div>
             <div class="modal-body">
-                <img src="https://i.imgur.com/fN8pbGu.jpeg"/>
-                <img src="https://i.imgur.com/9IDKaII.jpeg"/>
-                <img src="https://i.imgur.com/wy4lcpK.jpeg"/>
+                @*<img src="./_content/BlazorExtensions/preloader2.gif" width="100" height="100"/>*@
+                <img />
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary btn-upload">
@@ -31,6 +35,7 @@
 
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
+    private JsModule _jsModule = default!;
 
     [Parameter]
     public string Header { get; set; } = string.Empty;
@@ -49,5 +54,20 @@
         StateHasChanged();
     }
 
+    protected override async Task OnInitializedAsync()
+    {
+        await InitJsModule();
+        await base.OnInitializedAsync();
+    }
 
+    private async Task LoadAssets()
+    {
+        var assets = await _assetsApi.ListAssetsAsync();
+    }
+
+    private async Task InitJsModule()
+    {
+        _jsModule = _jsModulesProvider.AssetManager;
+        await _jsModule.LoadingTask;
+    }
 }

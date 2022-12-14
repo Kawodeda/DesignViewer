@@ -7,6 +7,7 @@
 @using BlazorExtensions.InputHandling.HitTest
 @using BlazorExtensions.Rendering
 @using BlazorExtensions.Services
+@using BlazorExtensions.Services.JsInterop
 @using BlazorExtensions.Viewports
 @using Model.Design
 @using Model.Design.Appearance.Color
@@ -45,7 +46,7 @@
     private BECanvasComponent _uiCanvasReference;
     private Canvas2DContext _outputCanvasContext;
     private Canvas2DContext _uiCanvasContext;
-    private IJSObjectReference? _module;
+    private JsModule _module;
     private DotNetObjectReference<DesignViewer> _instanceRef;
     private IInputHandlingBuilder _inputHandler;
     private IViewport _viewport;
@@ -193,6 +194,8 @@
         _inputHandler.UseHandler<ViewPortInputHandler>();
         _inputHandler.UseHandler<DesignInputHandler>();
 
+        _module = _jsModules.DesignViewer;
+
         base.OnInitialized();
     }
 
@@ -205,28 +208,14 @@
 
             _renderer.Context = _outputCanvasContext;
 
-            InitJsModule();
+            await _module.LoadingTask;
 
             _instanceRef = DotNetObjectReference.Create(this);
 
             RequestRendering();
         }
+
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private void InitJsModule()
-    {
-        if (_jsModules.IsInitialized)
-        {
-            _module = _jsModules.DesignViewer;
-            return;
-        }
-
-        _jsModules.Initialized += (sender, args) => 
-        {
-            _module = _jsModules.DesignViewer;
-            RequestRendering();
-        };
     }
 
     private Artboard CurrentArtboard
@@ -239,12 +228,12 @@
 
     private void RequestRendering()
     {
-        if (_module == null || _instanceRef == null)
+        if (_module.Module == null || _instanceRef == null)
         {
             return;
         }
 
-        _module.InvokeVoidAsync("callRequestAnimationFrame", _instanceRef);
+        _module.Module.InvokeVoidAsync("callRequestAnimationFrame", _instanceRef);
     }
 
     private void OnMouseDown(MouseEventArgs e)

@@ -2,6 +2,7 @@ using ApiClient;
 using BlazorExtensions.InputHandling.HitTest;
 using BlazorExtensions.Rendering;
 using BlazorExtensions.Services;
+using BlazorExtensions.Services.JsInterop;
 using DesignViewer.Client;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
