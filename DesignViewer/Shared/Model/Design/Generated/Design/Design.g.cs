@@ -37,6 +37,11 @@ namespace Model.Design {
 
   }
   #region Messages
+  /// <summary>
+  /// A Design  represents the final result of the user's effort. 
+  /// By itself is the set of Surfaces that contain Artboards and Layers
+  /// that contain design elements.
+  /// </summary>
   public sealed partial class Design : pb::IMessage<Design>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

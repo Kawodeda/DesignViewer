@@ -43,6 +43,10 @@ namespace Model.Design.Content {
 
   }
   #region Messages
+  /// <summary>
+  /// An ElementContent represents an abstract content of a design element
+  /// and contains one of concrete element content.
+  /// </summary>
   public sealed partial class ElementContent : pb::IMessage<ElementContent>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

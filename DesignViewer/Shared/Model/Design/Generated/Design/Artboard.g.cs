@@ -42,6 +42,10 @@ namespace Model.Design {
 
   }
   #region Messages
+  /// <summary>
+  /// An Artboard represents an area on a surface that defines which design
+  /// elements will be eventually printed.
+  /// </summary>
   public sealed partial class Artboard : pb::IMessage<Artboard>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

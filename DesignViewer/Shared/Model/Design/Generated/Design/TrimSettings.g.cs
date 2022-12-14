@@ -38,6 +38,9 @@ namespace Model.Design {
 
   }
   #region Messages
+  /// <summary>
+  /// A TrimSettings is a part of Artboard that defines its shape and trim.
+  /// </summary>
   public sealed partial class TrimSettings : pb::IMessage<TrimSettings>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -1,0 +1,15 @@
+
+syntax = "proto3";
+
+package design.content.controls;
+
+import "content/controls/rectangle_controls.proto";
+
+option csharp_namespace = "Model.Design.Content.Controls";
+
+// An ImageControls represents an abstract image control points.
+message ImageControls
+{
+  // Control points of a rectangle.
+  RectangleControls rectangle = 1;
+}

@@ -2,10 +2,11 @@
 using System.IO;
 using System.IO.Abstractions.TestingHelpers;
 using System.Linq;
-using BlazorViewer.Server.Dtos;
-using BlazorViewer.Server.Exceptions;
-using BlazorViewer.Server.Options;
-using BlazorViewer.Server.Services;
+using DesignViewer.Server.Dtos;
+using DesignViewer.Server.Exceptions;
+using DesignViewer.Server.Options;
+using DesignViewer.Server.Services;
+using DesignViewer.Server.Services.FileStorage;
 using Google.Protobuf;
 using Microsoft.Extensions.Options;
 using Model.Design;
@@ -18,14 +19,14 @@ namespace ServerTests
     {
         private const string DefaultFilename = "design";
 
-        private FileStorageOptions _options;
-        private IOptions<FileStorageOptions> _wrappedOptions;
+        private DesignsStorageOptions _options;
+        private IOptions<DesignsStorageOptions> _wrappedOptions;
         private INameGeneratorService _nameGeneratorService;
 
         [SetUp]
         public void Init()
         {
-            _options = new FileStorageOptions
+            _options = new DesignsStorageOptions
             {
                 Path = "Storage/Designs",
                 FileExtension = ".dat"
@@ -45,10 +46,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design design = Design.CreateBlank();
             Stream designStream = new MemoryStream(design.ToByteArray());
@@ -73,10 +76,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design design = Design.CreateBlank();
             Stream designStream = new MemoryStream(design.ToByteArray());
@@ -97,10 +102,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design design = Design.CreateBlank();
             Stream designStream = new MemoryStream(design.ToByteArray());
@@ -126,10 +133,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design design = Design.CreateBlank();
             Stream designStream = new MemoryStream(design.ToByteArray());
@@ -151,6 +160,8 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             string filename = "design";
             string path = fileSystem.Path
                 .Combine(_options.Path, $"{filename}{_options.FileExtension}");
@@ -163,8 +174,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Stream designStream = new MemoryStream(design.ToByteArray());
             string existingName = filename;
@@ -180,6 +191,8 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             string filename = "design1";
             string path = fileSystem.Path
                 .Combine(_options.Path, $"{filename}{_options.FileExtension}");
@@ -192,8 +205,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             var expected = new DesignDto
             {
@@ -211,10 +224,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             string nonExistingName = "design1";
 
@@ -229,6 +244,8 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             string filename = "design1";
             string path = fileSystem.Path
                 .Combine(_options.Path, $"{filename}{_options.FileExtension}");
@@ -241,8 +258,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Stream expected = new MemoryStream(design.ToByteArray());
             Stream actual = service.GetDesignContent(filename);
@@ -256,10 +273,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             string nonExistingName = "design1";
 
@@ -273,6 +292,8 @@ namespace ServerTests
         {
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
+
+            var fileStorageService = new FileStorageService(fileSystem);
 
             List<string> filenames = new List<string>()
             {
@@ -295,8 +316,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             IEnumerable<DesignDto> expected = filenames
                 .Select(x => new DesignDto()
@@ -315,6 +336,8 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             string filename = "design1";
             string path = fileSystem.Path
                 .Combine(_options.Path, $"{filename}{_options.FileExtension}");
@@ -327,8 +350,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design updatedDesign = Design.CreateBlank();
             updatedDesign
@@ -354,6 +377,8 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             string filename = "design1";
             string path = fileSystem.Path
                 .Combine(_options.Path, $"{filename}{_options.FileExtension}");
@@ -366,8 +391,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design updatedDesign = Design.CreateBlank();
             updatedDesign
@@ -393,10 +418,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             Design updatedDesign = Design.CreateBlank();
             updatedDesign
@@ -419,6 +446,8 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             string filename = "design1";
             string path = fileSystem.Path
                 .Combine(_options.Path, $"{filename}{_options.FileExtension}");
@@ -431,8 +460,8 @@ namespace ServerTests
 
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             service.DeleteDesign(filename);
 
@@ -447,10 +476,12 @@ namespace ServerTests
             var fileSystem = new MockFileSystem();
             fileSystem.AddDirectory(_options.Path);
 
+            var fileStorageService = new FileStorageService(fileSystem);
+
             var service = new DesignFileStorageService(
                 _wrappedOptions,
-                _nameGeneratorService,
-                fileSystem);
+                fileStorageService,
+                _nameGeneratorService);
 
             string nonExistingName = "design1";
 

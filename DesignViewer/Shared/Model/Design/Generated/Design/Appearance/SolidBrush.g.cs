@@ -38,6 +38,9 @@ namespace Model.Design.Appearance {
 
   }
   #region Messages
+  /// <summary>
+  /// A SolidBrush represents solid one-color fill.
+  /// </summary>
   public sealed partial class SolidBrush : pb::IMessage<SolidBrush>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

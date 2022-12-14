@@ -1,7 +1,4 @@
 
-// A ClosedVectorControls represents an abstract closed vector controls
-// and contains one of concrete controls available for closed vector.
-
 syntax = "proto3";
 
 package design.content.controls;
@@ -11,6 +8,8 @@ import "content/controls/path_controls.proto";
 
 option csharp_namespace = "Model.Design.Content.Controls";
 
+// A ClosedVectorControls represents an abstract closed vector controls
+// and contains one of concrete controls available for closed vector.
 message ClosedVectorControls
 {
   // Only one concrete controls is stored at a time.

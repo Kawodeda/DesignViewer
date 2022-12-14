@@ -1,7 +1,4 @@
 
-// A LineControls represents a section of a straight two-dimensional line
-// and is defined by its start and end points.
-
 syntax = "proto3";
 
 package design.content.controls;
@@ -10,6 +7,8 @@ import "math/point.proto";
 
 option csharp_namespace = "Model.Design.Content.Controls";
 
+// A LineControls represents a section of a straight two-dimensional line
+// and is defined by its start and end points.
 message LineControls
 {
   // The strat point of a line section

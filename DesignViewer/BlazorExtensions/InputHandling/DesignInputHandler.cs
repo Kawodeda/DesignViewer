@@ -1,11 +1,8 @@
 ﻿using Model.Design;
-using Model.Design.Content.Controls;
 using Model.Design.Math;
 using BlazorExtensions.Commands;
 using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;
-using System.Xml.Linq;
-using System.Threading;
 
 namespace BlazorExtensions.InputHandling
 {
@@ -52,7 +49,7 @@ namespace BlazorExtensions.InputHandling
             Element? element = _designViewer.CurrentSurface.Layers
                     .SelectMany(x => x.Elements)
                     .Reverse()
-                    .FirstOrDefault(x => IsWithinElement(x, mouse));
+                    .FirstOrDefault(x => HitTest(x, mouse));
 
             if (element != _designViewer.SelectedElement)
             {
@@ -63,7 +60,7 @@ namespace BlazorExtensions.InputHandling
             {
                 return base.OnMouseDown(e);
             }
-            if (!IsWithinElement(_designViewer.SelectedElement, mouse) 
+            if (!HitTest(_designViewer.SelectedElement, mouse)
                 || _capturedElement != _designViewer.SelectedElement)
             {
                 return base.OnMouseDown(e);
@@ -83,6 +80,7 @@ namespace BlazorExtensions.InputHandling
                 case DesignState.Translate:
                     if(_designViewer.SelectedElement == null)
                     {
+                        _state = DesignState.Default;
                         return base.OnMouseMove(e);
                     }
 
@@ -96,7 +94,7 @@ namespace BlazorExtensions.InputHandling
                         mouse.X - _prevMouseX,
                         mouse.Y - _prevMouseY)
                         * transform.Inverse()
-                        * elementTransform;
+                        * elementTransform.RotationMatrix;
 
                     _prevMouseX = mouse.X;
                     _prevMouseY = mouse.Y;
@@ -156,6 +154,7 @@ namespace BlazorExtensions.InputHandling
             {
                 if (_designViewer.SelectedElement != null)
                 {
+                    _capturedElement = null;
                     return new CompositeCommand(
                         new DeleteElementCommand(_designViewer.SelectedElement),
                         new ChangeSelectionCommand(null));
@@ -185,20 +184,11 @@ namespace BlazorExtensions.InputHandling
             _prevMouseY = mouse.Y;
         }
 
-        private bool IsWithinElement(Element element, Point point)
+        private bool HitTest(Element element, Point point)
         {
-            RectangleControls rectangle 
-                = element.Content.ClosedVector.Controls.Rectangle;
-            Affine2DMatrix transform = _designViewer.Transform;
-            Point elementPos = element.Position;
-            Point corner1 = elementPos + rectangle.Corner1;
-            Point corner2 = elementPos + rectangle.Corner2;
-            point *= element.Transform * transform.Inverse();               
-
-            return point.X > corner1.X
-                && point.X < corner2.X
-                && point.Y > corner1.Y
-                && point.Y < corner2.Y;
+            return _designViewer.HitTestStrategyFactory
+                .Create(element)
+                .HitTest(point, _designViewer.Transform);
         }
 
         private Point ViewportToSurface(Point inViewport, Element element)

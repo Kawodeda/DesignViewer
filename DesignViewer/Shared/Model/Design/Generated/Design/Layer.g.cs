@@ -37,6 +37,10 @@ namespace Model.Design {
 
   }
   #region Messages
+  /// <summary>
+  /// A Layer serves as a container for design elements that user can work with
+  /// at a time.
+  /// </summary>
   public sealed partial class Layer : pb::IMessage<Layer>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -2,6 +2,7 @@
 @using ApiClient
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@inject IDesignsApiClient _designsApiClient
 
 <PageTitle>Designs</PageTitle>
 
@@ -32,7 +33,6 @@
 </p>
 
 @code {
-    private IDesignsApiClient _designsApiClient;
     private Virtualize<DesignDto> _virtualizeComponent;
 
     private const string ErrorMessage 
@@ -46,10 +46,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _designsApiClient = new DesignsApiClient(
-            "https://localhost:7091", 
-            new HttpClient());
-
         await base.OnInitializedAsync();
     }
 

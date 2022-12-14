@@ -1,14 +1,14 @@
-﻿using BlazorViewer.Server.Dtos;
-using BlazorViewer.Server.Exceptions;
-using BlazorViewer.Server.Filters;
-using BlazorViewer.Server.Services;
+﻿using DesignViewer.Server.Dtos;
+using DesignViewer.Server.Exceptions;
+using DesignViewer.Server.Filters;
+using DesignViewer.Server.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace BlazorViewer.Server.Controllers
+namespace DesignViewer.Server.Controllers
 {
     [ApiController]
     [Route("api/storage/v1/[controller]")]
-    [TypeFilter(typeof(DesignsExceptionFilter))]
+    [TypeFilter(typeof(DefaultExceptionFilter))]
     public sealed class DesignsController : ControllerBase
     {
         private readonly IDesignStorageService _storageService;
@@ -49,6 +49,7 @@ namespace BlazorViewer.Server.Controllers
             try
             {
                 Stream result = _storageService.GetDesignContent(name);
+
                 return File(result, "application/octet-stream");
             }
             catch (FileNotFoundException)
@@ -76,7 +77,7 @@ namespace BlazorViewer.Server.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<DesignDto> UploadDesignAutoName(IFormFile file)
         {
-            Stream stream = file.OpenReadStream();
+            using Stream stream = file.OpenReadStream();
             DesignDto info = _storageService.UploadDesign(stream);
 
             return CreatedAtAction(nameof(UploadDesignAutoName), info);
@@ -85,13 +86,13 @@ namespace BlazorViewer.Server.Controllers
         [HttpPost("{name}", Name = nameof(UploadDesign))]
         [Produces(contentType: "application/json")]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(DesignDto))]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status409Conflict, Type = typeof(FileErrorDto))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult<DesignDto> UploadDesign([FromRoute] string name, IFormFile file)
         {
             try
             {
-                Stream stream = file.OpenReadStream();
+                using Stream stream = file.OpenReadStream();
                 DesignDto info = _storageService.UploadDesign(stream, name);
 
                 return CreatedAtAction(nameof(UploadDesign), info);
@@ -108,13 +109,24 @@ namespace BlazorViewer.Server.Controllers
         [HttpPut("{name}", Name = nameof(UpdateDesign))]
         [Produces(contentType: "application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(DesignDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(FileErrorDto))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public ActionResult UpdateDesign([FromRoute] string name, IFormFile file)
         {
-            Stream stream = file.OpenReadStream();
-            DesignDto info = _storageService.UpdateDesign(name, stream);
+            try
+            {
+                using Stream stream = file.OpenReadStream();
+                DesignDto info = _storageService.UpdateDesign(name, stream);
 
-            return Ok(info);
+                return Ok(info);
+            }
+            catch (FileNotFoundException)
+            {
+                return NotFound(new FileErrorDto
+                {
+                    Name = name
+                });
+            }
         }
 
         [HttpDelete("{name}", Name = nameof(DeleteDesign))]

@@ -37,6 +37,12 @@ namespace Model.Design.Math {
 
   }
   #region Messages
+  /// <summary>
+  /// An object of Sides defines the offset relative to the sides of some
+  /// rectangular area. It may be described either with one number (to represent
+  /// the same offset for all sides), or with four numbers (left, top, right,
+  /// bottom).
+  /// </summary>
   public sealed partial class Sides : pb::IMessage<Sides>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

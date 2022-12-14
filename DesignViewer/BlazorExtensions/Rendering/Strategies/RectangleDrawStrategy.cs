@@ -6,7 +6,7 @@ using Model.Design.Math;
 
 namespace BlazorExtensions.Rendering.Strategies
 {
-    internal class RectangleDrawStrategy : BaseElementDrawStrategy
+    public class RectangleDrawStrategy : BaseElementDrawStrategy
     {
         public RectangleDrawStrategy(Element element) : base(element) { }
 
@@ -17,8 +17,9 @@ namespace BlazorExtensions.Rendering.Strategies
             Point position = _element.Position.Clone();
             float x = position.X + rectangle.Corner1.X;
             float y = position.Y + rectangle.Corner1.Y;
-            float width = rectangle.Width;
-            float height = rectangle.Height;
+            var scale = _element.Transform.ScaleFactor;
+            float width = rectangle.Width * scale.X;
+            float height = rectangle.Height * scale.Y;
             RgbColor rgb = fillColor.Rgb;
             uint alpha = fillColor.Alpha;
 

@@ -1,6 +1,4 @@
 
-// A Pen describes the appearance of vector's stroke.
-
 syntax = "proto3";
 
 package design.appearance;
@@ -26,6 +24,7 @@ enum LineJoin
   LINE_JOIN_ROUND = 3;
 }
 
+// A Pen describes the appearance of vector's stroke.
 message Pen
 {
   float width = 1;

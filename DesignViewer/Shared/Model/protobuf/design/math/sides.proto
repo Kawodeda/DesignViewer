@@ -1,15 +1,14 @@
 
-// An object of Sides defines the offset relative to the sides of some
-// rectangular area. It may be described either with one number (to represent
-// the same offset for all sides), or with four numbers (left, top, right,
-// bottom).
-
 syntax = "proto3";
 
 package design.math;
 
 option csharp_namespace = "Model.Design.Math";
 
+// An object of Sides defines the offset relative to the sides of some
+// rectangular area. It may be described either with one number (to represent
+// the same offset for all sides), or with four numbers (left, top, right,
+// bottom).
 message Sides
 {
   float left = 1;

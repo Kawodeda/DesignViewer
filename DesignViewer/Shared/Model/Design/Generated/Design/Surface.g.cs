@@ -38,6 +38,13 @@ namespace Model.Design {
 
   }
   #region Messages
+  /// <summary>
+  /// A Surface is a some sort of space that contains the set of design elements
+  /// that user can interact with at a time. A Surface can represent the side of
+  /// a physical item, such as a page, a book spread and so on. A Surface defines
+  /// the frame of reference for all design elements it contains. It contains
+  /// artboards and layers that separate it along the Z-axis.
+  /// </summary>
   public sealed partial class Surface : pb::IMessage<Surface>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

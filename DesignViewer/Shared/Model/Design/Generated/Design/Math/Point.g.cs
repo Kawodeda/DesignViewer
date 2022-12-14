@@ -37,6 +37,10 @@ namespace Model.Design.Math {
 
   }
   #region Messages
+  /// <summary>
+  /// A Point represents a point in two-dimensional space in the Cartesian
+  /// coordinate system, encoded as x and y components.
+  /// </summary>
   public sealed partial class Point : pb::IMessage<Point>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

@@ -1,7 +1,4 @@
 
-// An OpenedVectorControls represents an abstract opened vector controls
-// and contains one of concrete controls available for opened vector.
-
 syntax = "proto3";
 
 package design.content.controls;
@@ -12,6 +9,8 @@ import "content/controls/path_controls.proto";
 
 option csharp_namespace = "Model.Design.Content.Controls";
 
+// An OpenedVectorControls represents an abstract opened vector controls
+// and contains one of concrete controls available for opened vector.
 message OpenedVectorControls
 {
   // Only one concrete controls is stored at a time.

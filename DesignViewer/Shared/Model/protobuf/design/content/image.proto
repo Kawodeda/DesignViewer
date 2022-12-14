@@ -1,13 +1,19 @@
 
-// An Image
-
 syntax = "proto3";
 
 package design.content;
 
+import "content/controls/image_controls.proto";
+
 option csharp_namespace = "Model.Design.Content";
 
+// Represents an image which content is located in storage, 
+// and shape is defined by controls.
 message Image
 {
-  // To be defined
+  // Contains identifier of image content located in storage.
+  string storage_id = 1;
+
+  // Contains control points of an image.
+  controls.ImageControls controls = 2;
 }

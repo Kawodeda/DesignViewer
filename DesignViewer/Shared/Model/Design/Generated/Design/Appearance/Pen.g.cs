@@ -65,6 +65,9 @@ namespace Model.Design.Appearance {
   #endregion
 
   #region Messages
+  /// <summary>
+  /// A Pen describes the appearance of vector's stroke.
+  /// </summary>
   public sealed partial class Pen : pb::IMessage<Pen>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

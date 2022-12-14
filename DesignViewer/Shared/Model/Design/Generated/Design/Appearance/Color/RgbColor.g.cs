@@ -38,6 +38,10 @@ namespace Model.Design.Appearance.Color {
 
   }
   #region Messages
+  /// <summary>
+  /// An RgbColor represents a color in RGB color space, i.e. it is encoded as
+  /// red, green and blue components.
+  /// </summary>
   public sealed partial class RgbColor : pb::IMessage<RgbColor>
   #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       , pb::IBufferMessage

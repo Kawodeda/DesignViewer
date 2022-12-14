@@ -1,6 +1,4 @@
 
-// A Color is an abstract color.
-
 syntax = "proto3";
 
 package design.appearance.color;
@@ -10,6 +8,7 @@ import "appearance/color/process_color.proto";
 
 option csharp_namespace = "Model.Design.Appearance.Color";
 
+// A Color is an abstract color.
 message Color
 {
   oneof value
