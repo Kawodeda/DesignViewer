@@ -1,5 +1,6 @@
 ﻿@using ApiClient
 @using BlazorExtensions.Services.JsInterop
+@using Microsoft.AspNetCore.Components.Web.Virtualization
 @inject IAssetsApiClient _assetsApi
 @inject IJsModulesProvider _jsModulesProvider
 
@@ -13,7 +14,19 @@
             </div>
             <div class="modal-body">
                 @*<img src="./_content/BlazorExtensions/preloader2.gif" width="100" height="100"/>*@
-                <img />
+                @*@foreach(string url in _assetUrls)
+                {
+                    <img src="@url" style="margin: 5px" onload="() => URL.revokeObjectURL('@url')" width="100" height="100"/>
+                }*@
+                <img src="./_content/BlazorExtensions/preloader2.gif" style="margin: 5px" width="200" height="200" />
+                <Virtualize ItemsProvider="@LoadAssets" Context="url" ItemSize="200">
+                    <ItemContent>
+                        <img src="@url" style="margin: 5px" width="200" height="200" />
+                    </ItemContent>
+                    <Placeholder>
+                        <img src="./_content/BlazorExtensions/preloader2.gif" style="margin: 5px" width="200" height="200" />
+                    </Placeholder>
+                </Virtualize>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary btn-upload">
@@ -36,6 +49,8 @@
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
     private JsModule _jsModule = default!;
+    private List<string> _assetUrls = new List<string>();
+
 
     [Parameter]
     public string Header { get; set; } = string.Empty;
@@ -60,9 +75,63 @@
         await base.OnInitializedAsync();
     }
 
-    private async Task LoadAssets()
+    private async ValueTask<ItemsProviderResult<string>> LoadAssets(ItemsProviderRequest request)
     {
-        var assets = await _assetsApi.ListAssetsAsync();
+        ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
+
+        int startIndex = request.StartIndex;
+        int endIndex = startIndex + request.Count;
+        var range = new Range(startIndex, endIndex);
+
+        await Task.Delay(5000);
+
+        IEnumerable<string> urls = await Task.WhenAll(assetInfos
+            .Take(range)
+            .Select(async info =>
+            {
+                using MemoryStream content = await LoadAssetContentAsync(info.StorageId);
+
+                return await _jsModule.Module!.InvokeAsync<string>("getImageUrl", content.ToArray());
+            })
+            .ToArray());
+
+        return new ItemsProviderResult<string>(urls, urls.Count());
+    }
+
+    private async Task LoadAssetsAsync()
+    {
+        ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
+
+        MemoryStream[] assets = await Task.WhenAll(
+            assetInfos
+            .Select(info => LoadAssetContentAsync(info.StorageId))
+            .ToArray());
+
+        await Task.WhenAll(
+            assets
+            .Select( async asset => {
+                try
+                {
+                    string url = await _jsModule.Module!.InvokeAsync<string>("getImageUrl", asset.ToArray());
+                    _assetUrls.Add(url);
+                }
+                finally
+                {
+                    asset.Dispose();
+                }
+            })
+            .ToArray());
+
+        StateHasChanged();
+    }
+
+    private async Task<MemoryStream> LoadAssetContentAsync(string storageId)
+    {
+        using FileResponse response = await _assetsApi.GetAssetContnetAsync(storageId);
+        var result = new MemoryStream();
+        response.Stream.CopyTo(result);
+
+        return result;
     }
 
     private async Task InitJsModule()

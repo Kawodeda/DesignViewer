@@ -14,7 +14,7 @@
     background-color: #fefefe;
     margin: 5% auto;
     padding: 10px;
-    border: 1px solid #888;
+    border: 1px solid transparent;
     width: 80%;
     max-height: 80%;
 }
