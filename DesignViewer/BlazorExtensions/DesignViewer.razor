@@ -16,7 +16,6 @@
 @inject IJSRuntime JsRuntime
 @inject IDesignRenderer _renderer
 @inject IJsModulesProvider _jsModules
-@inject IImageContentService _imageService
 @inject IHitTestStrategyFactory _hitTestStrategyFactory
 @implements IDesignViewer
 
@@ -152,27 +151,6 @@
         {
             _design = value;
             Viewport.ContentSize = CurrentArtboard.ActualSize;
-            //_design.Surfaces.First().Layers.First().Elements.Add(new Element
-            //{
-            //    Content = new ElementContent
-            //    {
-            //        Image = new Image
-            //        {
-            //            StorageId = "masyunya",
-            //            Controls = new ImageControls
-            //            {
-            //                Rectangle = new RectangleControls
-            //                {
-            //                    Corner1 = new Point(0, 0),
-            //                    Corner2 = new Point(100, 100)
-            //                }
-            //            }
-            //        }
-            //    },
-            //    Position = new Point(20, 20),
-            //    ReferencePoint = ReferencePointType.TopLeftCorner,
-            //    Transform = new Affine2DMatrix().Scale(0.31f)
-            //});
 
             RequestRendering();
         }
