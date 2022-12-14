@@ -1,0 +1,53 @@
+﻿<div class="modal" style="display: @_displayModal">
+    <div class="modal-content">
+        @if (_displayContent)
+        {
+            <div class="modal-header">
+                <h3 class="header">@Header</h3>
+                <span class="oi oi-x close" @onclick="(args) => Close()"></span>
+            </div>
+            <div class="modal-body">
+                <img src="https://i.imgur.com/fN8pbGu.jpeg"/>
+                <img src="https://i.imgur.com/9IDKaII.jpeg"/>
+                <img src="https://i.imgur.com/wy4lcpK.jpeg"/>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary btn-upload">
+                    <span class="oi oi-data-transfer-upload"></span>
+                    Upload
+                </button>
+                <button class="btn btn-primary">
+                    <span class="oi oi-check"></span>
+                    Accept
+                    </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private const string DisplayNone = "none";
+    private const string DisplayBlock = "block";
+
+    private string _displayModal = DisplayNone;
+    private bool _displayContent = false;
+
+    [Parameter]
+    public string Header { get; set; } = string.Empty;
+
+    public void Open()
+    {
+        _displayModal = DisplayBlock;
+        _displayContent = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        _displayModal = DisplayNone;
+        _displayContent = false;
+        StateHasChanged();
+    }
+
+
+}

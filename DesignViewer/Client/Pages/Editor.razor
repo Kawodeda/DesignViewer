@@ -16,6 +16,13 @@
 
 <h1>Editor</h1>
 
+<button class="btn btn-light" @onclick="(args) => _assetManager.Open()">
+    <span class="oi oi-image"></span>
+    Assets
+</button>
+
+<AssetManager @ref="_assetManager" Header="Select image:"></AssetManager>
+
 <div style="margin-bottom: 5px">
     <ColorPicker Width="300" IsVisible="@_isColorPickerVisible" @bind-Color="Color"></ColorPicker>
 </div>
@@ -51,6 +58,7 @@
     private const string UpdateMessage = "File \"{0}\" has been successfully updated";
 
     private IDesignViewer _designViewer;
+    private AssetManager _assetManager;
     private SaveDesignModel _saveDesignModel = new();
     private bool _isColorPickerVisible = false;
     private string _saveFormMessage = "";
