@@ -80,6 +80,7 @@ namespace BlazorExtensions.InputHandling
                 case DesignState.Translate:
                     if(_designViewer.SelectedElement == null)
                     {
+                        _state = DesignState.Default;
                         return base.OnMouseMove(e);
                     }
 
@@ -153,6 +154,7 @@ namespace BlazorExtensions.InputHandling
             {
                 if (_designViewer.SelectedElement != null)
                 {
+                    _capturedElement = null;
                     return new CompositeCommand(
                         new DeleteElementCommand(_designViewer.SelectedElement),
                         new ChangeSelectionCommand(null));
