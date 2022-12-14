@@ -10,10 +10,10 @@ namespace BlazorExtensions.Rendering
     {
         private const string ContextNotSetMessage = "Rendering context was not set";
 
-        private IDrawStrategyFactory _factory;
+        private IElementDrawStrategyFactory _factory;
         private Canvas2DContext? _context;
 
-        public DesignRenderer(IDrawStrategyFactory factory)
+        public DesignRenderer(IElementDrawStrategyFactory factory)
         {
             _factory = factory;
         }
@@ -59,18 +59,14 @@ namespace BlazorExtensions.Rendering
 
         public async Task RenderSelection(Element element)
         {
-            if(element.Content.ElementContentCase == ElementContent.ElementContentOneofCase.Image)
-            {
-                return;
-            }
             if (_context == null)
             {
                 throw new ContextNotSetException(ContextNotSetMessage);
             }
 
-            await _context.SaveAsync();
-            Affine2DMatrix transform = element.Transform;
+            Affine2DMatrix transform = element.Transform.RotationMatrix;
 
+            await _context.SaveAsync();
             await _context.TransformAsync(
                 transform.M11,
                 transform.M12,
@@ -78,18 +74,7 @@ namespace BlazorExtensions.Rendering
                 transform.M22,
                 transform.D1,
                 transform.D2);
-
-            float x = element.Position.X + element.Content.ClosedVector.Controls.Rectangle.Corner1.X;
-            float y = element.Position.Y + element.Content.ClosedVector.Controls.Rectangle.Corner1.Y;
-            float width = element.Content.ClosedVector.Controls.Rectangle.Corner2.X - element.Content.ClosedVector.Controls.Rectangle.Corner1.X;
-            float height = element.Content.ClosedVector.Controls.Rectangle.Corner2.Y - element.Content.ClosedVector.Controls.Rectangle.Corner1.Y;
-
-            float lineWidth = 1;
-
-            await _context.SetStrokeStyleAsync("yellow");
-            await _context.SetLineWidthAsync(lineWidth);
-            await _context.StrokeRectAsync(x, y, width, height);
-
+            await _factory.CreateSelection(element).Draw(_context);
             await _context.RestoreAsync();
         }
     }

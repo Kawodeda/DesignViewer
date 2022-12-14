@@ -3,8 +3,10 @@ using Model.Design;
 
 namespace BlazorExtensions.Rendering
 {
-    public interface IDrawStrategyFactory
+    public interface IElementDrawStrategyFactory
     {
         IDrawStrategy Create(Element element);
+
+        IDrawStrategy CreateSelection(Element element);
     }
 }

@@ -13,7 +13,7 @@ builder.RootComponents.Add<HeadOutlet>("head::after");
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 builder.Services.AddScoped<IDesignsApiClient>(sp => new DesignsApiClient(builder.HostEnvironment.BaseAddress));
 builder.Services.AddScoped<IAssetsApiClient>(sp => new AssetsApiClient(builder.HostEnvironment.BaseAddress));
-builder.Services.AddScoped<IDrawStrategyFactory, DrawStrategyFactory>();
+builder.Services.AddScoped<IElementDrawStrategyFactory, ElementDrawStrategyFactory>();
 builder.Services.AddScoped<IHitTestStrategyFactory, HitTestStrategyFactory>();
 builder.Services.AddScoped<IJsModulesProvider, JsModulesProvider>();
 builder.Services.AddScoped<IAssetService, AssetService>();
