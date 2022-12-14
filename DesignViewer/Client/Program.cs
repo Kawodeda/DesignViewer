@@ -1,4 +1,5 @@
 using ApiClient;
+using BlazorExtensions.InputHandling.HitTest;
 using BlazorExtensions.Rendering;
 using BlazorExtensions.Services;
 using DesignViewer.Client;
@@ -13,6 +14,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<IDesignsApiClient>(sp => new DesignsApiClient(builder.HostEnvironment.BaseAddress));
 builder.Services.AddScoped<IAssetsApiClient>(sp => new AssetsApiClient(builder.HostEnvironment.BaseAddress));
 builder.Services.AddScoped<IDrawStrategyFactory, DrawStrategyFactory>();
+builder.Services.AddScoped<IHitTestStrategyFactory, HitTestStrategyFactory>();
 builder.Services.AddScoped<IJsModulesProvider, JsModulesProvider>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IImageContentService, ImageContentService>();

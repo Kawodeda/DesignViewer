@@ -1,4 +1,5 @@
-﻿using Model.Design;
+﻿using BlazorExtensions.InputHandling.HitTest;
+using Model.Design;
 using Model.Design.Appearance.Color;
 using Model.Design.Math;
 
@@ -17,5 +18,7 @@ namespace BlazorExtensions
         public Design Design { get; set; }
 
         public int CurrentSurfaceIndex { get; set; }
+
+        public IHitTestStrategyFactory HitTestStrategyFactory { get; }
     }
 }

@@ -4,15 +4,20 @@
 @using BlazorExtensions.Commands
 @using BlazorExtensions.Commands.Context
 @using BlazorExtensions.InputHandling
+@using BlazorExtensions.InputHandling.HitTest
 @using BlazorExtensions.Rendering
 @using BlazorExtensions.Services
 @using BlazorExtensions.Viewports
 @using Model.Design
 @using Model.Design.Appearance.Color
+@using Model.Design.Content
+@using Model.Design.Content.Controls
 @using Model.Design.Math
 @inject IJSRuntime JsRuntime
 @inject IDesignRenderer _renderer
 @inject IJsModulesProvider _jsModules
+@inject IImageContentService _imageService
+@inject IHitTestStrategyFactory _hitTestStrategyFactory
 @implements IDesignViewer
 
 <div id="ora" style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
@@ -147,6 +152,27 @@
         {
             _design = value;
             Viewport.ContentSize = CurrentArtboard.ActualSize;
+            //_design.Surfaces.First().Layers.First().Elements.Add(new Element
+            //{
+            //    Content = new ElementContent
+            //    {
+            //        Image = new Image
+            //        {
+            //            StorageId = "masyunya",
+            //            Controls = new ImageControls
+            //            {
+            //                Rectangle = new RectangleControls
+            //                {
+            //                    Corner1 = new Point(0, 0),
+            //                    Corner2 = new Point(100, 100)
+            //                }
+            //            }
+            //        }
+            //    },
+            //    Position = new Point(20, 20),
+            //    ReferencePoint = ReferencePointType.TopLeftCorner,
+            //    Transform = new Affine2DMatrix().Scale(0.31f)
+            //});
 
             RequestRendering();
         }
@@ -163,6 +189,14 @@
             _currentSurfaceIndex = value;
             Viewport.ContentSize = CurrentArtboard.ActualSize;
             RequestRendering();
+        }
+    }
+
+    public IHitTestStrategyFactory HitTestStrategyFactory
+    {
+        get
+        {
+            return _hitTestStrategyFactory;
         }
     }
 
@@ -343,7 +377,7 @@
 
         await _uiCanvasContext.SetFillStyleAsync("black");
         await _uiCanvasContext.SetFontAsync("10px verdana");
-        var selected = SelectedElement?.Content.ClosedVector.Controls.ControlsCase;
+        var selected = SelectedElement?.Content.ElementContentCase;
         await _uiCanvasContext.FillTextAsync($"SelectedElement: {selected}", 5, 10);
 
         await _uiCanvasContext.FillTextAsync($"scrollX: {Viewport.ScrollX.ToString("N2")}", Width - 80, 10);

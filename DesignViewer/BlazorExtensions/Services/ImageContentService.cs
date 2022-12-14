@@ -1,5 +1,6 @@
 ﻿using BlazorExtensions.Services.Exceptions;
 using Microsoft.JSInterop;
+using Model.Design.Math;
 
 namespace BlazorExtensions.Services
 {
@@ -65,12 +66,15 @@ namespace BlazorExtensions.Services
                 "getHtmlImage",
                 await ExtractBytesAsync(content));
 
+            float width = await _jsModule!.InvokeAsync<float>("getImageWidth", htmlImage);
+            float height = await _jsModule!.InvokeAsync<float>("getImageHeight", htmlImage);
+
             if (htmlImage == null)
             {
                 throw new ImageContentLoadingException();
             }
 
-            return new ImageContent(htmlImage);
+            return new ImageContent(htmlImage, new Size(width, height));
         }
 
         private async Task<byte[]> ExtractBytesAsync(Stream data)

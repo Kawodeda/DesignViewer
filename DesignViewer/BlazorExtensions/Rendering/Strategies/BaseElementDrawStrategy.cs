@@ -5,7 +5,7 @@ namespace BlazorExtensions.Rendering.Strategies
 {
     public abstract class BaseElementDrawStrategy : IDrawStrategy
     {
-        protected Element _element;
+        protected readonly Element _element;
 
         protected BaseElementDrawStrategy(Element element)
         {

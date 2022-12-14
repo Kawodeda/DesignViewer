@@ -1,6 +1,7 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
 using BlazorExtensions.Rendering.Exceptions;
 using Model.Design;
+using Model.Design.Content;
 using Model.Design.Math;
 
 namespace BlazorExtensions.Rendering
@@ -58,6 +59,10 @@ namespace BlazorExtensions.Rendering
 
         public async Task RenderSelection(Element element)
         {
+            if(element.Content.ElementContentCase == ElementContent.ElementContentOneofCase.Image)
+            {
+                return;
+            }
             if (_context == null)
             {
                 throw new ContextNotSetException(ContextNotSetMessage);

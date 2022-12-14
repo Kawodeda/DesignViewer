@@ -43,9 +43,14 @@ namespace BlazorExtensions.Rendering.Strategies
 
             Point scale = _element.Transform.ScaleFactor;
 
-            await _jsModule.InvokeVoidAsync("drawImage", context, 
-                imageContent.HtmlImage, _element.Position.X, _element.Position.Y, 
-                scale.X, scale.Y);
+            await _jsModule.InvokeVoidAsync(
+                "drawImage", 
+                context, 
+                imageContent.HtmlImage, 
+                _element.Position.X, 
+                _element.Position.Y, 
+                scale.X, 
+                scale.Y);
         }
 
         public void InitJsModule()
