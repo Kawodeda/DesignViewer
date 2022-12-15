@@ -1,0 +1,38 @@
+﻿.asset-item {
+    display: inline-block;
+    background-color: transparent;
+    border: 2px dashed transparent;
+    border-radius: 3%;
+    transition: border-color linear 0.0s;
+    transition: background-color linear 0.0s;
+}
+
+.asset-item:hover {
+    background-color: rgba(0, 100, 255, .2);
+    border-color: rgba(0, 100, 255, .5);
+}
+
+div.asset-item img {
+    mix-blend-mode: normal;
+}
+
+div.asset-item:hover img {
+    mix-blend-mode: multiply;
+}
+
+div.asset-item-selected img {
+    mix-blend-mode: multiply;
+}
+
+.asset-item-image {
+    margin: 1%;
+    width: 98%;
+    height: 98%;
+}
+
+.asset-item-selected {
+    display: inline-block;
+    background-color: rgba(0, 100, 255, .3);
+    border: 2px dashed rgba(0, 100, 255, .5);
+    border-radius: 3%;
+}

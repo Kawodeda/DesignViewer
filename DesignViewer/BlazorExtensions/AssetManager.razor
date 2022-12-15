@@ -17,20 +17,24 @@
                 {
                     <Preloader></Preloader>
                 }
-                <Virtualize @ref="_virtualizeRef" ItemsProvider="@(async (request) => await LoadAssets(request))" Context="urls" ItemSize="@ImageItemSize" OverscanCount="1">
+                <Virtualize @ref="_virtualizeRef" ItemsProvider="@LoadAssetsAsync" Context="urls" ItemSize="@AssetItemSize" OverscanCount="1">
                     <ItemContent>
                         @foreach(string url in urls)
                         {
-                            <div style="width: @(ImageSize)px; height: @(ImageSize)px; margin: @(ImageMargin)px; display: inline-block;">
-                                <img src="@url" style="width: @(ImageSize)px; height: @(ImageSize)px;" alt="Could not load..." />
-                            </div>
+                            <AssetItem 
+                                ImageUrl="@url" 
+                                Size="@ItemSize" 
+                                Margin="@ItemMargin" 
+                                Selected="@SelectItem"
+                                Unselected="@UnselectItem">
+                            </AssetItem>
                         }
                     </ItemContent>
                     <Placeholder>
                         @for (int i = 0; i < _columnCount; i++)
                         {
-                            <div style="width: @(ImageSize)px; height: @(ImageSize)px;  margin: @(ImageMargin)px; display: inline-block;">
-                                <img src="./_content/BlazorExtensions/preloader2.gif" style="width: @(ImageSize)px; height: @(ImageSize)px;" />
+                            <div class="asset-item-placeholder" style="width: @(ItemSize)px; height: @(ItemSize)px;  margin: @(ItemMargin)px;">
+                                <img class="asset-item-placeholder-image" src="./_content/BlazorExtensions/preloader2.gif" />
                             </div>
                         }
                     </Placeholder>
@@ -41,9 +45,9 @@
                     <span class="oi oi-data-transfer-upload"></span>
                     Upload
                 </button>
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" disabled="@(!IsSubmitEnabled)">
                     <span class="oi oi-check"></span>
-                    Accept
+                    Submit
                     </button>
             </div>
         }
@@ -53,18 +57,19 @@
 @code {
     private const string DisplayNone = "none";
     private const string DisplayBlock = "block";
-    private const float ImageSize = 225;
-    private const float ImageMargin = 5;
+    private const float ItemSize = 225;
+    private const float ItemMargin = 5;
 
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
-    private JsModule _jsModule = default!;
-    private List<string> _assetUrls = new List<string>();
+    private bool _isSubmitEnabled = false;
     private Virtualize<IEnumerable<string>> _virtualizeRef;
     private ElementReference _body;
     private int _columnCount;
     private bool _firstFetch = true;
+    private AssetItem? _selectedItem;
 
+    private JsModule _jsModule = default!;
 
     [Parameter]
     public string Header { get; set; } = string.Empty;
@@ -90,11 +95,57 @@
         await base.OnInitializedAsync();
     }
 
-    private float ImageItemSize
+    private Task<int> ColumnCount
     {
         get
         {
-            return ImageSize + 2 * ImageMargin;
+            return _jsModule.Module!.InvokeAsync<float>("getElementWidth", _body)
+                .AsTask()
+                .ContinueWith(bodyWidth =>
+                {
+                    _columnCount = (int)(bodyWidth.Result / AssetItemSize);
+
+                    return _columnCount;
+                });
+        }
+    }
+
+    private float AssetItemSize
+    {
+        get
+        {
+            return ItemSize + 2 * ItemMargin;
+        }
+    }
+
+    private AssetItem? SelectedItem
+    {
+        get
+        {
+            return _selectedItem;
+        }
+        set
+        {
+            _selectedItem = value;
+            IsSubmitEnabled = _selectedItem != null;
+        }
+    }
+
+    private bool IsSubmitEnabled
+    {
+        get
+        {
+            return _isSubmitEnabled;
+        }
+        set
+        {
+            if (_isSubmitEnabled == value)
+            {
+                return;
+            }
+
+            _isSubmitEnabled = value;
+            StateHasChanged();
         }
     }
 
@@ -104,7 +155,7 @@
         StateHasChanged();
     }
 
-    private async ValueTask<ItemsProviderResult<IEnumerable<string>>> LoadAssets(ItemsProviderRequest request)
+    private async ValueTask<ItemsProviderResult<IEnumerable<string>>> LoadAssetsAsync(ItemsProviderRequest request)
     {
         int columnCount = await ColumnCount;
         ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
@@ -131,33 +182,6 @@
         return new ItemsProviderResult<IEnumerable<string>>(rows, rowCount);
     }
 
-    private async Task LoadAssetsAsync()
-    {
-        ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
-
-        MemoryStream[] assets = await Task.WhenAll(
-            assetInfos
-            .Select(info => LoadAssetContentAsync(info.StorageId))
-            .ToArray());
-
-        await Task.WhenAll(
-            assets
-            .Select( async asset => {
-                try
-                {
-                    string url = await _jsModule.Module!.InvokeAsync<string>("getImageUrl", asset.ToArray());
-                    _assetUrls.Add(url);
-                }
-                finally
-                {
-                    asset.Dispose();
-                }
-            })
-            .ToArray());
-
-        StateHasChanged();
-    }
-
     private async Task<MemoryStream> LoadAssetContentAsync(string storageId)
     {
         using FileResponse response = await _assetsApi.GetAssetContnetAsync(storageId);
@@ -167,19 +191,19 @@
         return result;
     }
 
-    private Task<int> ColumnCount
+    private void SelectItem(AssetItem item)
     {
-        get
+        if (SelectedItem != null)
         {
-            return _jsModule.Module!.InvokeAsync<float>("getElementWidth", _body)
-                .AsTask()
-                .ContinueWith(bodyWidth =>
-                {
-                    _columnCount = (int)(bodyWidth.Result / ImageItemSize);
-
-                    return _columnCount;
-                });
+            SelectedItem.IsSelected = false;
         }
+
+        SelectedItem = item;
+    }
+
+    private void UnselectItem(AssetItem item)
+    {
+        SelectedItem = null;
     }
 
     private async Task InitJsModule()

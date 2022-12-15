@@ -1,0 +1,86 @@
+﻿
+<div 
+    class="@_class" 
+    style="width: @(Size)px; height: @(Size)px; margin: @(Margin)px;"
+     @onclick="(args) => OnClick(args)">
+    <img class="asset-item-image" src="@_imageUrl" />
+</div>
+
+@code {
+    private const string UnselectedClass = "asset-item";
+    private const string SelectedClass = "asset-item-selected";
+
+    private bool _isSelected;
+    private string _imageUrl = string.Empty;
+    private string _class = UnselectedClass;
+
+    [Parameter]
+    public float Size { get; set; }
+
+    [Parameter]
+    public float Margin { get; set; }
+
+    [Parameter]
+    public string ImageUrl 
+    { 
+        get
+        {
+            return _imageUrl;
+        }
+        set
+        {
+            if (_imageUrl == value)
+            {
+                return;
+            }
+
+            _imageUrl = value;
+            IsSelected = false;
+        }
+    }
+
+    public bool IsSelected
+    {
+        get
+        {
+            return _isSelected;
+        }
+        set
+        {
+            _isSelected = value;
+            UpdateClass();
+
+            if(_isSelected)
+            {
+                Selected.InvokeAsync(this);
+            }
+            else
+            {
+                Unselected.InvokeAsync(this);
+            }
+        }
+    }
+
+    [Parameter]
+    public EventCallback<AssetItem> Selected { get; set; }
+
+    [Parameter]
+    public EventCallback<AssetItem> Unselected { get; set; }
+
+    private void OnClick(MouseEventArgs e)
+    {
+        IsSelected = !IsSelected;
+    }
+
+    private void UpdateClass()
+    {
+        if (_isSelected)
+        {
+            _class = SelectedClass;
+        }
+        else
+        {
+            _class = UnselectedClass;
+        }
+    }
+}

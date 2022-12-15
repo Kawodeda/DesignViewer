@@ -67,3 +67,13 @@
 .btn-upload {
     float: left;
 }
+
+.asset-item-placeholder {
+    display: inline-block;
+}
+
+.asset-item-placeholder-image {
+    margin: 1%;
+    width: 98%;
+    height: 98%;
+}
