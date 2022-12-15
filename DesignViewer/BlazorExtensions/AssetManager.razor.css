@@ -68,6 +68,14 @@
     float: left;
 }
 
+.asset-row {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    align-content: center;
+    flex-direction: row;
+}
+
 .asset-item-placeholder {
     display: inline-block;
 }

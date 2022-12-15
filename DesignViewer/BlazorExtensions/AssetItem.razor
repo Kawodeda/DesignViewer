@@ -1,10 +1,12 @@
 ﻿@using BlazorExtensions.Models;
 
 <div 
-    class="@_class" 
-    style="width: @(Size)px; height: @(Size)px; margin: @(Margin)px;"
+    class="@_class"
+     style="--item-size: @(Size)px; margin: @(Margin)px;"
      @onclick="(args) => OnClick(args)">
-    <img class="asset-item-image" src="@_asset.ImageUrl" />
+    <div class="center">
+        <img class="asset-item-image" src="@_asset.ImageUrl" />
+    </div>
 </div>
 
 @code {

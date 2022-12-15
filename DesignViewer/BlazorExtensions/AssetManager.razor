@@ -20,14 +20,13 @@
                 }
                 <Virtualize @ref="_virtualizeRef" ItemsProvider="@LoadAssetsAsync" Context="assets" ItemSize="@AssetItemSize" OverscanCount="1">
                     <ItemContent>
-                        @foreach(var asset in assets)
+                        @foreach (var asset in assets)
                         {
-                            <AssetItem 
-                                Asset="@asset"
-                                Size="@ItemSize" 
-                                Margin="@ItemMargin" 
-                                Selected="@SelectItem"
-                                Unselected="@UnselectItem">
+                            <AssetItem Asset="@asset"
+                               Size="@ItemSize"
+                               Margin="@ItemMargin"
+                               Selected="@SelectItem"
+                               Unselected="@UnselectItem">
                             </AssetItem>
                         }
                     </ItemContent>

@@ -1,15 +1,19 @@
 ﻿.asset-item {
     display: inline-block;
+    position: relative;
     background-color: transparent;
-    border: 2px dashed transparent;
+    /*border: 2px dashed transparent;*/
     border-radius: 3%;
     transition: border-color linear 0.0s;
     transition: background-color linear 0.0s;
+    width: var(--item-size);
+    height: var(--item-size);
+    --size: var(--item-size);
 }
 
 .asset-item:hover {
-    background-color: rgba(0, 100, 255, .2);
-    border-color: rgba(0, 100, 255, .5);
+    background-color: rgba(0, 100, 255, .15);
+    /*border-color: rgba(0, 100, 255, .5);*/
 }
 
 div.asset-item img {
@@ -25,14 +29,28 @@ div.asset-item-selected img {
 }
 
 .asset-item-image {
-    margin: 1%;
-    width: 98%;
-    height: 98%;
+    max-width: calc(var(--item-size) * 0.95);
+    max-height: calc(var(--item-size) * 0.95);
 }
 
 .asset-item-selected {
     display: inline-block;
-    background-color: rgba(0, 100, 255, .3);
-    border: 2px dashed rgba(0, 100, 255, .5);
+    position: relative;
+    background-color: rgba(0, 100, 255, .25);
+    /*border: 2px dashed rgba(0, 100, 255, .5);*/
     border-radius: 3%;
+    width: var(--item-size);
+    height: var(--item-size);
+    --size: var(--item-size);
+}
+
+.center {
+    margin: 0;
+    --item-size: var(--size);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    /*mix-blend-mode: multiply;*/
 }
