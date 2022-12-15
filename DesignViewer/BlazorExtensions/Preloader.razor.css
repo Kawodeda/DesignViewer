@@ -1,0 +1,34 @@
+﻿.preloader {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.text-preloader {
+    font-size: 400%;
+    position: relative;
+    top: -25px;
+}
+
+.text-preloader::after {
+    content: "";
+    animation-name: loading;
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+}
+
+@keyframes loading {
+    0% {
+        content: ""
+    }
+    25% {
+        content: "."
+    }
+    50% {
+        content: ".."
+    }
+    75% {
+        content: "..."
+    }
+}

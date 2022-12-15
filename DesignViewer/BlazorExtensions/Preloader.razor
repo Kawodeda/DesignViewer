@@ -1,0 +1,17 @@
+﻿<div class="preloader">
+    <img src="./_content/BlazorExtensions/preloader2.gif" style="width: @ImageSize; height: @ImageSize;" />
+    <p class="text-preloader" style="font-size: @FontSize">
+        @Text
+    </p>
+</div>
+
+@code {
+    [Parameter]
+    public string Text { get; set; } = "Fetching";
+
+    [Parameter]
+    public string FontSize { get; set; } = "400%";
+
+    [Parameter]
+    public string ImageSize { get; set; } = "150px";
+}
