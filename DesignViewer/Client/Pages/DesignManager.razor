@@ -1,5 +1,6 @@
 ﻿@page "/"
 @using ApiClient
+@using BlazorExtensions;
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IDesignsApiClient _designsApiClient
@@ -9,8 +10,13 @@
 <h1>Designs:</h1>
 
 <div style="height: 500px; width: 500px; overflow-y: scroll; margin: 1em">
+    @if(_firstFetch)
+    {
+        <Preloader></Preloader>
+    }
     <Virtualize @ref="_virtualizeComponent" Context="design" ItemsProvider="@LoadDesigns">
-        <div style="border: 2px outset black; padding: 10px; margin: 5px">
+        <ItemContent>
+            <div style="border: 2px outset black; padding: 10px; margin: 5px; height: 90px;">
             <h5>@design.Name</h5>
             <button class="btn btn-light" @onclick="() => EditDesign(design)">
                 <span class="oi oi-pencil"></span>
@@ -21,6 +27,12 @@
                 Delete
                 </button>
         </div>
+        </ItemContent>
+        <Placeholder>
+            <div class="placeholder-container">
+                <img src="./_content/BlazorExtensions/preloader2.gif" style="height: 100%; aspect-ratio: 1 / 1; display: block" />
+            </div>
+        </Placeholder>
     </Virtualize>
 </div>
 <button class="btn btn-primary" @onclick="CreateDesign"
@@ -43,6 +55,7 @@
         = "Are you really want to delete file \"{0}\"?";
 
     private string _message = "";
+    private bool _firstFetch = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -79,12 +92,20 @@
         }
     }
 
-    private async ValueTask<ItemsProviderResult<DesignDto>> LoadDesigns(
-        ItemsProviderRequest request)
+    private async ValueTask<ItemsProviderResult<DesignDto>> LoadDesigns(ItemsProviderRequest request)
     {
         var designs = await _designsApiClient.ListDesignsAsync();
+        var result = designs
+            .Skip(request.StartIndex)
+            .Take(request.Count);
 
-        return new ItemsProviderResult<DesignDto>(designs, designs.Count);
+        if (_firstFetch)
+        {
+            _firstFetch = false;
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<DesignDto>(result, designs.Count);
     }
 
     private async Task ReloadDesigns()

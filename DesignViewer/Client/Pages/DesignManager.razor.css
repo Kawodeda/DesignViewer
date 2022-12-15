@@ -1,0 +1,8 @@
+﻿.placeholder-container {
+    margin: 5px;
+    display: flex;
+    align-items: center;
+    height: 90px;
+    align-content: center;
+    justify-content: center;
+}
