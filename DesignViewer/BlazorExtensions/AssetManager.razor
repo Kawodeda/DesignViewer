@@ -1,4 +1,5 @@
 ﻿@using ApiClient
+@using BlazorExtensions.Models;
 @using BlazorExtensions.Services.JsInterop
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @inject IAssetsApiClient _assetsApi
@@ -17,12 +18,12 @@
                 {
                     <Preloader></Preloader>
                 }
-                <Virtualize @ref="_virtualizeRef" ItemsProvider="@LoadAssetsAsync" Context="urls" ItemSize="@AssetItemSize" OverscanCount="1">
+                <Virtualize @ref="_virtualizeRef" ItemsProvider="@LoadAssetsAsync" Context="assets" ItemSize="@AssetItemSize" OverscanCount="1">
                     <ItemContent>
-                        @foreach(string url in urls)
+                        @foreach(var asset in assets)
                         {
                             <AssetItem 
-                                ImageUrl="@url" 
+                                Asset="@asset"
                                 Size="@ItemSize" 
                                 Margin="@ItemMargin" 
                                 Selected="@SelectItem"
@@ -45,7 +46,7 @@
                     <span class="oi oi-data-transfer-upload"></span>
                     Upload
                 </button>
-                <button class="btn btn-primary" disabled="@(!IsSubmitEnabled)">
+                <button class="btn btn-primary" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
                     <span class="oi oi-check"></span>
                     Submit
                     </button>
@@ -63,7 +64,7 @@
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
     private bool _isSubmitEnabled = false;
-    private Virtualize<IEnumerable<string>> _virtualizeRef;
+    private Virtualize<IEnumerable<Asset>> _virtualizeRef = default!;
     private ElementReference _body;
     private int _columnCount;
     private bool _firstFetch = true;
@@ -73,6 +74,12 @@
 
     [Parameter]
     public string Header { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback Closed { get; set; }
+
+    [Parameter]
+    public EventCallback<Asset> Submited { get; set; }
 
     public void Open()
     {
@@ -87,6 +94,7 @@
         _displayModal = DisplayNone;
         _displayContent = false;
         StateHasChanged();
+        Closed.InvokeAsync();
     }
 
     protected override async Task OnInitializedAsync()
@@ -155,7 +163,7 @@
         StateHasChanged();
     }
 
-    private async ValueTask<ItemsProviderResult<IEnumerable<string>>> LoadAssetsAsync(ItemsProviderRequest request)
+    private async ValueTask<ItemsProviderResult<IEnumerable<Asset>>> LoadAssetsAsync(ItemsProviderRequest request)
     {
         int columnCount = await ColumnCount;
         ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
@@ -169,8 +177,9 @@
                 .Select(async info =>
                 {
                     using MemoryStream content = await LoadAssetContentAsync(info.StorageId);
+                    string url = await _jsModule.Module!.InvokeAsync<string>("getImageUrl", content.ToArray());
 
-                    return await _jsModule.Module!.InvokeAsync<string>("getImageUrl", content.ToArray());
+                    return new Asset(info, url);
                 }))));
 
         if(_firstFetch)
@@ -179,7 +188,7 @@
             StateHasChanged();
         }
 
-        return new ItemsProviderResult<IEnumerable<string>>(rows, rowCount);
+        return new ItemsProviderResult<IEnumerable<Asset>>(rows, rowCount);
     }
 
     private async Task<MemoryStream> LoadAssetContentAsync(string storageId)
@@ -189,6 +198,17 @@
         response.Stream.CopyTo(result);
 
         return result;
+    }
+
+    private void OnSubmit(MouseEventArgs e)
+    {
+        if(SelectedItem == null)
+        {
+            return;
+        }
+
+        Close();
+        Submited.InvokeAsync(SelectedItem!.Asset);
     }
 
     private void SelectItem(AssetItem item)

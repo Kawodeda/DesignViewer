@@ -5,9 +5,9 @@ using Model.Design.Content;
 using Model.Design.Content.Controls;
 using Model.Design.Math;
 
-namespace BlazorExtensions
+namespace BlazorExtensions.Services
 {
-    public class ElementCreator : IElementCreator
+    public class ElementFactory : IElementFactory
     {
         private Brush Lavender
         {
@@ -82,7 +82,7 @@ namespace BlazorExtensions
                             {
                                 Corner1 = new Point(0, 0),
                                 Corner2 = new Point(
-                                    _random.Next(10, 64), 
+                                    _random.Next(10, 64),
                                     _random.Next(10, 64))
                             }
                         }
@@ -91,6 +91,32 @@ namespace BlazorExtensions
             };
 
             return rectangle;
+        }
+
+        public Element CreateImage(string storageId, Point position, Affine2DMatrix transform)
+        {
+            var image = new Element
+            {
+                Position = position,
+                Transform = transform,
+                ReferencePoint = ReferencePointType.TopLeftCorner,
+                Content = new ElementContent
+                {
+                    Image = new Image
+                    {
+                        StorageId= storageId,
+                        Controls = new ImageControls
+                        {
+                            Rectangle= new RectangleControls
+                            {
+                                Corner1 = new Point(0, 0),
+                                Corner2 = new Point(0, 0)
+                            }
+                        }
+                    }
+                }
+            };
+            return image;
         }
 
         private Brush GetRandomBrush()

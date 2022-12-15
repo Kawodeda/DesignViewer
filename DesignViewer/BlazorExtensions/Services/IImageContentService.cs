@@ -1,4 +1,6 @@
-﻿namespace BlazorExtensions.Services
+﻿using BlazorExtensions.Models;
+
+namespace BlazorExtensions.Services
 {
     public interface IImageContentService
     {

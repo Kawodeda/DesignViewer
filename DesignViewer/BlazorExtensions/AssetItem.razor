@@ -1,18 +1,20 @@
-﻿
+﻿@using BlazorExtensions.Models;
+
 <div 
     class="@_class" 
     style="width: @(Size)px; height: @(Size)px; margin: @(Margin)px;"
      @onclick="(args) => OnClick(args)">
-    <img class="asset-item-image" src="@_imageUrl" />
+    <img class="asset-item-image" src="@_asset.ImageUrl" />
 </div>
 
 @code {
     private const string UnselectedClass = "asset-item";
     private const string SelectedClass = "asset-item-selected";
 
-    private bool _isSelected;
-    private string _imageUrl = string.Empty;
     private string _class = UnselectedClass;
+
+    private Asset _asset = default!;
+    private bool _isSelected;
 
     [Parameter]
     public float Size { get; set; }
@@ -21,20 +23,20 @@
     public float Margin { get; set; }
 
     [Parameter]
-    public string ImageUrl 
-    { 
+    public Asset Asset
+    {
         get
         {
-            return _imageUrl;
+            return _asset;
         }
         set
         {
-            if (_imageUrl == value)
+            if (_asset == value)
             {
                 return;
             }
 
-            _imageUrl = value;
+            _asset = value;
             IsSelected = false;
         }
     }

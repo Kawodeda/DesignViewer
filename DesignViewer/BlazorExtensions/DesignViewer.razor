@@ -5,6 +5,7 @@
 @using BlazorExtensions.Commands.Context
 @using BlazorExtensions.InputHandling
 @using BlazorExtensions.InputHandling.HitTest
+@using BlazorExtensions.Models;
 @using BlazorExtensions.Rendering
 @using BlazorExtensions.Services
 @using BlazorExtensions.Services.JsInterop
@@ -20,23 +21,25 @@
 @inject IHitTestStrategyFactory _hitTestStrategyFactory
 @implements IDesignViewer
 
-<div id="ora" style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
-    <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
-</div>
+<div style="width: @(Width)px; height: @(Height)px;">
+    <div style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
+        <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
+    </div>
 
-<!--Doesn't capture keyboard events without tabindex-->
-<div style="position: absolute; width: @(Width)px; height: @(Height)px"
-    tabindex="0"
-    @onmousedown="OnMouseDown" 
-    @onmouseup="OnMouseUp" 
-    @onmousemove="OnMouseMove"
-    @onmouseover="OnMouseOver"
-    @onmouseout="OnMouseOut"
-    @onwheel="OnWheel"
-    @onkeydown="OnKeyDown"
-    @onkeyup="OnKeyUp"
-    @onkeypress="OnKeyPress">
-    <BECanvas Width="@Width" Height="@Height" @ref="_uiCanvasReference"></BECanvas>
+    <!--Doesn't capture keyboard events without tabindex-->
+    <div style="position: absolute; width: @(Width)px; height: @(Height)px"
+         tabindex="0"
+         @onmousedown="OnMouseDown"
+         @onmouseup="OnMouseUp"
+         @onmousemove="OnMouseMove"
+         @onmouseover="OnMouseOver"
+         @onmouseout="OnMouseOut"
+         @onwheel="OnWheel"
+         @onkeydown="OnKeyDown"
+         @onkeyup="OnKeyUp"
+         @onkeypress="OnKeyPress">
+        <BECanvas Width="@Width" Height="@Height" @ref="_uiCanvasReference"></BECanvas>
+    </div>
 </div>
 
 @code {

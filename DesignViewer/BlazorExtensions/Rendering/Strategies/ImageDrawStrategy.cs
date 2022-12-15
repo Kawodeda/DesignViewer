@@ -1,4 +1,5 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
+using BlazorExtensions.Models;
 using BlazorExtensions.Services;
 using BlazorExtensions.Services.JsInterop;
 using Microsoft.JSInterop;

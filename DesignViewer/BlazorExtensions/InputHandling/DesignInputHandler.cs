@@ -3,6 +3,7 @@ using Model.Design.Math;
 using BlazorExtensions.Commands;
 using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;
+using BlazorExtensions.Services;
 
 namespace BlazorExtensions.InputHandling
 {
@@ -26,7 +27,7 @@ namespace BlazorExtensions.InputHandling
 
         private IDesignViewer _designViewer;
         private DesignState _state;
-        private IElementCreator _elementCreator = new ElementCreator();
+        private IElementFactory _elementCreator = new ElementFactory();
         private float _prevMouseX;
         private float _prevMouseY;
         private Element? _capturedElement;

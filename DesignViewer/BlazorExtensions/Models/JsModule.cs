@@ -1,6 +1,6 @@
 ﻿using Microsoft.JSInterop;
 
-namespace BlazorExtensions.Services.JsInterop
+namespace BlazorExtensions.Models
 {
     internal class JsModule
     {
