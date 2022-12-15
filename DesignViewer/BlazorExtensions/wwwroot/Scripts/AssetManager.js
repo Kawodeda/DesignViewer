@@ -3,3 +3,7 @@
 
     return URL.createObjectURL(blob);
 }
+
+export function getElementWidth(element) {
+    return element.clientWidth;
+}

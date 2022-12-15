@@ -12,24 +12,32 @@
                 <h3 class="header">@Header</h3>
                 <span class="oi oi-x close" @onclick="(args) => Close()"></span>
             </div>
-            <div class="modal-body">
-                @*<img src="./_content/BlazorExtensions/preloader2.gif" width="100" height="100"/>*@
-                @*@foreach(string url in _assetUrls)
+            <div class="modal-body" @ref="_body">
+                @if(_firstFetch)
                 {
-                    <img src="@url" style="margin: 5px" onload="() => URL.revokeObjectURL('@url')" width="100" height="100"/>
-                }*@
-                <img src="./_content/BlazorExtensions/preloader2.gif" style="margin: 5px" width="200" height="200" />
-                <Virtualize ItemsProvider="@LoadAssets" Context="url" ItemSize="200">
+                    <Preloader></Preloader>
+                }
+                <Virtualize @ref="_virtualizeRef" ItemsProvider="@(async (request) => await LoadAssets(request))" Context="urls" ItemSize="@ImageItemSize" OverscanCount="1">
                     <ItemContent>
-                        <img src="@url" style="margin: 5px" width="200" height="200" />
+                        @foreach(string url in urls)
+                        {
+                            <div style="width: @(ImageSize)px; height: @(ImageSize)px; margin: @(ImageMargin)px; display: inline-block;">
+                                <img src="@url" style="width: @(ImageSize)px; height: @(ImageSize)px;" alt="Could not load..." />
+                            </div>
+                        }
                     </ItemContent>
                     <Placeholder>
-                        <img src="./_content/BlazorExtensions/preloader2.gif" style="margin: 5px" width="200" height="200" />
+                        @for (int i = 0; i < _columnCount; i++)
+                        {
+                            <div style="width: @(ImageSize)px; height: @(ImageSize)px;  margin: @(ImageMargin)px; display: inline-block;">
+                                <img src="./_content/BlazorExtensions/preloader2.gif" style="width: @(ImageSize)px; height: @(ImageSize)px;" />
+                            </div>
+                        }
                     </Placeholder>
                 </Virtualize>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary btn-upload">
+                <button class="btn btn-primary btn-upload" @onclick="async (args) => await Reload(args)">
                     <span class="oi oi-data-transfer-upload"></span>
                     Upload
                 </button>
@@ -45,11 +53,17 @@
 @code {
     private const string DisplayNone = "none";
     private const string DisplayBlock = "block";
+    private const float ImageSize = 225;
+    private const float ImageMargin = 5;
 
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
     private JsModule _jsModule = default!;
     private List<string> _assetUrls = new List<string>();
+    private Virtualize<IEnumerable<string>> _virtualizeRef;
+    private ElementReference _body;
+    private int _columnCount;
+    private bool _firstFetch = true;
 
 
     [Parameter]
@@ -59,6 +73,7 @@
     {
         _displayModal = DisplayBlock;
         _displayContent = true;
+        _firstFetch = true;
         StateHasChanged();
     }
 
@@ -75,27 +90,45 @@
         await base.OnInitializedAsync();
     }
 
-    private async ValueTask<ItemsProviderResult<string>> LoadAssets(ItemsProviderRequest request)
+    private float ImageItemSize
     {
+        get
+        {
+            return ImageSize + 2 * ImageMargin;
+        }
+    }
+
+    private async Task Reload(MouseEventArgs e)
+    {
+        await _virtualizeRef.RefreshDataAsync(); 
+        StateHasChanged();
+    }
+
+    private async ValueTask<ItemsProviderResult<IEnumerable<string>>> LoadAssets(ItemsProviderRequest request)
+    {
+        int columnCount = await ColumnCount;
         ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
+        int rowCount = (int)Math.Ceiling(assetInfos.Count / (float)columnCount);
 
-        int startIndex = request.StartIndex;
-        int endIndex = startIndex + request.Count;
-        var range = new Range(startIndex, endIndex);
+        var rows = await Task.WhenAll(assetInfos
+            .Chunk(columnCount)
+            .Skip(request.StartIndex)
+            .Take(request.Count)
+            .Select(async infoRow => await Task.WhenAll(infoRow
+                .Select(async info =>
+                {
+                    using MemoryStream content = await LoadAssetContentAsync(info.StorageId);
 
-        await Task.Delay(5000);
+                    return await _jsModule.Module!.InvokeAsync<string>("getImageUrl", content.ToArray());
+                }))));
 
-        IEnumerable<string> urls = await Task.WhenAll(assetInfos
-            .Take(range)
-            .Select(async info =>
-            {
-                using MemoryStream content = await LoadAssetContentAsync(info.StorageId);
+        if(_firstFetch)
+        {
+            _firstFetch = false;
+            StateHasChanged();
+        }
 
-                return await _jsModule.Module!.InvokeAsync<string>("getImageUrl", content.ToArray());
-            })
-            .ToArray());
-
-        return new ItemsProviderResult<string>(urls, urls.Count());
+        return new ItemsProviderResult<IEnumerable<string>>(rows, rowCount);
     }
 
     private async Task LoadAssetsAsync()
@@ -132,6 +165,21 @@
         response.Stream.CopyTo(result);
 
         return result;
+    }
+
+    private Task<int> ColumnCount
+    {
+        get
+        {
+            return _jsModule.Module!.InvokeAsync<float>("getElementWidth", _body)
+                .AsTask()
+                .ContinueWith(bodyWidth =>
+                {
+                    _columnCount = (int)(bodyWidth.Result / ImageItemSize);
+
+                    return _columnCount;
+                });
+        }
     }
 
     private async Task InitJsModule()
