@@ -2,6 +2,9 @@
 @page "/editor/{DesignName}"
 @using ApiClient
 @using BlazorExtensions
+@using BlazorExtensions.Commands
+@using BlazorExtensions.Models
+@using BlazorExtensions.Services
 @using DesignViewer.Client.Models
 @using Google.Protobuf
 @using Model.Design
@@ -10,22 +13,37 @@
 @using Model.Design.Content
 @using Model.Design.Appearance.Color
 @using Model.Design.Content.Controls
-@inject IDesignsApiClient _designsApiClient;
+@inject IDesignsApiClient _designsApiClient
+@inject IElementFactory _elementFactory
 
 <PageTitle>Editor</PageTitle>
 
 <h1>Editor</h1>
 
+<AssetManager @ref="_assetManager" Header="Select image:" Submited="OnAssetSelected"></AssetManager>
+
 <div style="margin-bottom: 5px">
     <ColorPicker Width="300" IsVisible="@_isColorPickerVisible" @bind-Color="Color"></ColorPicker>
 </div>
 
-<div style="width: 700px; height: 480px">
+<div style="
+    display: flex;
+    align-content: center;
+    align-items: flex-start;
+    flex-direction: row;
+    justify-content: flex-start;">
+    <button class="btn btn-outline-primary" style="
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    margin: 0 15px 0 0;" @onclick="(args) => _assetManager.Open()">
+        <span class="oi oi-image"></span>
+    </button>
     <DesignViewer 
         Width="700" 
         Height="480" 
         ArtboardScrollMargin="@(new Sides(150))"
-        SelectedElementChanged="OnSelectedElementChanged"
+        SelectedElementChangedParameter="@OnSelectedElementChanged"
         @ref="_designViewer"></DesignViewer>
 </div>
 
@@ -51,6 +69,7 @@
     private const string UpdateMessage = "File \"{0}\" has been successfully updated";
 
     private IDesignViewer _designViewer;
+    private AssetManager _assetManager = default!;
     private SaveDesignModel _saveDesignModel = new();
     private bool _isColorPickerVisible = false;
     private string _saveFormMessage = "";
@@ -82,11 +101,6 @@
 
         Color = _designViewer.SelectedElementFillColor;
         _isColorPickerVisible = true;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -136,7 +150,7 @@
                 _saveFormMessage = string.Format(SaveMessage, result.Name);
                 return;
             }
-            
+
             var designs = await _designsApiClient.ListDesignsAsync();
             var designNames = designs.Select(x => x.Name);
             if (designNames.Contains(_saveDesignModel.Name))
@@ -158,5 +172,18 @@
     private void HandleSaveDesignInvalidSubmit()
     {
         _saveFormMessage = "";
+    }
+
+    private void OnAssetSelected(Asset asset)
+    {
+        Element image = _elementFactory.CreateImage(
+            asset.Info.StorageId, 
+            new Point(0, 0),
+            Affine2DMatrix.CreateScale(0.5f));
+
+        _designViewer.ExecuteCommand(
+            new CompositeCommand(
+                new AddElementCommand(image),
+                new ChangeSelectionCommand(image)));
     }
 }

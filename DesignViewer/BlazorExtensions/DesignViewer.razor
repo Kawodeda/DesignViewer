@@ -5,8 +5,10 @@
 @using BlazorExtensions.Commands.Context
 @using BlazorExtensions.InputHandling
 @using BlazorExtensions.InputHandling.HitTest
+@using BlazorExtensions.Models;
 @using BlazorExtensions.Rendering
 @using BlazorExtensions.Services
+@using BlazorExtensions.Services.JsInterop
 @using BlazorExtensions.Viewports
 @using Model.Design
 @using Model.Design.Appearance.Color
@@ -19,23 +21,25 @@
 @inject IHitTestStrategyFactory _hitTestStrategyFactory
 @implements IDesignViewer
 
-<div id="ora" style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
-    <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
-</div>
+<div style="width: @(Width)px; height: @(Height)px;">
+    <div style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
+        <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
+    </div>
 
-<!--Doesn't capture keyboard events without tabindex-->
-<div style="position: absolute; width: @(Width)px; height: @(Height)px"
-    tabindex="0"
-    @onmousedown="OnMouseDown" 
-    @onmouseup="OnMouseUp" 
-    @onmousemove="OnMouseMove"
-    @onmouseover="OnMouseOver"
-    @onmouseout="OnMouseOut"
-    @onwheel="OnWheel"
-    @onkeydown="OnKeyDown"
-    @onkeyup="OnKeyUp"
-    @onkeypress="OnKeyPress">
-    <BECanvas Width="@Width" Height="@Height" @ref="_uiCanvasReference"></BECanvas>
+    <!--Doesn't capture keyboard events without tabindex-->
+    <div style="position: absolute; width: @(Width)px; height: @(Height)px"
+         tabindex="0"
+         @onmousedown="OnMouseDown"
+         @onmouseup="OnMouseUp"
+         @onmousemove="OnMouseMove"
+         @onmouseover="OnMouseOver"
+         @onmouseout="OnMouseOut"
+         @onwheel="OnWheel"
+         @onkeydown="OnKeyDown"
+         @onkeyup="OnKeyUp"
+         @onkeypress="OnKeyPress">
+        <BECanvas Width="@Width" Height="@Height" @ref="_uiCanvasReference"></BECanvas>
+    </div>
 </div>
 
 @code {
@@ -45,7 +49,7 @@
     private BECanvasComponent _uiCanvasReference;
     private Canvas2DContext _outputCanvasContext;
     private Canvas2DContext _uiCanvasContext;
-    private IJSObjectReference? _module;
+    private JsModule _module;
     private DotNetObjectReference<DesignViewer> _instanceRef;
     private IInputHandlingBuilder _inputHandler;
     private IViewport _viewport;
@@ -62,7 +66,9 @@
     public Sides ArtboardScrollMargin { get; set; } = new Sides(0f);
 
     [Parameter]
-    public EventCallback<Element?> SelectedElementChanged { get; set; }
+    public EventCallback<Element?> SelectedElementChangedParameter { get; set; }
+
+    public event EventHandler<Element?>? SelectedElementChanged;
 
     public IViewport Viewport
     {
@@ -103,7 +109,8 @@
         set
         {
             _selectedElement = value;
-            SelectedElementChanged.InvokeAsync(_selectedElement);
+            SelectedElementChanged?.Invoke(this, _selectedElement);
+            SelectedElementChangedParameter.InvokeAsync(_selectedElement);
         }
     }
 
@@ -111,7 +118,7 @@
     {
         get
         {
-            return SelectedElement?.Content.ClosedVector.Fill.Solid.Color;
+            return SelectedElement?.Content.ClosedVector?.Fill?.Solid.Color;
         }
         set
         {
@@ -187,11 +194,21 @@
         RequestRendering();
     }
 
+    public void ExecuteCommand(ICommand command)
+    {
+        if (command.CanExecute())
+        {
+            command.Execute(new ExecutionContext(this));
+        }
+    }
+
     protected override void OnInitialized()
     {
         _inputHandler = new DesignViewerInputHandler(this);
         _inputHandler.UseHandler<ViewPortInputHandler>();
         _inputHandler.UseHandler<DesignInputHandler>();
+
+        _module = _jsModules.DesignViewer;
 
         base.OnInitialized();
     }
@@ -205,28 +222,14 @@
 
             _renderer.Context = _outputCanvasContext;
 
-            InitJsModule();
+            await _module.LoadingTask;
 
             _instanceRef = DotNetObjectReference.Create(this);
 
             RequestRendering();
         }
+
         await base.OnAfterRenderAsync(firstRender);
-    }
-
-    private void InitJsModule()
-    {
-        if (_jsModules.IsInitialized)
-        {
-            _module = _jsModules.DesignViewer;
-            return;
-        }
-
-        _jsModules.Initialized += (sender, args) => 
-        {
-            _module = _jsModules.DesignViewer;
-            RequestRendering();
-        };
     }
 
     private Artboard CurrentArtboard
@@ -239,12 +242,12 @@
 
     private void RequestRendering()
     {
-        if (_module == null || _instanceRef == null)
+        if (_module.Module == null || _instanceRef == null)
         {
             return;
         }
 
-        _module.InvokeVoidAsync("callRequestAnimationFrame", _instanceRef);
+        _module.Module.InvokeVoidAsync("callRequestAnimationFrame", _instanceRef);
     }
 
     private void OnMouseDown(MouseEventArgs e)
@@ -299,14 +302,6 @@
     {
         ICommand result = _inputHandler.OnKeyUp(e);
         ExecuteCommand(result);
-    }
-
-    private void ExecuteCommand(ICommand command)
-    {
-        if(command.CanExecute())
-        {
-            command.Execute(new ExecutionContext(this));
-        }
     }
 
     private async Task RedrawCanvasAsync(float timeStamp)

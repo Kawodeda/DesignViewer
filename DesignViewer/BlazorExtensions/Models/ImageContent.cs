@@ -1,7 +1,7 @@
 ﻿using Microsoft.JSInterop;
 using Model.Design.Math;
 
-namespace BlazorExtensions.Services
+namespace BlazorExtensions.Models
 {
     public class ImageContent
     {

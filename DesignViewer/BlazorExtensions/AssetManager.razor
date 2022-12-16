@@ -1,0 +1,289 @@
+﻿@using System.Net
+@using ApiClient
+@using BlazorExtensions.Models
+@using BlazorExtensions.Services.JsInterop
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@inject IAssetsApiClient _assetsApi
+@inject IJsModulesProvider _jsModulesProvider
+
+<div class="modal" style="display: @_displayModal">
+    <div class="modal-content">
+        @if (_displayContent)
+        {
+            <div class="modal-header">
+                <h3 class="header">@Header</h3>
+                <span class="oi oi-x close" @onclick="(args) => Close()"></span>
+            </div>
+            <div class="modal-body" @ref="_body" @onclick="(args) => OnBodyClick(args)">
+                @if(_firstFetch)
+                {
+                    <Preloader></Preloader>
+                }
+                <Virtualize @ref="_virtualizeRef" ItemsProvider="@LoadAssetsAsync" Context="assets" ItemSize="@AssetItemSize" OverscanCount="1">
+                    <ItemContent>
+                        @foreach (var asset in assets)
+                        {
+                            <AssetItem Asset="@asset"
+                               Size="@ItemSize"
+                               Margin="@ItemMargin"
+                               Selected="@OnItemSelect"
+                               Unselected="@OnItemUnselect">
+                            </AssetItem>
+                        }
+                    </ItemContent>
+                    <Placeholder>
+                        @for (int i = 0; i < _columnCount; i++)
+                        {
+                            <div class="asset-item-placeholder" style="width: @(ItemSize)px; height: @(ItemSize)px;  margin: @(ItemMargin)px;">
+                                <img class="asset-item-placeholder-image" src="./_content/BlazorExtensions/preloader2.gif" />
+                            </div>
+                        }
+                    </Placeholder>
+                </Virtualize>
+            </div>
+            <div class="modal-footer">
+                <div class="file-upload-container">
+                    <FileUpload OnChange="@OnFileSelected" Accept="image/gif, image/*"></FileUpload>
+                    <p class="file-upload-message @_messageAnimationClass">
+                        @_fileUploadMessage
+                    </p>
+                </div>
+                <button class="btn btn-primary" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
+                    <span class="oi oi-check"></span>
+                    Submit
+                    </button>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    private const string DisplayNone = "none";
+    private const string DisplayBlock = "block";
+    private const string FadeOutAnimationClass = "animated-fade-out";
+    private const string UploadSuccessMessage = "File \"{0}\" has been successfully uploaded.";
+    private const string UploadFailedMessage = "Could not upload file \"{0}\".";
+    private const string UploadConflictMessage = "Can't upload file with existing name: \"{0}\".";
+    private const float ItemSize = 225;
+    private const float ItemMargin = 5;
+
+    private string _displayModal = DisplayNone;
+    private bool _displayContent = false;
+    private bool _isSubmitEnabled = false;
+    private Virtualize<IEnumerable<Asset>> _virtualizeRef = default!;
+    private ElementReference _body;
+    private int _columnCount;
+    private bool _firstFetch = true;
+    private AssetItem? _selectedItem;
+    private string _fileUploadMessage = string.Empty;
+    private string _messageAnimationClass = FadeOutAnimationClass;
+
+    private JsModule _jsModule = default!;
+
+    [Parameter]
+    public string Header { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback Closed { get; set; }
+
+    [Parameter]
+    public EventCallback<Asset> Submited { get; set; }
+
+    public void Open()
+    {
+        _displayModal = DisplayBlock;
+        _displayContent = true;
+        _firstFetch = true;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        _displayModal = DisplayNone;
+        _displayContent = false;
+        StateHasChanged();
+        UnselectCurrentItem();
+        Closed.InvokeAsync();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await InitJsModule();
+        await base.OnInitializedAsync();
+    }
+
+    private Task<int> ColumnCount
+    {
+        get
+        {
+            return _jsModule.Module!.InvokeAsync<float>("getElementWidth", _body)
+                .AsTask()
+                .ContinueWith(bodyWidth =>
+                {
+                    _columnCount = (int)(bodyWidth.Result / AssetItemSize);
+
+                    return _columnCount;
+                });
+        }
+    }
+
+    private float AssetItemSize
+    {
+        get
+        {
+            return ItemSize + 2 * ItemMargin;
+        }
+    }
+
+    private AssetItem? SelectedItem
+    {
+        get
+        {
+            return _selectedItem;
+        }
+        set
+        {
+            _selectedItem = value;
+        }
+    }
+
+    private bool IsSubmitEnabled
+    {
+        get
+        {
+            return SelectedItem != null;
+        }
+        set
+        {
+            if (_isSubmitEnabled == value)
+            {
+                return;
+            }
+
+            _isSubmitEnabled = value;
+            StateHasChanged();
+        }
+    }
+
+    private async Task Reload()
+    {
+        await _virtualizeRef.RefreshDataAsync(); 
+        StateHasChanged();
+    }
+
+    private async ValueTask<ItemsProviderResult<IEnumerable<Asset>>> LoadAssetsAsync(ItemsProviderRequest request)
+    {
+        int columnCount = await ColumnCount;
+        ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
+        int rowCount = (int)Math.Ceiling(assetInfos.Count / (float)columnCount);
+
+        var rows = await Task.WhenAll(assetInfos
+            .Chunk(columnCount)
+            .Skip(request.StartIndex)
+            .Take(request.Count)
+            .Select(async infoRow => await Task.WhenAll(infoRow
+                .Select(async info =>
+                {
+                    using MemoryStream content = await LoadAssetContentAsync(info.StorageId);
+                    string url = await _jsModule.Module!.InvokeAsync<string>("getImageUrl", content.ToArray());
+
+                    return new Asset(info, url);
+                }))));
+
+        if(_firstFetch)
+        {
+            _firstFetch = false;
+            StateHasChanged();
+        }
+
+        return new ItemsProviderResult<IEnumerable<Asset>>(rows, rowCount);
+    }
+
+    private async Task<MemoryStream> LoadAssetContentAsync(string storageId)
+    {
+        using FileResponse response = await _assetsApi.GetAssetContnetAsync(storageId);
+        var result = new MemoryStream();
+        response.Stream.CopyTo(result);
+
+        return result;
+    }
+
+    private void OnSubmit(MouseEventArgs e)
+    {
+        if(SelectedItem == null)
+        {
+            return;
+        }
+
+        Submited.InvokeAsync(SelectedItem!.Asset);
+        Close();
+    }
+
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        _messageAnimationClass = string.Empty;
+
+        try
+        {
+            using Stream stream = e.File.OpenReadStream();
+            await _assetsApi.UploadAssetAsync(
+                Path.GetFileNameWithoutExtension(e.File.Name),
+                e.File.ContentType,
+                e.File.Size,
+                new FileParameter(stream));
+
+            _fileUploadMessage = string.Format(UploadSuccessMessage, e.File.Name);
+            await _virtualizeRef.RefreshDataAsync();
+        }
+        catch(ApiException ex)
+        {
+            switch(ex.StatusCode)
+            {
+                case (int)HttpStatusCode.InternalServerError:
+                    _fileUploadMessage = string.Format(UploadFailedMessage, e.File.Name);
+                    break;
+                case (int)HttpStatusCode.Conflict:
+                    _fileUploadMessage = string.Format(
+                        UploadConflictMessage, 
+                        Path.GetFileNameWithoutExtension(e.File.Name));
+                    break;
+            }
+        }
+        finally
+        {
+            _messageAnimationClass = FadeOutAnimationClass;
+            StateHasChanged();
+        }
+    }
+
+    private void OnBodyClick(MouseEventArgs e)
+    {
+        UnselectCurrentItem();
+    }
+
+    private void OnItemSelect(AssetItem item)
+    {
+        UnselectCurrentItem();
+        SelectedItem = item;
+    }
+
+    private void OnItemUnselect(AssetItem item)
+    {
+        SelectedItem = null;
+    }
+
+    private void UnselectCurrentItem()
+    {
+        if (SelectedItem != null)
+        {
+            SelectedItem.IsSelected = false;
+        }
+    }
+
+    private async Task InitJsModule()
+    {
+        _jsModule = _jsModulesProvider.AssetManager;
+        await _jsModule.LoadingTask;
+    }
+}

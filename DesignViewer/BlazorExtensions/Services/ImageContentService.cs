@@ -1,4 +1,6 @@
-﻿using BlazorExtensions.Services.Exceptions;
+﻿using BlazorExtensions.Models;
+using BlazorExtensions.Services.Exceptions;
+using BlazorExtensions.Services.JsInterop;
 using Microsoft.JSInterop;
 using Model.Design.Math;
 
@@ -8,16 +10,15 @@ namespace BlazorExtensions.Services
     {
         private readonly IAssetService _assetService;
         private readonly IJsModulesProvider _jsModulesProvider;
+        private readonly JsModule _jsModule;
         private readonly Dictionary<string, ImageContent> _images = new Dictionary<string, ImageContent>();
         private readonly ISet<string> _requestedImages = new HashSet<string>();
-
-        private IJSObjectReference? _jsModule;
 
         public ImageContentService(IAssetService assetService, IJsModulesProvider jsModulesProvider)
         {
             _assetService = assetService;
             _jsModulesProvider = jsModulesProvider;
-            InitJsModule();
+            _jsModule = _jsModulesProvider.ImageContentService;
         }
 
         public ImageContent? GetImageContent(string storageId)
@@ -62,12 +63,17 @@ namespace BlazorExtensions.Services
 
         private async Task<ImageContent> CreateImageContentAsync(Stream content)
         {
-            var htmlImage =  await _jsModule!.InvokeAsync<IJSObjectReference>(
+            if (_jsModule.Module == null)
+            {
+                await _jsModule.LoadingTask;
+            }
+
+            var htmlImage =  await _jsModule.Module!.InvokeAsync<IJSObjectReference>(
                 "getHtmlImage",
                 await ExtractBytesAsync(content));
 
-            float width = await _jsModule!.InvokeAsync<float>("getImageWidth", htmlImage);
-            float height = await _jsModule!.InvokeAsync<float>("getImageHeight", htmlImage);
+            float width = await _jsModule.Module!.InvokeAsync<float>("getImageWidth", htmlImage);
+            float height = await _jsModule.Module!.InvokeAsync<float>("getImageHeight", htmlImage);
 
             if (htmlImage == null)
             {
@@ -83,19 +89,6 @@ namespace BlazorExtensions.Services
             await data.CopyToAsync(memoryStream);
 
             return memoryStream.ToArray();
-        }
-
-        private void InitJsModule()
-        {
-            if (_jsModulesProvider.IsInitialized)
-            {
-                _jsModule = _jsModulesProvider.ImageContentService;
-            }
-
-            _jsModulesProvider.Initialized += (sender, args) =>
-            {
-                _jsModule = _jsModulesProvider.ImageContentService;
-            };
         }
     }
 }

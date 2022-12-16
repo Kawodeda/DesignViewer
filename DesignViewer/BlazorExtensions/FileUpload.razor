@@ -1,0 +1,44 @@
+﻿@using Microsoft.AspNetCore.Components.Forms;
+
+<label class="upload-file">
+    <InputFile 
+        style="position: absolute;
+                z-index: -1;
+                opacity: 0;
+                display: block;
+                width: 0;
+                height: 0;"
+        accept="@_accept"
+        OnChange="@OnFileSelected"></InputFile>
+        <span class="btn btn-primary">
+            <span class="oi oi-data-transfer-upload"></span>
+            Upload
+        </span>
+</label>
+
+@code {
+    private const string DefaultAccept = "*.*";
+
+    private string _accept = DefaultAccept;
+
+    [Parameter]
+    public EventCallback<InputFileChangeEventArgs> OnChange { get; set; }
+
+    [Parameter]
+    public string Accept 
+    { 
+        get
+        {
+            return _accept;
+        }
+        set
+        {
+            _accept = value;
+        } 
+    }
+
+    private void OnFileSelected(InputFileChangeEventArgs e)
+    {
+        OnChange.InvokeAsync(e);
+    }
+}

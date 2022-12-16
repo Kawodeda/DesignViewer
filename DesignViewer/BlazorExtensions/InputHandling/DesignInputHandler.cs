@@ -3,6 +3,7 @@ using Model.Design.Math;
 using BlazorExtensions.Commands;
 using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;
+using BlazorExtensions.Services;
 
 namespace BlazorExtensions.InputHandling
 {
@@ -26,7 +27,7 @@ namespace BlazorExtensions.InputHandling
 
         private IDesignViewer _designViewer;
         private DesignState _state;
-        private IElementCreator _elementCreator = new ElementCreator();
+        private IElementFactory _elementCreator = new ElementFactory();
         private float _prevMouseX;
         private float _prevMouseY;
         private Element? _capturedElement;
@@ -35,6 +36,7 @@ namespace BlazorExtensions.InputHandling
         {
             _designViewer = designViewer;
             _state = DesignState.Default;
+            _designViewer.SelectedElementChanged += OnSelectedElementChanged;
         }
 
         public override ICommand OnMouseDown(MouseEventArgs e)
@@ -164,12 +166,16 @@ namespace BlazorExtensions.InputHandling
             return base.OnKeyDown(e);
         }
 
+        private void OnSelectedElementChanged(object? sender, Element? element)
+        {
+            _capturedElement = element;
+        }
+
         private ICommand HandleElementPlacing(Point mouse)
         {
             _state = DesignState.Default;
             Element element = _elementCreator.CreateRandomRectangle();
             element.Position = ViewportToSurface(mouse, element) - element.Center;
-            _capturedElement = element;
             StartTranslate(mouse);
 
             return new CompositeCommand(

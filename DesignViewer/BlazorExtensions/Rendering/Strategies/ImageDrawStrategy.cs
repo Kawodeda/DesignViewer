@@ -1,9 +1,10 @@
 ﻿using Blazor.Extensions.Canvas.Canvas2D;
+using BlazorExtensions.Models;
 using BlazorExtensions.Services;
+using BlazorExtensions.Services.JsInterop;
 using Microsoft.JSInterop;
 using Model.Design;
 using Model.Design.Content;
-using Model.Design.Content.Controls;
 using Model.Design.Math;
 
 namespace BlazorExtensions.Rendering.Strategies
@@ -12,8 +13,7 @@ namespace BlazorExtensions.Rendering.Strategies
     {
         private readonly IImageContentService _imageContentService;
         private readonly IJsModulesProvider _jsModulesProvider;
-
-        private IJSObjectReference? _jsModule;
+        private readonly JsModule _jsModule;
 
         public ImageDrawStrategy(
             Element element, 
@@ -23,16 +23,11 @@ namespace BlazorExtensions.Rendering.Strategies
         {
             _imageContentService = imageContentService;
             _jsModulesProvider = jsModulesProvider;
-            InitJsModule();
+            _jsModule = _jsModulesProvider.Rendering;
         }
 
         public override async Task Draw(Canvas2DContext context)
         {
-            if (_jsModule == null)
-            {
-                return;
-            }
-
             Image image = _element.Content.Image;
             ImageContent? imageContent = _imageContentService.GetImageContent(image.StorageId);
             if (imageContent == null)
@@ -43,7 +38,8 @@ namespace BlazorExtensions.Rendering.Strategies
 
             Point scale = _element.Transform.ScaleFactor;
 
-            await _jsModule.InvokeVoidAsync(
+            await InitJsModule();
+            await _jsModule.Module!.InvokeVoidAsync(
                 "drawImage", 
                 context, 
                 imageContent.HtmlImage, 
@@ -53,16 +49,9 @@ namespace BlazorExtensions.Rendering.Strategies
                 scale.Y);
         }
 
-        public void InitJsModule()
+        private async Task InitJsModule()
         {
-            if (_jsModulesProvider.IsInitialized)
-            {
-                _jsModule = _jsModulesProvider.Rendering;
-                return;
-            }
-
-            _jsModulesProvider.Initialized += (sender, args) => 
-                _jsModule = _jsModulesProvider.Rendering;
+            await _jsModule.LoadingTask;
         }
     }
 }
