@@ -4,6 +4,8 @@ using BlazorExtensions.Commands;
 using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;
 using BlazorExtensions.Services;
+using BlazorExtensions.Viewports;
+using System.ComponentModel.DataAnnotations;
 
 namespace BlazorExtensions.InputHandling
 {
@@ -37,6 +39,8 @@ namespace BlazorExtensions.InputHandling
             _designViewer = designViewer;
             _state = DesignState.Default;
             _designViewer.SelectedElementChanged += OnSelectedElementChanged;
+            _designViewer.Viewport.ZoomChanged += OnViewportZoomChanged;
+            _designViewer.Viewport.ScrollChanged += OnViewportScrollChanged;
         }
 
         public override ICommand OnMouseDown(MouseEventArgs e)
@@ -86,17 +90,10 @@ namespace BlazorExtensions.InputHandling
                         return base.OnMouseMove(e);
                     }
 
-                    var transform = _designViewer.Transform;
-                    transform.D1 = 0f;
-                    transform.D2 = 0f;
-
-                    var elementTransform = _designViewer.SelectedElement.Transform;
-
-                    var shift = new Point(
-                        mouse.X - _prevMouseX,
-                        mouse.Y - _prevMouseY)
-                        * transform.Inverse()
-                        * elementTransform.RotationMatrix;
+                    var shift = ViewportToSurface(
+                        new Point(mouse.X - _prevMouseX, mouse.Y - _prevMouseY),
+                        _designViewer.SelectedElement,
+                        RemoveTranslate(_designViewer.Transform));
 
                     _prevMouseX = mouse.X;
                     _prevMouseY = mouse.Y;
@@ -171,11 +168,39 @@ namespace BlazorExtensions.InputHandling
             _capturedElement = element;
         }
 
+        private void OnViewportZoomChanged(object? sender, ZoomChangedEventArgs args)
+        {
+            if (_state != DesignState.Translate || _designViewer.SelectedElement == null)
+            {
+                return;
+            }
+
+            _designViewer.ExecuteCommand(new ChangeSelectionCommand(null));   
+        }
+
+        private void OnViewportScrollChanged(object? sender, ScrollChangedEventArgs args)
+        {
+            if (_state != DesignState.Translate || _designViewer.SelectedElement == null)
+            {
+                return;
+            }
+
+            var shift = ViewportToSurface(
+                new Point(-args.DeltaScrollX, -args.DeltaScrollY), 
+                _designViewer.SelectedElement,
+                RemoveTranslate(_designViewer.Transform));
+
+            _designViewer.ExecuteCommand(new TranslateElementCommand(
+                        new TranslateElementCommandParams(
+                            _designViewer.SelectedElement,
+                            shift)));
+        }
+
         private ICommand HandleElementPlacing(Point mouse)
         {
             _state = DesignState.Default;
             Element element = _elementCreator.CreateRandomRectangle();
-            element.Position = ViewportToSurface(mouse, element) - element.Center;
+            element.Position = ViewportToSurface(mouse, element, _designViewer.Transform) - element.Center;
             StartTranslate(mouse);
 
             return new CompositeCommand(
@@ -197,17 +222,20 @@ namespace BlazorExtensions.InputHandling
                 .HitTest(point, _designViewer.Transform);
         }
 
-        private Point ViewportToSurface(Point inViewport, Element element)
-        {
-            var transform = _designViewer.Transform;
-
-            var elementTransform = element.Transform;
-            elementTransform.D1 = 0f;
-            elementTransform.D2 = 0f;
-            
+        private Point ViewportToSurface(Point inViewport, Element element, Affine2DMatrix viweportTransform)
+        { 
             return inViewport 
-                * transform.Inverse() 
-                * elementTransform;
+                * viweportTransform.Inverse() 
+                * element.Transform.RotationMatrix;
+        }
+
+        private Affine2DMatrix RemoveTranslate(Affine2DMatrix transform)
+        {
+            Affine2DMatrix result = transform.Clone();
+            result.D1 = 0;
+            result.D2 = 0;
+
+            return result;
         }
     }
 }

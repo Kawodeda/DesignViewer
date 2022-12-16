@@ -5,5 +5,7 @@
         public float ScrollX { get; set; }
 
         public float ScrollY { get; set; }
+
+        public event EventHandler<ScrollChangedEventArgs> ScrollChanged;
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Model.Design.Math;
+using Model.Utils;
 
 namespace BlazorExtensions.Viewports
 {
@@ -19,6 +20,9 @@ namespace BlazorExtensions.Viewports
             ContentScrollMargin = contentScrollMargin;
             ScrollbarSize = scrollbarSize;
         }
+
+        public event EventHandler<ZoomChangedEventArgs> ZoomChanged;
+        public event EventHandler<ScrollChangedEventArgs> ScrollChanged;
 
         public Size Size { get; set; }
 
@@ -137,6 +141,8 @@ namespace BlazorExtensions.Viewports
             }
             set
             {
+                float previous = ScrollX;
+
                 if (value < MinScrollX)
                 {
                     _scrollX = MinScrollX;
@@ -149,6 +155,10 @@ namespace BlazorExtensions.Viewports
                 }
 
                 _scrollX = value;
+
+                ScrollChanged?.Invoke(
+                    this,
+                    new ScrollChangedEventArgs(_scrollX, ScrollY, _scrollX - previous, 0));
             }
         }
         
@@ -170,6 +180,8 @@ namespace BlazorExtensions.Viewports
             }
             set
             {
+                float previous = ScrollY;
+
                 if (value < MinScrollY)
                 {
                     _scrollY = MinScrollY;
@@ -182,6 +194,10 @@ namespace BlazorExtensions.Viewports
                 }
 
                 _scrollY = value;
+
+                ScrollChanged?.Invoke(
+                    this,
+                    new ScrollChangedEventArgs(ScrollX, _scrollY, 0, _scrollY - previous));
             }
         }
 
@@ -193,18 +209,11 @@ namespace BlazorExtensions.Viewports
             }
             set
             {
-                if (value < MinZoom)
-                {
-                    _zoom = MinZoom;
-                    return;
-                }
-                if (value > MaxZoom)
-                {
-                    _zoom = MaxZoom;
-                    return;
-                }
+                float previous = _zoom;
 
-                _zoom = value;
+                _zoom = MathUtils.Clamp(value, MinZoom, MaxZoom);
+
+                ZoomChanged?.Invoke(this, new ZoomChangedEventArgs(_zoom, _zoom / previous));
             }
         }
 

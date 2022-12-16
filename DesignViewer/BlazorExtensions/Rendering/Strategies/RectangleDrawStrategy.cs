@@ -3,6 +3,7 @@ using Model.Design;
 using Model.Design.Appearance.Color;
 using Model.Design.Content.Controls;
 using Model.Design.Math;
+using Model.Utils;
 
 namespace BlazorExtensions.Rendering.Strategies
 {

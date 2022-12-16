@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Model.Design
+namespace Model.Utils
 {
     public static class ColorUtils
     {
@@ -9,7 +9,7 @@ namespace Model.Design
             var format = new NumberFormatInfo();
             format.NumberDecimalSeparator = ".";
 
-            return ((float)alpha / 255f).ToString(format);
+            return (alpha / 255f).ToString(format);
         }
     }
 }

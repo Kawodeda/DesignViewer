@@ -4,7 +4,7 @@ using System.Text.RegularExpressions;
 using Model.Design.Appearance.Color;
 using Color = Model.Design.Appearance.Color.Color;
 
-namespace Model.Design
+namespace Model.Utils
 {
     public class ColorConverter
     {
