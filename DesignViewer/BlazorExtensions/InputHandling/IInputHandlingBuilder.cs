@@ -2,6 +2,6 @@
 {
     public interface IInputHandlingBuilder : IInputHandler
     {
-        public void UseHandler<T>() where T : InputHandlerBase;
+        public void UseHandler<T>() where T : BaseInputHandler;
     }
 }

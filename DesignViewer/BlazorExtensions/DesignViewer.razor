@@ -16,18 +16,18 @@
 @using Model.Design.Content.Controls
 @using Model.Design.Math
 @inject IJSRuntime JsRuntime
-@inject IDesignRenderer _renderer
+@inject ISurfaceRenderer _surfaceRenderer
 @inject IJsModulesProvider _jsModules
 @inject IHitTestStrategyFactory _hitTestStrategyFactory
 @implements IDesignViewer
 
 <div style="width: @(Width)px; height: @(Height)px;">
-    <div style="background-color: gray; position: absolute; width: @(Width)px; height: @(Height)px">
+    <div class="canvas-container" style="background-color: transparent; position: absolute; width: @(Width)px; height: @(Height)px">
         <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
     </div>
 
     <!--Doesn't capture keyboard events without tabindex-->
-    <div style="position: absolute; width: @(Width)px; height: @(Height)px"
+    <div class="canvas-container" style="position: absolute; width: @(Width)px; height: @(Height)px"
          tabindex="0"
          @onmousedown="OnMouseDown"
          @onmouseup="OnMouseUp"
@@ -141,7 +141,7 @@
                 (Height - size.Height * Viewport.Zoom) / 2);
             Point scroll = new Point(Viewport.ScrollX, Viewport.ScrollY);
 
-            return CurrentArtboard.Basis
+            return Affine2DMatrix.CreateIdentity()
                 .Translate(shiftToCenter)
                 .Translate(scroll)
                 .Scale(Viewport.Zoom);
@@ -220,7 +220,7 @@
             _outputCanvasContext = await _canvasReference.CreateCanvas2DAsync();
             _uiCanvasContext = await _uiCanvasReference.CreateCanvas2DAsync();
 
-            _renderer.Context = _outputCanvasContext;
+            _surfaceRenderer.Context = _outputCanvasContext;
 
             await _module.LoadingTask;
 
@@ -305,29 +305,12 @@
     }
 
     private async Task RedrawCanvasAsync(float timeStamp)
-    {
-        Size size = CurrentArtboard.Size;
-        Affine2DMatrix transform = Transform;
-
-        await _outputCanvasContext.SetTransformAsync(1, 0, 0, 1, 0, 0);
-        await _outputCanvasContext.ClearRectAsync(0, 0, Width, Height);
-
-        await _outputCanvasContext.SetTransformAsync(
-            transform.M11,
-            transform.M12,
-            transform.M21,
-            transform.M22,
-            transform.D1,
-            transform.D2);
-
-        await _outputCanvasContext.SetFillStyleAsync("lightgray");
-        await _outputCanvasContext.FillRectAsync(0, 0, size.Width, size.Height);    
-
-        await _renderer.Render(CurrentSurface);
-
+    { 
+        await _surfaceRenderer.Render(CurrentSurface, Width, Height, Transform);
+        
         if(SelectedElement != null)
         {
-            await _renderer.RenderSelection(SelectedElement);
+            await _surfaceRenderer.RenderSelection(SelectedElement, Transform);
         }
     }
 

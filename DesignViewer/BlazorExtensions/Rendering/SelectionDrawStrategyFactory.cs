@@ -1,21 +1,17 @@
 ﻿using BlazorExtensions.Rendering.Strategies;
+using BlazorExtensions.Rendering.Strategies.Selection;
 using BlazorExtensions.Services;
-using BlazorExtensions.Services.JsInterop;
 using Model.Design;
 using Model.Design.Content;
 
 namespace BlazorExtensions.Rendering
 {
-    public class ElementDrawStrategyFactory : IElementDrawStrategyFactory
+    public class SelectionDrawStrategyFactory : ISelectionDrawStrategyFactory
     {
-        private readonly IJsModulesProvider _jsModulesProvider;
         private readonly IImageContentService _imageContentService;
 
-        public ElementDrawStrategyFactory(
-            IJsModulesProvider jsModulesProvider, 
-            IImageContentService imageContentService)
+        public SelectionDrawStrategyFactory(IImageContentService imageContentService)
         {
-            _jsModulesProvider = jsModulesProvider;
             _imageContentService = imageContentService;
         }
 
@@ -28,14 +24,14 @@ namespace BlazorExtensions.Rendering
                         switch (element.Content.ClosedVector.Controls.ControlsCase)
                         {
                             case Model.Design.Content.Controls.ClosedVectorControls.ControlsOneofCase.Rectangle:
-                                return new RectangleDrawStrategy(element);
+                                return new RectangleSelectionDrawStrategy(element);
                             default:
                                 throw new NotSupportedException();
                         }
                     }
 
                 case ElementContent.ElementContentOneofCase.Image:
-                    return new ImageDrawStrategy(element, _imageContentService, _jsModulesProvider);
+                    return new ImageSelectionDrawStrategy(element, _imageContentService);
 
                 default:
                     throw new NotSupportedException();

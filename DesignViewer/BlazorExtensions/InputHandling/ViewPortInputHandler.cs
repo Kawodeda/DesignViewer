@@ -12,7 +12,7 @@ namespace BlazorExtensions.InputHandling
         ScrollY = 2
     }
 
-    public class ViewPortInputHandler : InputHandlerBase
+    public class ViewPortInputHandler : BaseInputHandler
     {
         private IViewport _viewPort;
         private ViewPortState _state;

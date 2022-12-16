@@ -15,12 +15,14 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.
 builder.Services.AddScoped<IDesignsApiClient>(sp => new DesignsApiClient(builder.HostEnvironment.BaseAddress));
 builder.Services.AddScoped<IAssetsApiClient>(sp => new AssetsApiClient(builder.HostEnvironment.BaseAddress));
 builder.Services.AddScoped<IElementDrawStrategyFactory, ElementDrawStrategyFactory>();
+builder.Services.AddScoped<ISelectionDrawStrategyFactory, SelectionDrawStrategyFactory>();
 builder.Services.AddScoped<IHitTestStrategyFactory, HitTestStrategyFactory>();
 builder.Services.AddScoped<IElementFactory, ElementFactory>();
 builder.Services.AddScoped<IJsModulesProvider, JsModulesProvider>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IImageContentService, ImageContentService>();
 
-builder.Services.AddTransient<IDesignRenderer, DesignRenderer>();
+builder.Services.AddTransient<ISurfaceRenderer, SurfaceRenderer>();
+builder.Services.AddTransient<ILayerRenderer, LayerRenderer>();
 
 await builder.Build().RunAsync();

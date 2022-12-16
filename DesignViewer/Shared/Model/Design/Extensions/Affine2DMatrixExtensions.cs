@@ -193,6 +193,14 @@
             }
         }
 
+        public Affine2DMatrix RotationMatrix
+        {
+            get
+            {
+                return CreateIdentity().Rotate(Rotation);
+            }
+        }
+
         public Point ScaleFactor
         {
             get
@@ -203,11 +211,19 @@
             }
         }
 
-        public Affine2DMatrix RotationMatrix
+        public Affine2DMatrix ScaleMatrix
         {
             get
             {
-                return CreateIdentity().Rotate(Rotation);
+                return CreateIdentity().Scale(ScaleFactor.X, ScaleFactor.Y);
+            }
+        }
+
+        public Affine2DMatrix TranslationMatrix
+        {
+            get
+            {
+                return CreateIdentity().Translate(new Point(D1, D2));
             }
         }
 
