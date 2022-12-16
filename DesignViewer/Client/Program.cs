@@ -24,5 +24,6 @@ builder.Services.AddScoped<IImageContentService, ImageContentService>();
 
 builder.Services.AddTransient<ISurfaceRenderer, SurfaceRenderer>();
 builder.Services.AddTransient<ILayerRenderer, LayerRenderer>();
+builder.Services.AddTransient<IImageRenderer, ImageRenderer>();
 
 await builder.Build().RunAsync();

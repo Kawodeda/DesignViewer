@@ -61,6 +61,16 @@
             return a.Translate(b);
         }
 
+        public static implicit operator Size(Point point)
+        {
+            return new Size(point.X, point.Y);
+        }
+
+        public static implicit operator Point(Size size)
+        {
+            return new Point(size.Width, size.Height);
+        }
+
         public Point MultiplyBy(Affine2DMatrix matrix)
         {
             return Multiply(this, matrix);

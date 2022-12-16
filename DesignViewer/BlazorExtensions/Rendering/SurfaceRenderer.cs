@@ -3,6 +3,7 @@ using BlazorExtensions.Extensions;
 using BlazorExtensions.Rendering.Exceptions;
 using Model.Design;
 using Model.Design.Appearance.Color;
+using Model.Design.Content;
 using Model.Design.Math;
 using Model.Utils;
 
@@ -11,12 +12,17 @@ namespace BlazorExtensions.Rendering
     public class SurfaceRenderer : BaseRenderer, ISurfaceRenderer
     {
         private readonly ILayerRenderer _layerRenderer;
+        private readonly IImageRenderer _imageRenderer;
         private readonly ISelectionDrawStrategyFactory _selectionDrawStrategyFactory;
 
-        public SurfaceRenderer(ILayerRenderer layerRenderer, ISelectionDrawStrategyFactory selectionDrawStrategyFactory)
+        public SurfaceRenderer(
+            ILayerRenderer layerRenderer, 
+            IImageRenderer imageRenderer,
+            ISelectionDrawStrategyFactory selectionDrawStrategyFactory)
         {
             _layerRenderer = layerRenderer;
             _selectionDrawStrategyFactory = selectionDrawStrategyFactory;
+            _imageRenderer = imageRenderer;
         }
 
         public override Canvas2DContext? Context 
@@ -38,13 +44,18 @@ namespace BlazorExtensions.Rendering
             {
                 throw new ContextNotSetException(ContextNotSetMessage);
             }
-
+            
             await _context.SaveAsync();
 
             await _context.SetTransformAsync(1, 0, 0, 1, 0, 0);
             await _context.ClearRectAsync(0, 0, width, width);
 
             await _context.SetTransformAsync(transform);
+
+            if (surface.Mockup != null)
+            {
+                await RenderMockup(surface.Mockup);
+            }
 
             await RenderLayers(surface.Layers);
             await RenderArtboards(surface.Artboards, transform);
@@ -104,6 +115,16 @@ namespace BlazorExtensions.Rendering
             {
                 await _layerRenderer.Render(layer);
             }
+        }
+
+        private async Task RenderMockup(Mockup mockup)
+        {
+            await _context!.SaveAsync();
+
+            await _context!.TransformAsync(mockup.Transform.RotationMatrix);
+            await _imageRenderer.Render(_context, mockup.Content, mockup.Position, mockup.Transform.ScaleFactor, ReferencePointType.Center);
+
+            await _context!.RestoreAsync();
         }
     }
 }

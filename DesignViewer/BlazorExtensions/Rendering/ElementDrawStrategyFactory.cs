@@ -1,6 +1,4 @@
 ﻿using BlazorExtensions.Rendering.Strategies;
-using BlazorExtensions.Services;
-using BlazorExtensions.Services.JsInterop;
 using Model.Design;
 using Model.Design.Content;
 
@@ -8,15 +6,11 @@ namespace BlazorExtensions.Rendering
 {
     public class ElementDrawStrategyFactory : IElementDrawStrategyFactory
     {
-        private readonly IJsModulesProvider _jsModulesProvider;
-        private readonly IImageContentService _imageContentService;
+        private readonly IImageRenderer _imageRenderer;
 
-        public ElementDrawStrategyFactory(
-            IJsModulesProvider jsModulesProvider, 
-            IImageContentService imageContentService)
+        public ElementDrawStrategyFactory(IImageRenderer imageRenderer)
         {
-            _jsModulesProvider = jsModulesProvider;
-            _imageContentService = imageContentService;
+            _imageRenderer = imageRenderer;
         }
 
         public IDrawStrategy Create(Element element)
@@ -35,7 +29,7 @@ namespace BlazorExtensions.Rendering
                     }
 
                 case ElementContent.ElementContentOneofCase.Image:
-                    return new ImageDrawStrategy(element, _imageContentService, _jsModulesProvider);
+                    return new ImageDrawStrategy(element, _imageRenderer);
 
                 default:
                     throw new NotSupportedException();
