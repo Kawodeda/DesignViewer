@@ -1,0 +1,23 @@
+
+syntax = "proto3";
+
+package design;
+
+import "content/image.proto";
+import "math/affine_2d_matrix.proto";
+import "math/point.proto";
+
+option csharp_namespace = "Model.Design";
+
+// Represents the displayed in editor image of some physical item
+// for which design is being created.
+message Mockup 
+{
+  // Position relative to the surface
+  math.Point position = 1;
+
+  math.Affine2DMatrix transform = 2;
+
+  // The image content of mockup
+  content.Image content = 3;
+}
