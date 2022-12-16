@@ -64,10 +64,6 @@
     margin: 5px;
 }
 
-.btn-upload {
-    float: left;
-}
-
 .asset-row {
     display: flex;
     justify-content: space-evenly;
@@ -84,4 +80,33 @@
     margin: 1%;
     width: 98%;
     height: 98%;
+}
+
+.file-upload-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+}
+
+.file-upload-message {
+    margin: 0 0 0 10px;
+    position: relative;
+    top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.animated-fade-out {
+    animation: fade-out 5s 1 forwards;
+}
+
+@keyframes fade-out {
+    0% {
+        opacity: 1;
+        visibility: visible;
+    }
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
 }

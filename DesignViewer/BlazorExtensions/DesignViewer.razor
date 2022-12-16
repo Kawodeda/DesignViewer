@@ -66,7 +66,9 @@
     public Sides ArtboardScrollMargin { get; set; } = new Sides(0f);
 
     [Parameter]
-    public EventCallback<Element?> SelectedElementChanged { get; set; }
+    public EventCallback<Element?> SelectedElementChangedParameter { get; set; }
+
+    public event EventHandler<Element?>? SelectedElementChanged;
 
     public IViewport Viewport
     {
@@ -107,7 +109,8 @@
         set
         {
             _selectedElement = value;
-            SelectedElementChanged.InvokeAsync(_selectedElement);
+            SelectedElementChanged?.Invoke(this, _selectedElement);
+            SelectedElementChangedParameter.InvokeAsync(_selectedElement);
         }
     }
 
@@ -115,7 +118,7 @@
     {
         get
         {
-            return SelectedElement?.Content.ClosedVector.Fill.Solid.Color;
+            return SelectedElement?.Content.ClosedVector?.Fill?.Solid.Color;
         }
         set
         {
@@ -189,6 +192,14 @@
         await RedrawUiCanvasAsync(timeStamp);
 
         RequestRendering();
+    }
+
+    public void ExecuteCommand(ICommand command)
+    {
+        if (command.CanExecute())
+        {
+            command.Execute(new ExecutionContext(this));
+        }
     }
 
     protected override void OnInitialized()
@@ -291,14 +302,6 @@
     {
         ICommand result = _inputHandler.OnKeyUp(e);
         ExecuteCommand(result);
-    }
-
-    private void ExecuteCommand(ICommand command)
-    {
-        if(command.CanExecute())
-        {
-            command.Execute(new ExecutionContext(this));
-        }
     }
 
     private async Task RedrawCanvasAsync(float timeStamp)

@@ -1,6 +1,8 @@
-﻿@using ApiClient
-@using BlazorExtensions.Models;
+﻿@using System.Net
+@using ApiClient
+@using BlazorExtensions.Models
 @using BlazorExtensions.Services.JsInterop
+@using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Web.Virtualization
 @inject IAssetsApiClient _assetsApi
 @inject IJsModulesProvider _jsModulesProvider
@@ -13,7 +15,7 @@
                 <h3 class="header">@Header</h3>
                 <span class="oi oi-x close" @onclick="(args) => Close()"></span>
             </div>
-            <div class="modal-body" @ref="_body">
+            <div class="modal-body" @ref="_body" @onclick="(args) => OnBodyClick(args)">
                 @if(_firstFetch)
                 {
                     <Preloader></Preloader>
@@ -25,8 +27,8 @@
                             <AssetItem Asset="@asset"
                                Size="@ItemSize"
                                Margin="@ItemMargin"
-                               Selected="@SelectItem"
-                               Unselected="@UnselectItem">
+                               Selected="@OnItemSelect"
+                               Unselected="@OnItemUnselect">
                             </AssetItem>
                         }
                     </ItemContent>
@@ -41,10 +43,12 @@
                 </Virtualize>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-primary btn-upload" @onclick="async (args) => await Reload(args)">
-                    <span class="oi oi-data-transfer-upload"></span>
-                    Upload
-                </button>
+                <div class="file-upload-container">
+                    <FileUpload OnChange="@OnFileSelected" Accept="image/gif, image/*"></FileUpload>
+                    <p class="file-upload-message @_messageAnimationClass">
+                        @_fileUploadMessage
+                    </p>
+                </div>
                 <button class="btn btn-primary" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
                     <span class="oi oi-check"></span>
                     Submit
@@ -57,6 +61,10 @@
 @code {
     private const string DisplayNone = "none";
     private const string DisplayBlock = "block";
+    private const string FadeOutAnimationClass = "animated-fade-out";
+    private const string UploadSuccessMessage = "File \"{0}\" has been successfully uploaded.";
+    private const string UploadFailedMessage = "Could not upload file \"{0}\".";
+    private const string UploadConflictMessage = "Can't upload file with existing name: \"{0}\".";
     private const float ItemSize = 225;
     private const float ItemMargin = 5;
 
@@ -68,6 +76,8 @@
     private int _columnCount;
     private bool _firstFetch = true;
     private AssetItem? _selectedItem;
+    private string _fileUploadMessage = string.Empty;
+    private string _messageAnimationClass = FadeOutAnimationClass;
 
     private JsModule _jsModule = default!;
 
@@ -93,6 +103,7 @@
         _displayModal = DisplayNone;
         _displayContent = false;
         StateHasChanged();
+        UnselectCurrentItem();
         Closed.InvokeAsync();
     }
 
@@ -134,7 +145,6 @@
         set
         {
             _selectedItem = value;
-            IsSubmitEnabled = _selectedItem != null;
         }
     }
 
@@ -142,7 +152,7 @@
     {
         get
         {
-            return _isSubmitEnabled;
+            return SelectedItem != null;
         }
         set
         {
@@ -156,7 +166,7 @@
         }
     }
 
-    private async Task Reload(MouseEventArgs e)
+    private async Task Reload()
     {
         await _virtualizeRef.RefreshDataAsync(); 
         StateHasChanged();
@@ -206,23 +216,69 @@
             return;
         }
 
-        Close();
         Submited.InvokeAsync(SelectedItem!.Asset);
+        Close();
     }
 
-    private void SelectItem(AssetItem item)
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
+    {
+        _messageAnimationClass = string.Empty;
+
+        try
+        {
+            using Stream stream = e.File.OpenReadStream();
+            await _assetsApi.UploadAssetAsync(
+                Path.GetFileNameWithoutExtension(e.File.Name),
+                e.File.ContentType,
+                e.File.Size,
+                new FileParameter(stream));
+
+            _fileUploadMessage = string.Format(UploadSuccessMessage, e.File.Name);
+            await _virtualizeRef.RefreshDataAsync();
+        }
+        catch(ApiException ex)
+        {
+            switch(ex.StatusCode)
+            {
+                case (int)HttpStatusCode.InternalServerError:
+                    _fileUploadMessage = string.Format(UploadFailedMessage, e.File.Name);
+                    break;
+                case (int)HttpStatusCode.Conflict:
+                    _fileUploadMessage = string.Format(
+                        UploadConflictMessage, 
+                        Path.GetFileNameWithoutExtension(e.File.Name));
+                    break;
+            }
+        }
+        finally
+        {
+            _messageAnimationClass = FadeOutAnimationClass;
+            StateHasChanged();
+        }
+    }
+
+    private void OnBodyClick(MouseEventArgs e)
+    {
+        UnselectCurrentItem();
+    }
+
+    private void OnItemSelect(AssetItem item)
+    {
+        UnselectCurrentItem();
+        SelectedItem = item;
+    }
+
+    private void OnItemUnselect(AssetItem item)
+    {
+        SelectedItem = null;
+    }
+
+    private void UnselectCurrentItem()
     {
         if (SelectedItem != null)
         {
             SelectedItem.IsSelected = false;
         }
-
-        SelectedItem = item;
-    }
-
-    private void UnselectItem(AssetItem item)
-    {
-        SelectedItem = null;
     }
 
     private async Task InitJsModule()

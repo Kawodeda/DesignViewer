@@ -1,4 +1,5 @@
-﻿using BlazorExtensions.InputHandling.HitTest;
+﻿using BlazorExtensions.Commands;
+using BlazorExtensions.InputHandling.HitTest;
 using Model.Design;
 using Model.Design.Appearance.Color;
 using Model.Design.Math;
@@ -11,6 +12,8 @@ namespace BlazorExtensions
 
         public Element? SelectedElement { get; set; }
 
+        public event EventHandler<Element?> SelectedElementChanged;
+
         public Color? SelectedElementFillColor { get; set; }
 
         public Affine2DMatrix Transform { get; }
@@ -20,5 +23,7 @@ namespace BlazorExtensions
         public int CurrentSurfaceIndex { get; set; }
 
         public IHitTestStrategyFactory HitTestStrategyFactory { get; }
+
+        public void ExecuteCommand(ICommand command);
     }
 }

@@ -1,5 +1,4 @@
-﻿using BlazorExtensions.Models;
-using BlazorExtensions.Services.Exceptions;
+﻿using BlazorExtensions.Services.Exceptions;
 using Microsoft.JSInterop;
 
 namespace BlazorExtensions.Services.JsInterop

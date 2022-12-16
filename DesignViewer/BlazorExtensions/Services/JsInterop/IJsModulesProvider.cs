@@ -1,6 +1,4 @@
-﻿using BlazorExtensions.Models;
-
-namespace BlazorExtensions.Services.JsInterop
+﻿namespace BlazorExtensions.Services.JsInterop
 {
     public interface IJsModulesProvider
     {

@@ -2,8 +2,9 @@
 @page "/editor/{DesignName}"
 @using ApiClient
 @using BlazorExtensions
-@using BlazorExtensions.Models;
-@using BlazorExtensions.Services;
+@using BlazorExtensions.Commands
+@using BlazorExtensions.Models
+@using BlazorExtensions.Services
 @using DesignViewer.Client.Models
 @using Google.Protobuf
 @using Model.Design
@@ -12,8 +13,8 @@
 @using Model.Design.Content
 @using Model.Design.Appearance.Color
 @using Model.Design.Content.Controls
-@inject IDesignsApiClient _designsApiClient;
-@inject IElementFactory _elementFactory;
+@inject IDesignsApiClient _designsApiClient
+@inject IElementFactory _elementFactory
 
 <PageTitle>Editor</PageTitle>
 
@@ -42,7 +43,7 @@
         Width="700" 
         Height="480" 
         ArtboardScrollMargin="@(new Sides(150))"
-        SelectedElementChanged="OnSelectedElementChanged"
+        SelectedElementChangedParameter="@OnSelectedElementChanged"
         @ref="_designViewer"></DesignViewer>
 </div>
 
@@ -100,11 +101,6 @@
 
         Color = _designViewer.SelectedElementFillColor;
         _isColorPickerVisible = true;
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await base.OnInitializedAsync();
     }
 
     protected override async Task OnParametersSetAsync()
@@ -184,6 +180,10 @@
             asset.Info.StorageId, 
             new Point(0, 0),
             Affine2DMatrix.CreateScale(0.5f));
-        _designViewer.Design.Surfaces.First().Layers.First().Elements.Add(image);
+
+        _designViewer.ExecuteCommand(
+            new CompositeCommand(
+                new AddElementCommand(image),
+                new ChangeSelectionCommand(image)));
     }
 }

@@ -36,6 +36,7 @@ namespace BlazorExtensions.InputHandling
         {
             _designViewer = designViewer;
             _state = DesignState.Default;
+            _designViewer.SelectedElementChanged += OnSelectedElementChanged;
         }
 
         public override ICommand OnMouseDown(MouseEventArgs e)
@@ -165,12 +166,16 @@ namespace BlazorExtensions.InputHandling
             return base.OnKeyDown(e);
         }
 
+        private void OnSelectedElementChanged(object? sender, Element? element)
+        {
+            _capturedElement = element;
+        }
+
         private ICommand HandleElementPlacing(Point mouse)
         {
             _state = DesignState.Default;
             Element element = _elementCreator.CreateRandomRectangle();
             element.Position = ViewportToSurface(mouse, element) - element.Center;
-            _capturedElement = element;
             StartTranslate(mouse);
 
             return new CompositeCommand(

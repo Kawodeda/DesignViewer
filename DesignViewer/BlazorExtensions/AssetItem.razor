@@ -3,7 +3,7 @@
 <div 
     class="@_class"
      style="--item-size: @(Size)px; margin: @(Margin)px;"
-     @onclick="(args) => OnClick(args)">
+     @onclick="(args) => OnClick(args)" @onclick:stopPropagation>
     <div class="center">
         <img class="asset-item-image" src="@_asset.ImageUrl" />
     </div>
