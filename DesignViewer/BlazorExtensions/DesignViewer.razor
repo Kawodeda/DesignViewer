@@ -319,9 +319,6 @@
         await _uiCanvasContext.SetGlobalAlphaAsync(0.66f);
         await _uiCanvasContext.ClearRectAsync(0, 0, Width, Height);
 
-        await _uiCanvasContext.SetStrokeStyleAsync("red");
-        await _uiCanvasContext.StrokeRectAsync(0, 0, Width, Height);
-
         if(Viewport.IsHorizontalScrollbarShown)
         {
             await RedrawHorizontalScrollbarAsync();

@@ -9,5 +9,7 @@
         public string[] ImagesExtensions { get; set; } = Array.Empty<string>();
 
         public string DefaultImageExtension { get; set; } = string.Empty;
+
+        public string MockupsPath { get; set; } = string.Empty;
     }
 }

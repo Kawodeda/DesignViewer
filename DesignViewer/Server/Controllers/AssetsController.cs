@@ -19,13 +19,22 @@ namespace DesignViewer.Server.Controllers
             _assetStorageService = assetStorageService;
         }
 
-        [HttpGet(Name = nameof(ListAssets))]
+        [HttpGet("images", Name = nameof(ListImages))]
         [Produces(contentType: "application/json")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<AssetDto>))]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public ActionResult<IEnumerable<AssetDto>> ListAssets()
+        public ActionResult<IEnumerable<AssetDto>> ListImages()
         {
-            return Ok(_assetStorageService.ListAssets());
+            return Ok(_assetStorageService.ListImages());
+        }
+
+        [HttpGet("mockups", Name = nameof(ListMockups))]
+        [Produces(contentType: "application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(IEnumerable<AssetDto>))]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public ActionResult<IEnumerable<AssetDto>> ListMockups()
+        {
+            return Ok(_assetStorageService.ListMockups());
         }
 
         [HttpGet("{storageId}/info", Name = nameof(GetAssetInfo))]

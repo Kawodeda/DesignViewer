@@ -44,7 +44,7 @@ namespace BlazorExtensions.Rendering
             {
                 throw new ContextNotSetException(ContextNotSetMessage);
             }
-            
+
             await _context.SaveAsync();
 
             await _context.SetTransformAsync(1, 0, 0, 1, 0, 0);

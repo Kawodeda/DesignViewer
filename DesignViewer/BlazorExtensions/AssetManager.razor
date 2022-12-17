@@ -49,7 +49,7 @@
                         @_fileUploadMessage
                     </p>
                 </div>
-                <button class="btn btn-primary" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
+                <button class="btn btn-success" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
                     <span class="oi oi-check"></span>
                     Submit
                     </button>
@@ -88,10 +88,13 @@
     public EventCallback Closed { get; set; }
 
     [Parameter]
-    public EventCallback<Asset> Submited { get; set; }
+    public AssetFetchOptions AssetFetchOptions { get; set; } = new AssetFetchOptions(AssetType.Image);
 
-    public void Open()
+    public event EventHandler<Asset>? Submited;
+
+    public void Open(AssetFetchOptions options)
     {
+        AssetFetchOptions = options;
         _displayModal = DisplayBlock;
         _displayContent = true;
         _firstFetch = true;
@@ -175,7 +178,7 @@
     private async ValueTask<ItemsProviderResult<IEnumerable<Asset>>> LoadAssetsAsync(ItemsProviderRequest request)
     {
         int columnCount = await ColumnCount;
-        ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
+        ICollection<AssetDto> assetInfos = await GetAssetInfos();
         int rowCount = (int)Math.Ceiling(assetInfos.Count / (float)columnCount);
 
         var rows = await Task.WhenAll(assetInfos
@@ -216,7 +219,7 @@
             return;
         }
 
-        Submited.InvokeAsync(SelectedItem!.Asset);
+        Submited?.Invoke(this, SelectedItem!.Asset);
         Close();
     }
 
@@ -278,6 +281,19 @@
         if (SelectedItem != null)
         {
             SelectedItem.IsSelected = false;
+        }
+    }
+
+    private async Task<ICollection<AssetDto>> GetAssetInfos()
+    {
+        switch(AssetFetchOptions.AssetType)
+        {
+            case AssetType.Image:
+                return await _assetsApi.ListImagesAsync();
+            case AssetType.Mockup:
+                return await _assetsApi.ListMockupsAsync();
+            default:
+                throw new NotSupportedException();
         }
     }
 

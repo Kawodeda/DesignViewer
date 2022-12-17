@@ -22,9 +22,15 @@ namespace DesignViewer.Server.Services.FileStorage
             _contentTypeService = contentTypeService;
         }
 
-        public IEnumerable<AssetDto> ListAssets()
+        public IEnumerable<AssetDto> ListImages()
         {
-            return GetFileInfos()
+            return GetFileInfos(_options.ImagesPath)
+                .Select(fileInfo => GetAssetFileInfo(fileInfo));
+        }
+
+        public IEnumerable<AssetDto> ListMockups()
+        {
+            return GetFileInfos(_options.MockupsPath)
                 .Select(fileInfo => GetAssetFileInfo(fileInfo));
         }
 
@@ -94,18 +100,25 @@ namespace DesignViewer.Server.Services.FileStorage
             };
         }
 
-        private IEnumerable<IFileInfo> GetFileInfos()
+        private IEnumerable<IFileInfo> GetFileInfos(params string[] directories)
         {
-            var searchPatterns = _options.ImagesExtensions
+            IEnumerable<string> searchPatterns = _options.ImagesExtensions
                 .Select(extension => PathUtils.GetSearchPattern(extension));
 
-            return _fileStorageService.GetFileInfos(_options.ImagesPath, searchPatterns);
+            if (directories == null || directories.Length == 0)
+            {
+                return _fileStorageService.GetFileInfos(_options.ImagesPath, searchPatterns)
+                    .Concat(_fileStorageService.GetFileInfos(_options.MockupsPath, searchPatterns));
+            }
+
+            return directories
+                .Select(dir => _fileStorageService.GetFileInfos(dir, searchPatterns))
+                .Aggregate((result, dir) => result.Concat(dir));
         }
 
         private string GetContentType(string subpath)
         {
-            string? result;
-            if (_contentTypeService.TryGetContentType(subpath, out result))
+            if (_contentTypeService.TryGetContentType(subpath, out string? result))
             {
                 return result;
             }
@@ -115,8 +128,7 @@ namespace DesignViewer.Server.Services.FileStorage
 
         private string GetExtension(string contentType)
         {
-            string? result;
-            if (_contentTypeService.TryGetExtension(contentType, out result))
+            if (_contentTypeService.TryGetExtension(contentType, out string? result))
             {
                 return result;
             }
