@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorExtensions.InputHandling
 {
-    public abstract class InputHandlerBase : IInputHandler
+    public abstract class BaseInputHandler : IInputHandler
     {
         private IInputHandler? _next;
 

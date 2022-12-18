@@ -37,8 +37,8 @@
         } 
     }
 
-    private void OnFileSelected(InputFileChangeEventArgs e)
+    private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        OnChange.InvokeAsync(e);
+        await OnChange.InvokeAsync(e);
     }
 }

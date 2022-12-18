@@ -24,21 +24,21 @@ namespace ApiClient
     {
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListAssetsAsync();
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListImagesAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListAssetsAsync(System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListImagesAsync(System.Threading.CancellationToken cancellationToken);
 
-        /// <returns>Created</returns>
+        /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListMockupsAsync();
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Created</returns>
+        /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content, System.Threading.CancellationToken cancellationToken);
+        System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListMockupsAsync(System.Threading.CancellationToken cancellationToken);
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -57,6 +57,15 @@ namespace ApiClient
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
         System.Threading.Tasks.Task<FileResponse> GetAssetContnetAsync(string storageId, System.Threading.CancellationToken cancellationToken);
+
+        /// <returns>Created</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content);
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>Created</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content, System.Threading.CancellationToken cancellationToken);
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
@@ -113,18 +122,18 @@ namespace ApiClient
 
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListAssetsAsync()
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListImagesAsync()
         {
-            return ListAssetsAsync(System.Threading.CancellationToken.None);
+            return ListImagesAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListAssetsAsync(System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListImagesAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/storage/v1/Assets");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/storage/v1/Assets/images");
 
             var client_ = new System.Net.Http.HttpClient();
             var disposeClient_ = true;
@@ -191,20 +200,20 @@ namespace ApiClient
             }
         }
 
-        /// <returns>Created</returns>
+        /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content)
+        public virtual System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListMockupsAsync()
         {
-            return UploadAssetAsync(info_StorageId, info_Type, info_Size, content, System.Threading.CancellationToken.None);
+            return ListMockupsAsync(System.Threading.CancellationToken.None);
         }
 
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
-        /// <returns>Created</returns>
+        /// <returns>Success</returns>
         /// <exception cref="ApiException">A server side error occurred.</exception>
-        public virtual async System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content, System.Threading.CancellationToken cancellationToken)
+        public virtual async System.Threading.Tasks.Task<System.Collections.Generic.ICollection<AssetDto>> ListMockupsAsync(System.Threading.CancellationToken cancellationToken)
         {
             var urlBuilder_ = new System.Text.StringBuilder();
-            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/storage/v1/Assets");
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/storage/v1/Assets/mockups");
 
             var client_ = new System.Net.Http.HttpClient();
             var disposeClient_ = true;
@@ -212,43 +221,7 @@ namespace ApiClient
             {
                 using (var request_ = new System.Net.Http.HttpRequestMessage())
                 {
-                    var boundary_ = System.Guid.NewGuid().ToString();
-                    var content_ = new System.Net.Http.MultipartFormDataContent(boundary_);
-                    content_.Headers.Remove("Content-Type");
-                    content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
-
-                    if (info_StorageId == null)
-                        throw new System.ArgumentNullException("info_StorageId");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(info_StorageId, System.Globalization.CultureInfo.InvariantCulture)), "Info.StorageId");
-                    }
-
-                    if (info_Type == null)
-                        throw new System.ArgumentNullException("info_Type");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(info_Type, System.Globalization.CultureInfo.InvariantCulture)), "Info.Type");
-                    }
-
-                    if (info_Size == null)
-                        throw new System.ArgumentNullException("info_Size");
-                    else
-                    {
-                        content_.Add(new System.Net.Http.StringContent(ConvertToString(info_Size, System.Globalization.CultureInfo.InvariantCulture)), "Info.Size");
-                    }
-
-                    if (content == null)
-                        throw new System.ArgumentNullException("content");
-                    else
-                    {
-                        var content_content_ = new System.Net.Http.StreamContent(content.Data);
-                        if (!string.IsNullOrEmpty(content.ContentType))
-                            content_content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(content.ContentType);
-                        content_.Add(content_content_, "Content", content.FileName ?? "Content");
-                    }
-                    request_.Content = content_;
-                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Method = new System.Net.Http.HttpMethod("GET");
                     request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
 
                     PrepareRequest(client_, request_, urlBuilder_);
@@ -272,34 +245,14 @@ namespace ApiClient
                         ProcessResponse(client_, response_);
 
                         var status_ = (int)response_.StatusCode;
-                        if (status_ == 400)
+                        if (status_ == 200)
                         {
-                            var objectResponse_ = await ReadObjectResponseAsync<UploadAssetRequest>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new ApiException<UploadAssetRequest>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
-                        }
-                        else
-                        if (status_ == 201)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<AssetDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            var objectResponse_ = await ReadObjectResponseAsync<System.Collections.Generic.ICollection<AssetDto>>(response_, headers_, cancellationToken).ConfigureAwait(false);
                             if (objectResponse_.Object == null)
                             {
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             return objectResponse_.Object;
-                        }
-                        else
-                        if (status_ == 409)
-                        {
-                            var objectResponse_ = await ReadObjectResponseAsync<FileErrorDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
-                            if (objectResponse_.Object == null)
-                            {
-                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
-                            }
-                            throw new ApiException<FileErrorDto>("Conflict", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         if (status_ == 500)
@@ -486,6 +439,142 @@ namespace ApiClient
                                 throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
                             }
                             throw new ApiException<FileErrorDto>("Not Found", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 500)
+                        {
+                            string responseText_ = ( response_.Content == null ) ? string.Empty : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("Server Error", status_, responseText_, headers_, null);
+                        }
+                        else
+                        {
+                            var responseData_ = response_.Content == null ? null : await response_.Content.ReadAsStringAsync().ConfigureAwait(false);
+                            throw new ApiException("The HTTP status code of the response was not expected (" + status_ + ").", status_, responseData_, headers_, null);
+                        }
+                    }
+                    finally
+                    {
+                        if (disposeResponse_)
+                            response_.Dispose();
+                    }
+                }
+            }
+            finally
+            {
+                if (disposeClient_)
+                    client_.Dispose();
+            }
+        }
+
+        /// <returns>Created</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content)
+        {
+            return UploadAssetAsync(info_StorageId, info_Type, info_Size, content, System.Threading.CancellationToken.None);
+        }
+
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns>Created</returns>
+        /// <exception cref="ApiException">A server side error occurred.</exception>
+        public virtual async System.Threading.Tasks.Task<AssetDto> UploadAssetAsync(string? info_StorageId, string? info_Type, long? info_Size, FileParameter content, System.Threading.CancellationToken cancellationToken)
+        {
+            var urlBuilder_ = new System.Text.StringBuilder();
+            urlBuilder_.Append(BaseUrl != null ? BaseUrl.TrimEnd('/') : "").Append("/api/storage/v1/Assets");
+
+            var client_ = new System.Net.Http.HttpClient();
+            var disposeClient_ = true;
+            try
+            {
+                using (var request_ = new System.Net.Http.HttpRequestMessage())
+                {
+                    var boundary_ = System.Guid.NewGuid().ToString();
+                    var content_ = new System.Net.Http.MultipartFormDataContent(boundary_);
+                    content_.Headers.Remove("Content-Type");
+                    content_.Headers.TryAddWithoutValidation("Content-Type", "multipart/form-data; boundary=" + boundary_);
+
+                    if (info_StorageId == null)
+                        throw new System.ArgumentNullException("info_StorageId");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(info_StorageId, System.Globalization.CultureInfo.InvariantCulture)), "Info.StorageId");
+                    }
+
+                    if (info_Type == null)
+                        throw new System.ArgumentNullException("info_Type");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(info_Type, System.Globalization.CultureInfo.InvariantCulture)), "Info.Type");
+                    }
+
+                    if (info_Size == null)
+                        throw new System.ArgumentNullException("info_Size");
+                    else
+                    {
+                        content_.Add(new System.Net.Http.StringContent(ConvertToString(info_Size, System.Globalization.CultureInfo.InvariantCulture)), "Info.Size");
+                    }
+
+                    if (content == null)
+                        throw new System.ArgumentNullException("content");
+                    else
+                    {
+                        var content_content_ = new System.Net.Http.StreamContent(content.Data);
+                        if (!string.IsNullOrEmpty(content.ContentType))
+                            content_content_.Headers.ContentType = System.Net.Http.Headers.MediaTypeHeaderValue.Parse(content.ContentType);
+                        content_.Add(content_content_, "Content", content.FileName ?? "Content");
+                    }
+                    request_.Content = content_;
+                    request_.Method = new System.Net.Http.HttpMethod("POST");
+                    request_.Headers.Accept.Add(System.Net.Http.Headers.MediaTypeWithQualityHeaderValue.Parse("application/json"));
+
+                    PrepareRequest(client_, request_, urlBuilder_);
+
+                    var url_ = urlBuilder_.ToString();
+                    request_.RequestUri = new System.Uri(url_, System.UriKind.RelativeOrAbsolute);
+
+                    PrepareRequest(client_, request_, url_);
+
+                    var response_ = await client_.SendAsync(request_, System.Net.Http.HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+                    var disposeResponse_ = true;
+                    try
+                    {
+                        var headers_ = System.Linq.Enumerable.ToDictionary(response_.Headers, h_ => h_.Key, h_ => h_.Value);
+                        if (response_.Content != null && response_.Content.Headers != null)
+                        {
+                            foreach (var item_ in response_.Content.Headers)
+                                headers_[item_.Key] = item_.Value;
+                        }
+
+                        ProcessResponse(client_, response_);
+
+                        var status_ = (int)response_.StatusCode;
+                        if (status_ == 400)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<UploadAssetRequest>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<UploadAssetRequest>("Bad Request", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
+                        }
+                        else
+                        if (status_ == 201)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<AssetDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            return objectResponse_.Object;
+                        }
+                        else
+                        if (status_ == 409)
+                        {
+                            var objectResponse_ = await ReadObjectResponseAsync<FileErrorDto>(response_, headers_, cancellationToken).ConfigureAwait(false);
+                            if (objectResponse_.Object == null)
+                            {
+                                throw new ApiException("Response was null which was not expected.", status_, objectResponse_.Text, headers_, null);
+                            }
+                            throw new ApiException<FileErrorDto>("Conflict", status_, objectResponse_.Text, headers_, objectResponse_.Object, null);
                         }
                         else
                         if (status_ == 500)

@@ -20,23 +20,25 @@
 
 <h1>Editor</h1>
 
-<AssetManager @ref="_assetManager" Header="Select image:" Submited="OnAssetSelected"></AssetManager>
+<AssetManager @ref="_assetManager" Header="@_assetManagerHeader" Closed="OnAssetManagerClosed"></AssetManager>
 
 <div style="margin-bottom: 5px">
     <ColorPicker Width="300" IsVisible="@_isColorPickerVisible" @bind-Color="Color"></ColorPicker>
 </div>
 
 <div style="
+    border: none;
     display: flex;
     align-content: center;
     align-items: flex-start;
     flex-direction: row;
-    justify-content: flex-start;">
+    justify-content: center;
+    margin: 0 10% 0 0">
     <button class="btn btn-outline-primary" style="
     width: 2em;
     height: 2em;
     padding: 0;
-    margin: 0 15px 0 0;" @onclick="(args) => _assetManager.Open()">
+    margin: 0 15px 0 0;" @onclick="(args) => OpenSelectImage()">
         <span class="oi oi-image"></span>
     </button>
     <DesignViewer 
@@ -47,26 +49,50 @@
         @ref="_designViewer"></DesignViewer>
 </div>
 
+<div style="display: flex; justify-content: center">
+    <button class="btn btn-outline-primary"
+            style="margin: 5px"
+            type="submit"
+            @onclick="(args) => OpenSelectMockup()">
+        Select mockup
+    </button>
+    <button 
+        class="btn btn-outline-danger" 
+        style="margin: 5px" 
+        @onclick="() => OnRemoveMockup()" 
+        disabled="@(!RemoveMockupEnabled)">
+        <span class="oi oi-x"></span>
+        Remove mockup
+    </button>
+</div>
+
 <EditForm Model="@_saveDesignModel" 
     OnValidSubmit="@HandleSaveDesignSubmitAsync" 
-    OnInvalidSubmit="@HandleSaveDesignInvalidSubmit"
-    style="margin: 1em">
-    <InputText @bind-Value="_saveDesignModel.Name"/>
+    OnInvalidSubmit="@HandleSaveDesignInvalidSubmit">
+    <div style="display: flex; flex-direction: column; justify-content: center; align-items: center">
+        <div style="display: flex; justify-content: center;">
+            <InputText @bind-Value="_saveDesignModel.Name" style="margin: 5px"/>
+            <button class="btn btn-outline-success" type="submit" style="margin: 5px">
+                <span class="oi oi-check"></span>
+                Save
+            </button>
+        </div>
 
-    <button class="btn btn-light" type="submit">Save</button>
-
-    <DataAnnotationsValidator/>
-    <ValidationSummary/>
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
     
-    <p>
-        <label style="margin: 1em 0">@_saveFormMessage</label>
-    </p>
+        <p style="margin: 5px 0">
+            @_saveFormMessage
+        </p>
+    </div>
 </EditForm>
 
 @code {
     private const string ErrorMessage = "An error has occured";
     private const string SaveMessage = "File \"{0}\" has been successfully saved";
     private const string UpdateMessage = "File \"{0}\" has been successfully updated";
+    private const string SelectImageHeader = "Select image:";
+    private const string SelectMockupHeader = "Select mockup:";
 
     private IDesignViewer _designViewer;
     private AssetManager _assetManager = default!;
@@ -74,6 +100,15 @@
     private bool _isColorPickerVisible = false;
     private string _saveFormMessage = "";
     private Color _color;
+    private string _assetManagerHeader = string.Empty;
+
+    private bool RemoveMockupEnabled
+    {
+        get
+        {
+            return _designViewer?.CurrentSurface.Mockup != null;
+        }
+    }
 
     private Color Color
     {
@@ -174,7 +209,21 @@
         _saveFormMessage = "";
     }
 
-    private void OnAssetSelected(Asset asset)
+    private void OpenSelectImage()
+    {
+        _assetManagerHeader = SelectImageHeader;
+        _assetManager.Submited += OnImageSelected;
+        _assetManager.Open(new AssetFetchOptions(AssetType.Image));
+    }
+
+    private void OpenSelectMockup()
+    {
+        _assetManagerHeader = SelectMockupHeader;
+        _assetManager.Submited += OnMockupSelected;
+        _assetManager.Open(new AssetFetchOptions(AssetType.Mockup));
+    }
+
+    private void OnImageSelected(object? sender, Asset asset)
     {
         Element image = _elementFactory.CreateImage(
             asset.Info.StorageId, 
@@ -185,5 +234,21 @@
             new CompositeCommand(
                 new AddElementCommand(image),
                 new ChangeSelectionCommand(image)));
+    }
+
+    private void OnMockupSelected(object? sender, Asset asset)
+    {
+        _designViewer.ExecuteCommand(new SetMockupCommand(asset));
+    }
+
+    private void OnRemoveMockup()
+    {
+        _designViewer.ExecuteCommand(new RemoveMockupCommand());
+    }
+
+    private void OnAssetManagerClosed()
+    {
+        _assetManager.Submited -= OnImageSelected;
+        _assetManager.Submited -= OnMockupSelected;
     }
 }

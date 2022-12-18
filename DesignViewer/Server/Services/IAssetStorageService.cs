@@ -8,7 +8,9 @@ namespace DesignViewer.Server.Services
         /// <exception cref="FileAlreadyExistException"></exception>
         AssetDto UploadAsset(Stream content, AssetDto assetInfo);
 
-        IEnumerable<AssetDto> ListAssets();
+        IEnumerable<AssetDto> ListImages();
+
+        IEnumerable<AssetDto> ListMockups();
 
         /// <exception cref="FileNotFoundException"></exception>
         AssetDto GetAssetInfo(string storageId);

@@ -5,6 +5,7 @@ package design;
 
 import "artboard.proto";
 import "layer.proto";
+import "mockup.proto";
 
 option csharp_namespace = "Model.Design";
 
@@ -16,6 +17,11 @@ option csharp_namespace = "Model.Design";
 message Surface
 {
   string name = 1;
+
   repeated Artboard artboards = 2;
+
   repeated Layer layers = 3;
+
+  // Defines the displayed image of the represented physical item
+  Mockup mockup = 4;
 }

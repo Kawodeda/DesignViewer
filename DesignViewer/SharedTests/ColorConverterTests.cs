@@ -4,7 +4,7 @@ using System.Globalization;
 using Model.Design.Appearance.Color;
 using NUnit.Framework;
 using Color = Model.Design.Appearance.Color.Color;
-using ColorConverter = DesignViewer.Shared.Model.Utils.ColorConverter;
+using ColorConverter = Model.Utils.ColorConverter;
 
 namespace SharedTests
 {

@@ -43,13 +43,26 @@
                 </Virtualize>
             </div>
             <div class="modal-footer">
-                <div class="file-upload-container">
-                    <FileUpload OnChange="@OnFileSelected" Accept="image/gif, image/*"></FileUpload>
-                    <p class="file-upload-message @_messageAnimationClass">
-                        @_fileUploadMessage
-                    </p>
-                </div>
-                <button class="btn btn-primary" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
+                @if(ShowUpload)
+                {
+                    <div class="file-upload-container">
+                        <FileUpload OnChange="@OnFileSelected" Accept="image/gif, image/*"></FileUpload>
+                        <p class="file-upload-message @_messageAnimationClass">
+                            @_fileUploadMessage
+                        </p>
+                    </div>
+                }
+                @if(ShowSelectImage)
+                {
+                    <button class="btn btn-primary" @onclick="async (args) => {
+                        Open(new AssetFetchOptions(AssetType.Image));
+                        await Reload();
+                        }">
+                        <span class="oi oi-image" style="margin: 0 5px 0 0"></span>
+                        Select other image as mockup
+                    </button>
+                }
+                <button class="btn btn-success" @onclick="(args) => OnSubmit(args)" disabled="@(!IsSubmitEnabled)">
                     <span class="oi oi-check"></span>
                     Submit
                     </button>
@@ -65,8 +78,10 @@
     private const string UploadSuccessMessage = "File \"{0}\" has been successfully uploaded.";
     private const string UploadFailedMessage = "Could not upload file \"{0}\".";
     private const string UploadConflictMessage = "Can't upload file with existing name: \"{0}\".";
+    private const string UploadTooBigFileMessage = "Selected file's size exceeds the maximum file size: {0}";
     private const float ItemSize = 225;
     private const float ItemMargin = 5;
+    private const long FileMaxSize = 4 * 1024 * 1024;
 
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
@@ -88,10 +103,13 @@
     public EventCallback Closed { get; set; }
 
     [Parameter]
-    public EventCallback<Asset> Submited { get; set; }
+    public AssetFetchOptions AssetFetchOptions { get; set; } = new AssetFetchOptions(AssetType.Image);
 
-    public void Open()
+    public event EventHandler<Asset>? Submited;
+
+    public void Open(AssetFetchOptions options)
     {
+        AssetFetchOptions = options;
         _displayModal = DisplayBlock;
         _displayContent = true;
         _firstFetch = true;
@@ -102,6 +120,7 @@
     {
         _displayModal = DisplayNone;
         _displayContent = false;
+        _fileUploadMessage = string.Empty;
         StateHasChanged();
         UnselectCurrentItem();
         Closed.InvokeAsync();
@@ -166,6 +185,22 @@
         }
     }
 
+    private bool ShowUpload
+    {
+        get
+        {
+            return AssetFetchOptions.AssetType == AssetType.Image;
+        }
+    }
+
+    private bool ShowSelectImage
+    {
+        get
+        {
+            return AssetFetchOptions.AssetType == AssetType.Mockup;
+        }
+    }
+
     private async Task Reload()
     {
         await _virtualizeRef.RefreshDataAsync(); 
@@ -175,7 +210,7 @@
     private async ValueTask<ItemsProviderResult<IEnumerable<Asset>>> LoadAssetsAsync(ItemsProviderRequest request)
     {
         int columnCount = await ColumnCount;
-        ICollection<AssetDto> assetInfos = await _assetsApi.ListAssetsAsync();
+        ICollection<AssetDto> assetInfos = await GetAssetInfos();
         int rowCount = (int)Math.Ceiling(assetInfos.Count / (float)columnCount);
 
         var rows = await Task.WhenAll(assetInfos
@@ -216,44 +251,43 @@
             return;
         }
 
-        Submited.InvokeAsync(SelectedItem!.Asset);
+        Submited?.Invoke(this, SelectedItem!.Asset);
         Close();
     }
 
     private async Task OnFileSelected(InputFileChangeEventArgs e)
     {
-        _messageAnimationClass = string.Empty;
+        if(e.File.Size > FileMaxSize)
+        {
+            ShowFileUploadMessage(string.Format(UploadTooBigFileMessage, $"{(FileMaxSize / 1024 / 1024)} MB"));
+            return;
+        }
 
         try
         {
-            using Stream stream = e.File.OpenReadStream();
+            using Stream stream = e.File.OpenReadStream(FileMaxSize);
             await _assetsApi.UploadAssetAsync(
                 Path.GetFileNameWithoutExtension(e.File.Name),
                 e.File.ContentType,
                 e.File.Size,
                 new FileParameter(stream));
 
-            _fileUploadMessage = string.Format(UploadSuccessMessage, e.File.Name);
             await _virtualizeRef.RefreshDataAsync();
+            ShowFileUploadMessage(string.Format(UploadSuccessMessage, e.File.Name));
         }
         catch(ApiException ex)
         {
             switch(ex.StatusCode)
             {
                 case (int)HttpStatusCode.InternalServerError:
-                    _fileUploadMessage = string.Format(UploadFailedMessage, e.File.Name);
+                    ShowFileUploadMessage(string.Format(UploadFailedMessage, e.File.Name));
                     break;
                 case (int)HttpStatusCode.Conflict:
-                    _fileUploadMessage = string.Format(
-                        UploadConflictMessage, 
-                        Path.GetFileNameWithoutExtension(e.File.Name));
+                    ShowFileUploadMessage(string.Format(
+                        UploadConflictMessage,
+                        Path.GetFileNameWithoutExtension(e.File.Name)));
                     break;
             }
-        }
-        finally
-        {
-            _messageAnimationClass = FadeOutAnimationClass;
-            StateHasChanged();
         }
     }
 
@@ -279,6 +313,30 @@
         {
             SelectedItem.IsSelected = false;
         }
+    }
+
+    private async Task<ICollection<AssetDto>> GetAssetInfos()
+    {
+        switch(AssetFetchOptions.AssetType)
+        {
+            case AssetType.Image:
+                return await _assetsApi.ListImagesAsync();
+            case AssetType.Mockup:
+                return await _assetsApi.ListMockupsAsync();
+            default:
+                throw new NotSupportedException();
+        }
+    }
+
+    private void ShowFileUploadMessage(string message)
+    {
+        _messageAnimationClass = string.Empty;
+        Task.Delay(10).ContinueWith((task) =>
+        {
+            _fileUploadMessage = message;
+            _messageAnimationClass = FadeOutAnimationClass;
+            StateHasChanged();
+        });
     }
 
     private async Task InitJsModule()

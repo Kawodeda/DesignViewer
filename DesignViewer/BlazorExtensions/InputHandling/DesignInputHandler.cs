@@ -23,7 +23,7 @@ namespace BlazorExtensions.InputHandling
         Right = 2
     }
 
-    public class DesignInputHandler : InputHandlerBase
+    public class DesignInputHandler : BaseInputHandler
     {
         private const string AddElementKeyCode = "KeyA";        
 

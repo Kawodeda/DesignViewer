@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Model.Design.Appearance;
+﻿using Model.Design.Appearance;
 using Model.Design.Appearance.Color;
-using Model.Design.Content;
-using Model.Design.Content.Controls;
 using Model.Design.Math;
 
 namespace Model.Design
@@ -16,11 +9,11 @@ namespace Model.Design
         public static Design CreateBlank()
         {
             const string defaultName = "untitled";
-            Color white = new Color()
+            var transparentWhite = new Color()
             {
                 Process = new ProcessColor()
                 {
-                    Alpha = 255,
+                    Alpha = 0,
                     Rgb = new RgbColor()
                     {
                         R = 255,
@@ -29,27 +22,27 @@ namespace Model.Design
                     }
                 }
             };
-            Size defaultSize = new Size()
+            var defaultSize = new Size()
             {
                 Width = 200f,
                 Height = 200f
             };
-            Brush defaultBrush = new Brush()
+            var defaultBrush = new Brush()
             {
                 Solid = new SolidBrush()
                 {
-                    Color = white
+                    Color = transparentWhite
                 }
             };
             Affine2DMatrix defaultBasis = Affine2DMatrix.CreateIdentity();
-            Sides defaultSides = new Sides()
+            var defaultSides = new Sides()
             {
                 Left = 0,
                 Top = 0,
                 Right = 0,
                 Bottom = 0
             };
-            TrimSettings defaultTrimSettings = new TrimSettings()
+            var defaultTrimSettings = new TrimSettings()
             {
                 Bleed = defaultSides,
                 Slug = defaultSides
