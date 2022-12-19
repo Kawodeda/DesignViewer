@@ -6,6 +6,18 @@ html, body {
     overflow: hidden;
 }
 
+canvas:focus {
+    outline: none;
+}
+
+canvas:focus-visible {
+    outline: none;
+}
+
+main {
+    display: block;
+}
+
 h1:focus {
     outline: none;
 }
@@ -21,7 +33,11 @@ a, .btn-link {
 }
 
 .content {
-    padding-top: 1.1rem;
+    padding: 1.5rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .valid.modified:not([type=checkbox]) {

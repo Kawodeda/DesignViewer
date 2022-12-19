@@ -20,7 +20,7 @@
                 {
                     <Preloader></Preloader>
                 }
-                <Virtualize @ref="_virtualizeRef" ItemsProvider="@LoadAssetsAsync" Context="assets" ItemSize="@AssetItemSize" OverscanCount="1">
+                <Virtualize @ref="_virtualizeAssets" ItemsProvider="@LoadAssetsAsync" Context="assets" ItemSize="@AssetItemSize" OverscanCount="1">
                     <ItemContent>
                         @foreach (var asset in assets)
                         {
@@ -45,12 +45,8 @@
             <div class="modal-footer">
                 @if(ShowUpload)
                 {
-                    <div class="file-upload-container">
-                        <FileUpload OnChange="@OnFileSelected" Accept="image/gif, image/*"></FileUpload>
-                        <p class="file-upload-message @_messageAnimationClass">
-                            @_fileUploadMessage
-                        </p>
-                    </div>
+                    <FileUpload OnChange="@OnFileSelected" Accept="image/gif, image/*"></FileUpload>
+                    <Message @ref="_fileUploadMessage"></Message>
                 }
                 @if(ShowSelectImage)
                 {
@@ -74,7 +70,6 @@
 @code {
     private const string DisplayNone = "none";
     private const string DisplayBlock = "block";
-    private const string FadeOutAnimationClass = "animated-fade-out";
     private const string UploadSuccessMessage = "File \"{0}\" has been successfully uploaded.";
     private const string UploadFailedMessage = "Could not upload file \"{0}\".";
     private const string UploadConflictMessage = "Can't upload file with existing name: \"{0}\".";
@@ -86,13 +81,12 @@
     private string _displayModal = DisplayNone;
     private bool _displayContent = false;
     private bool _isSubmitEnabled = false;
-    private Virtualize<IEnumerable<Asset>> _virtualizeRef = default!;
+    private Virtualize<IEnumerable<Asset>> _virtualizeAssets = default!;
+    private Message _fileUploadMessage = default!;
     private ElementReference _body;
     private int _columnCount;
     private bool _firstFetch = true;
     private AssetItem? _selectedItem;
-    private string _fileUploadMessage = string.Empty;
-    private string _messageAnimationClass = FadeOutAnimationClass;
 
     private JsModule _jsModule = default!;
 
@@ -120,7 +114,6 @@
     {
         _displayModal = DisplayNone;
         _displayContent = false;
-        _fileUploadMessage = string.Empty;
         StateHasChanged();
         UnselectCurrentItem();
         Closed.InvokeAsync();
@@ -203,7 +196,7 @@
 
     private async Task Reload()
     {
-        await _virtualizeRef.RefreshDataAsync(); 
+        await _virtualizeAssets.RefreshDataAsync();
         StateHasChanged();
     }
 
@@ -259,7 +252,7 @@
     {
         if(e.File.Size > FileMaxSize)
         {
-            ShowFileUploadMessage(string.Format(UploadTooBigFileMessage, $"{(FileMaxSize / 1024 / 1024)} MB"));
+            _fileUploadMessage.Show(string.Format(UploadTooBigFileMessage, $"{(FileMaxSize / 1024 / 1024)} MB"));
             return;
         }
 
@@ -272,18 +265,18 @@
                 e.File.Size,
                 new FileParameter(stream));
 
-            await _virtualizeRef.RefreshDataAsync();
-            ShowFileUploadMessage(string.Format(UploadSuccessMessage, e.File.Name));
+            await _virtualizeAssets.RefreshDataAsync();
+            _fileUploadMessage.Show(string.Format(UploadSuccessMessage, e.File.Name));
         }
         catch(ApiException ex)
         {
             switch(ex.StatusCode)
             {
                 case (int)HttpStatusCode.InternalServerError:
-                    ShowFileUploadMessage(string.Format(UploadFailedMessage, e.File.Name));
+                    _fileUploadMessage.Show(string.Format(UploadFailedMessage, e.File.Name));
                     break;
                 case (int)HttpStatusCode.Conflict:
-                    ShowFileUploadMessage(string.Format(
+                    _fileUploadMessage.Show(string.Format(
                         UploadConflictMessage,
                         Path.GetFileNameWithoutExtension(e.File.Name)));
                     break;
@@ -326,17 +319,6 @@
             default:
                 throw new NotSupportedException();
         }
-    }
-
-    private void ShowFileUploadMessage(string message)
-    {
-        _messageAnimationClass = string.Empty;
-        Task.Delay(10).ContinueWith((task) =>
-        {
-            _fileUploadMessage = message;
-            _messageAnimationClass = FadeOutAnimationClass;
-            StateHasChanged();
-        });
     }
 
     private async Task InitJsModule()

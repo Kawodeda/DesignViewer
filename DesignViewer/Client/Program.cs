@@ -4,6 +4,7 @@ using BlazorExtensions.Rendering;
 using BlazorExtensions.Services;
 using BlazorExtensions.Services.JsInterop;
 using DesignViewer.Client;
+using DesignViewer.Client.Services;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
@@ -21,6 +22,7 @@ builder.Services.AddScoped<IElementFactory, ElementFactory>();
 builder.Services.AddScoped<IJsModulesProvider, JsModulesProvider>();
 builder.Services.AddScoped<IAssetService, AssetService>();
 builder.Services.AddScoped<IImageContentService, ImageContentService>();
+builder.Services.AddScoped<IWindowService, WindowService>();
 
 builder.Services.AddTransient<ISurfaceRenderer, SurfaceRenderer>();
 builder.Services.AddTransient<ILayerRenderer, LayerRenderer>();

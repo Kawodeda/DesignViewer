@@ -22,7 +22,7 @@
 @implements IDesignViewer
 
 <div style="width: @(Width)px; height: @(Height)px;">
-    <div class="canvas-container" style="background-color: transparent; position: absolute; width: @(Width)px; height: @(Height)px">
+    <div class="canvas-container" style="background-color: whitesmoke; position: absolute; width: @(Width)px; height: @(Height)px">
         <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
     </div>
 
@@ -43,6 +43,10 @@
 </div>
 
 @code {
+    private long _width = 256;
+    private long _height = 256;
+    private Sides _artboardScrollMargin = new Sides(0f);
+
     private Design _design;
     private int _currentSurfaceIndex;
     private BECanvasComponent _canvasReference;
@@ -57,13 +61,59 @@
     private Element? _selectedElement;
 
     [Parameter]
-    public long Width { get; set; } = 256;
+    public long Width 
+    {
+        get
+        {
+            return _width;
+        }
+        set
+        {
+            _width = value;
+            Viewport.Size.Width = _width;
+
+            if(AutoScrollMargin)
+            {
+                UpdateScrollMargin();
+            }
+        } 
+    }
 
     [Parameter]
-    public long Height { get; set; } = 256;
+    public long Height 
+    {
+        get
+        {
+            return _height;
+        }
+        set
+        {
+            _height = value;
+            Viewport.Size.Height = _height;
+
+            if(AutoScrollMargin)
+            {
+                UpdateScrollMargin();
+            }
+        }
+    }
 
     [Parameter]
-    public Sides ArtboardScrollMargin { get; set; } = new Sides(0f);
+    public bool AutoScrollMargin { get; set; } = false;
+
+    [Parameter]
+    public Sides ArtboardScrollMargin 
+    {
+        get
+        {
+            return _artboardScrollMargin;
+        } 
+        set
+        {
+            _artboardScrollMargin = value;
+            Viewport.ContentScrollMargin = _artboardScrollMargin;
+        }
+    }
 
     [Parameter]
     public EventCallback<Element?> SelectedElementChangedParameter { get; set; }
@@ -158,6 +208,11 @@
         {
             _design = value;
             Viewport.ContentSize = CurrentArtboard.ActualSize;
+
+            if(AutoScrollMargin)
+            {
+                UpdateScrollMargin();
+            }
 
             RequestRendering();
         }
@@ -307,7 +362,7 @@
     private async Task RedrawCanvasAsync(float timeStamp)
     { 
         await _surfaceRenderer.Render(CurrentSurface, Width, Height, Transform);
-        
+
         if(SelectedElement != null)
         {
             await _surfaceRenderer.RenderSelection(SelectedElement, Transform);
@@ -327,15 +382,6 @@
         {
             await RedrawVerticalScrollbarAsync();
         }   
-
-        await _uiCanvasContext.SetFillStyleAsync("black");
-        await _uiCanvasContext.SetFontAsync("10px verdana");
-        var selected = SelectedElement?.Content.ElementContentCase;
-        await _uiCanvasContext.FillTextAsync($"SelectedElement: {selected}", 5, 10);
-
-        await _uiCanvasContext.FillTextAsync($"scrollX: {Viewport.ScrollX.ToString("N2")}", Width - 80, 10);
-        await _uiCanvasContext.FillTextAsync($"scrollY: {Viewport.ScrollY.ToString("N2")}", Width - 80, 30);
-        await _uiCanvasContext.FillTextAsync($"zoom: {Viewport.Zoom.ToString("N2")}", Width - 80, 50);   
     }
 
     private async Task RedrawVerticalScrollbarAsync()
@@ -374,5 +420,18 @@
             horizontalScrollbarY,
             Viewport.HorizontalScrollbarBodyWidth,
             Viewport.ScrollbarSize);
+    }
+
+    private void UpdateScrollMargin()
+    {
+        if(_design == null)
+        {
+            return;
+        }
+
+        float horizontal = (Width - CurrentArtboard.ActualSize.Width) / 2 + 100;
+        float vertical = (Height - CurrentArtboard.ActualSize.Height) / 2 + 100;
+
+        ArtboardScrollMargin = new Sides(horizontal, vertical);
     }
 }

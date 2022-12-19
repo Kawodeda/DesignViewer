@@ -1,7 +1,7 @@
 ﻿.canvas-container {
-
+    display: flex;
 }
 
-.canvas-container canvas {
-    border: none;
+canvas:focus-visible {
+    outline: none;
 }

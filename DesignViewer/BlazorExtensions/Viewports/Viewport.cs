@@ -219,7 +219,7 @@ namespace BlazorExtensions.Viewports
 
         public float MinZoom { get; set; } = 0.2f;
 
-        public float MaxZoom { get; set; } = 10f;
+        public float MaxZoom { get; set; } = 5f;
 
         private float MinScrollX
         {

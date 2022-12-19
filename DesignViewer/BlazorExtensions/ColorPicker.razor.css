@@ -1,5 +1,6 @@
 ﻿.container {
-    display: block;
+    display: flex;
+    align-items: center;
     border: none;
     padding: 0;
     margin: 0;
@@ -26,8 +27,8 @@
     -moz-appearance: none;
     appearance: none;
     padding: 0;
-    width: 2em;
-    height: 2em;
+    width: 2.25rem;
+    height: 2.25rem;
     cursor: pointer;
     background: none;
     border: none;

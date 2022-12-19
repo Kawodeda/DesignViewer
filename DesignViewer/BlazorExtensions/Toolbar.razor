@@ -1,0 +1,25 @@
+﻿
+<div class="toolbar">
+    <button class="btn btn-primary toolbar-btn"
+            @onclick="async (args) => await OnImageClick.InvokeAsync(args)">
+        <span class="oi oi-image"></span>
+        Image
+    </button>
+    <button class="btn btn-primary toolbar-btn"
+            @onclick="async (args) => await OnShapeClick.InvokeAsync(args)">
+        Shape
+    </button>
+    @ChildContent
+</div>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnShapeClick { get; set; }
+
+    [Parameter]
+    public EventCallback<MouseEventArgs> OnImageClick { get; set; }
+}

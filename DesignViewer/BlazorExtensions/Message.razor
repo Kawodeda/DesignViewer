@@ -1,0 +1,43 @@
+﻿
+<p class="message @_messageAnimationClass" @onanimationend="(args) => OnAnimationed()">
+    @_message
+</p>
+
+@code {
+    private const string FadeOutAnimationClass = "animated-fade-out";
+
+    private string _messageAnimationClass = string.Empty;
+    private string _message = string.Empty;
+    private bool _needAnimation = false;
+
+    public void Show(string message)
+    {
+        _message = message;
+        _messageAnimationClass = string.Empty;
+        _needAnimation = true;
+        StateHasChanged();
+    }
+
+    public void Clear()
+    {
+        _message = string.Empty;
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (_needAnimation)
+        {
+            _messageAnimationClass = FadeOutAnimationClass;
+            _needAnimation = false;
+            StateHasChanged();
+        }
+
+        base.OnAfterRenderAsync(firstRender);
+    }
+
+    private void OnAnimationed()
+    {
+        _messageAnimationClass = string.Empty;
+        StateHasChanged();
+    }
+}

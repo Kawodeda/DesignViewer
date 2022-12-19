@@ -40,9 +40,7 @@
     <span class="oi oi-plus"></span>
     New
 </button>
-<p>
-    <label style="margin: 1em 0">@_message</label>
-</p>
+<Message @ref="_message"></Message>
 
 @code {
     private Virtualize<DesignDto> _virtualizeComponent;
@@ -54,7 +52,7 @@
     private const string DeleteConfirmationMessage
         = "Are you really want to delete file \"{0}\"?";
 
-    private string _message = "";
+    private Message _message = default!;
     private bool _firstFetch = true;
 
     protected override async Task OnInitializedAsync()
@@ -83,12 +81,12 @@
             {
                 await _designsApiClient.DeleteDesignAsync(design.Name);
                 await ReloadDesigns();
-                _message = string.Format(DeleteMessage, design.Name);
+                _message.Show(string.Format(DeleteMessage, design.Name));
             }
         }
         catch
         {
-            _message = ErrorMessage;
+            _message.Show(ErrorMessage);
         }
     }
 
