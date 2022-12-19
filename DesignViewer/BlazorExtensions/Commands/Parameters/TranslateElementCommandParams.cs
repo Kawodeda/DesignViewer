@@ -5,9 +5,9 @@ namespace BlazorExtensions.Commands.Parameters
 {
     public class TranslateElementCommandParams
     {
-        public Element Element { get; set; }
+        public Element Element { get; }
 
-        public Point Shift { get; set; }
+        public Point Shift { get; }
 
         public TranslateElementCommandParams(Element element, Point shift)
         {
