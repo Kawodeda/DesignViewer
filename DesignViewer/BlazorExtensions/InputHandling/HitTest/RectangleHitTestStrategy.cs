@@ -14,9 +14,10 @@ namespace BlazorExtensions.InputHandling.HitTest
             RectangleControls rectangle
                 = _element.Content.ClosedVector.Controls.Rectangle;
             Point elementPos = _element.Position;
-            Point corner1 = elementPos + rectangle.Corner1;
-            Point corner2 = elementPos + rectangle.Corner2;
-            point *= _element.Transform * transform.Inverse();
+            Point scale = _element.Transform.ScaleFactor;
+            Point corner1 = elementPos + new Point(rectangle.Corner1.X * scale.X, rectangle.Corner1.Y * scale.Y);
+            Point corner2 = elementPos + new Point(rectangle.Corner2.X * scale.X, rectangle.Corner2.Y * scale.Y);
+            point *= _element.Transform.RotationMatrix * transform.Inverse();
 
             return point.X > corner1.X
                 && point.X < corner2.X

@@ -4,7 +4,7 @@ namespace BlazorExtensions.Commands.Parameters
 {
     public class ZoomCommandParams
     {
-        public float DeltaZoom { get; set; }
+        public float DeltaZoom { get; }
 
         public ZoomCommandParams(float zoom)
         {
