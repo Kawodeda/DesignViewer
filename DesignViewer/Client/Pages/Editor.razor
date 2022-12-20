@@ -3,6 +3,7 @@
 @using ApiClient
 @using BlazorExtensions
 @using BlazorExtensions.Commands
+@using BlazorExtensions.Commands.Parameters;
 @using BlazorExtensions.Models
 @using BlazorExtensions.Services
 @using DesignViewer.Client.Models
@@ -22,7 +23,10 @@
 
 <AssetManager @ref="_assetManager" Header="@_assetManagerHeader" Closed="OnAssetManagerClosed"></AssetManager>
 
-<div id="editor" style="display: flex; flex-direction: row; justify-content: flex-end;">
+<div id="editor" style="display: flex; flex-direction: row; justify-content: space-evenly;">
+    <div style="display: flex; flex-direction: column; margin-top: calc(2.25rem + 10px); width: 15%">
+        <ResizeInput @bind-Scale="ElementScale" AllowUnproportional="@AllowUnproportionalResize" IsVisible="@_isResizeInputVisible"></ResizeInput>
+    </div>
     <div style="
             border: none;
             display: flex;
@@ -89,10 +93,15 @@
     private Message _designSaveMessage = default!;
     private SaveDesignModel _saveDesignModel = new();
     private bool _isColorPickerVisible = false;
+    private bool _isResizeInputVisible = false;
     private Color _color;
+    private Point _elementScale = new(1, 1);
     private string _assetManagerHeader = string.Empty;
     private long _viewerWidth = 550;
     private long _viewerHeight = 550;
+
+    [Parameter]
+    public string? DesignName { get; set; }
 
     private bool RemoveMockupEnabled
     {
@@ -120,12 +129,46 @@
         }
     }
 
-    [Parameter]
-    public string? DesignName { get; set; }
+    private Point ElementScale
+    {
+        get
+        {
+            return _elementScale;
+        }
+        set
+        {
+            _elementScale = value;
+
+            if(_designViewer.SelectedElement != null)
+            {
+                _designViewer.ExecuteCommand(new ResizeElementCommand(
+                    new ResizeElementCommandParams(
+                        _designViewer.SelectedElement, _elementScale.X, _elementScale.Y)));
+            }
+        }
+    }
+
+    private bool AllowUnproportionalResize
+    {
+        get
+        {
+            return _designViewer?.SelectedElement?.Content.ElementContentCase != ElementContent.ElementContentOneofCase.Image;
+        }
+    }
 
     private void OnSelectedElementChanged(Element? element)
     {
-        if(_designViewer.SelectedElementFillColor == null)
+        if (_designViewer.SelectedElement == null)
+        {
+            _isColorPickerVisible = false;
+            _isResizeInputVisible = false;
+            return;
+        }
+
+        _isResizeInputVisible = true;
+        ElementScale = _designViewer.SelectedElement.Transform.ScaleFactor;
+
+        if (_designViewer.SelectedElementFillColor == null)
         {
             _isColorPickerVisible = false;
             return;
@@ -266,7 +309,7 @@
 
     private void UpdateViewerSize(Size windowSize)
     {
-        _viewerWidth = (long)(0.7f * windowSize.Width);
+        _viewerWidth = (long)(0.7f * (windowSize.Width - 250));
         _viewerHeight = (long)(0.75f * windowSize.Height);
     }
 }

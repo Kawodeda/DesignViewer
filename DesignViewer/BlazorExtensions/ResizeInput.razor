@@ -1,0 +1,171 @@
+﻿@using Model.Design.Math;
+@using Model.Utils;
+
+<div class="resize-input" style="visibility: @_visibility">
+    @if(_isVisible)
+    {
+        <label id="proportional-switch" class="switch">
+            <input type="checkbox" value="" checked="@_proportionalResize" @oninput="OnProportionalResizeInput" disabled="@(!AllowUnproportional)">
+            <span class="switch-slider"></span>
+        </label>
+        <label for="proportional-switch">Proportional resize</label>
+        @if (_proportionalResize)
+        {
+            <label for="scale-x">Scale:</label>
+            <input id="scale-x" class="slider" type="range" step="1" min="@_minValue" max="@_maxValue" value="@_valueX" @oninput="OnValueXInput" list="snap-to-default">
+        }
+        else
+        {
+            <label for="scale-x">Scale X:</label>
+            <input id="scale-x" class="slider" type="range" step="1" min="@_minValue" max="@_maxValue" value="@_valueX" @oninput="OnValueXInput" list="snap-to-default">
+            <label for="scale-y">Scale Y:</label>
+            <input id="scale-y" class="slider" type="range" step="1" min="@_minValue" max="@_maxValue" value="@_valueY" @oninput="OnValueYInput" list="snap-to-default">
+        }
+        <datalist id="snap-to-default">
+            <option value="@_defaultValue"></option>
+        </datalist>
+    }
+</div>
+
+@code {
+    private const string Visible = "visible";
+    private const string Hidden = "hidden";
+
+    private float _defaultScale = 1;
+    private float _minScale = 0.125f;
+    private float _maxScale = 5f;
+    private float _a;
+    private float _b;
+
+    private float _scaleX;
+    private float _scaleY;
+    private Point _scale;
+
+    private int _minValue = -100;
+    private int _maxValue = 100;
+    private int _defaultValue = 0;
+    private int _valueX;
+    private int _valueY;
+    private bool _proportionalResize = false;
+    private bool _isVisible = true;
+    private string _visibility = Visible;
+
+    public bool ProportionalResize 
+    {
+        get
+        {
+            return _proportionalResize;
+        }
+        private set
+        {
+            _proportionalResize = value;
+            StateHasChanged();
+        }
+    }
+
+    [Parameter]
+    public bool AllowUnproportional { get; set; }
+
+    [Parameter]
+    public Point Scale 
+    { 
+        get
+        {
+            return _scale;
+        }
+        set
+        {
+            if(value == null)
+            {
+                return;
+            }
+
+            _scaleX = MathUtils.Clamp(value.X, _minScale, _maxScale);
+            _scaleY = MathUtils.Clamp(value.Y, _minScale, _maxScale);
+            UpdateValue();
+        }
+    }
+
+    [Parameter]
+    public EventCallback<Point> ScaleChanged { get; set; }
+
+    [Parameter]
+    public bool IsVisible 
+    { 
+        get
+        {
+            return _isVisible;
+        }
+        set
+        {
+            _isVisible = value;
+            _visibility = _isVisible ? Visible : Hidden;
+            UpdateValue();
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        _scale = new Point(_scaleX, _scaleY);
+        _a = (_maxScale - _minScale) / (_maxValue - _minValue);
+        _b = (_maxValue * _minScale - _minValue * _maxScale) / (_maxValue - _minValue);
+        _defaultValue = (int)((_defaultScale - _b) / _a);
+
+        base.OnInitialized();
+    }
+
+    protected override void OnParametersSet()
+    {
+        if(!AllowUnproportional)
+        {
+            ProportionalResize = true;
+        }
+
+        base.OnParametersSet();
+    }
+
+    private async Task OnValueXInput(ChangeEventArgs e)
+    {
+        _valueX = Convert.ToInt32(e.Value?.ToString());
+
+        if(ProportionalResize)
+        {
+            _valueY = _valueX;
+        }
+
+        await UpdateScale();
+    }
+
+    private async Task OnValueYInput(ChangeEventArgs e)
+    {
+        _valueY = Convert.ToInt32(e.Value?.ToString());
+        await UpdateScale();
+    }
+
+    private async Task OnProportionalResizeInput(ChangeEventArgs e)
+    {
+        ProportionalResize = (bool)(e.Value);
+
+        if (ProportionalResize)
+        {
+            _valueY = _valueX;
+        }
+
+        await UpdateScale();
+    }
+
+    private async Task UpdateScale()
+    {
+        _scaleX = _valueX * _a + _b;
+        _scaleY = _valueY * _a + _b;
+        _scale = new Point(_scaleX, _scaleY);
+        await ScaleChanged.InvokeAsync(_scale);
+    }
+
+    private void UpdateValue()
+    {
+        _valueX = (int)((_scaleX - _b) / _a);
+        _valueY = (int)((_scaleY - _b) / _a);
+    }
+}

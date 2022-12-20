@@ -1,5 +1,6 @@
 ﻿using BlazorExtensions.Commands.Context;
 using BlazorExtensions.Commands.Parameters;
+using Model.Design.Math;
 
 namespace BlazorExtensions.Commands
 {
@@ -19,7 +20,9 @@ namespace BlazorExtensions.Commands
 
         public void Execute(IExecutionContext context)
         {
-            _params.Element.Transform = _params.Element.Transform.Scale(_params.ScaleX, _params.ScaleY);
+            Affine2DMatrix transform = _params.Element.Transform;
+            _params.Element.Transform = (transform.TranslationMatrix * transform.RotationMatrix)
+                .Scale(_params.ScaleX, _params.ScaleY);
         }
     }
 }
