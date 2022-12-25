@@ -26,17 +26,16 @@ namespace Model.Design.Content {
           string.Concat(
             "Ch1jb250ZW50L2VsZW1lbnRfY29udGVudC5wcm90bxIOZGVzaWduLmNvbnRl",
             "bnQaG2NvbnRlbnQvb3BlbmVkX3ZlY3Rvci5wcm90bxobY29udGVudC9jbG9z",
-            "ZWRfdmVjdG9yLnByb3RvGhNjb250ZW50L2ltYWdlLnByb3RvGhJjb250ZW50",
-            "L3RleHQucHJvdG8i3wEKDkVsZW1lbnRDb250ZW50EjUKDW9wZW5lZF92ZWN0",
-            "b3IYASABKAsyHC5kZXNpZ24uY29udGVudC5PcGVuZWRWZWN0b3JIABI1Cg1j",
-            "bG9zZWRfdmVjdG9yGAIgASgLMhwuZGVzaWduLmNvbnRlbnQuQ2xvc2VkVmVj",
-            "dG9ySAASJgoFaW1hZ2UYAyABKAsyFS5kZXNpZ24uY29udGVudC5JbWFnZUgA",
-            "EiQKBHRleHQYBCABKAsyFC5kZXNpZ24uY29udGVudC5UZXh0SABCEQoPZWxl",
-            "bWVudF9jb250ZW50QheqAhRNb2RlbC5EZXNpZ24uQ29udGVudGIGcHJvdG8z"));
+            "ZWRfdmVjdG9yLnByb3RvGhNjb250ZW50L2ltYWdlLnByb3RvIrkBCg5FbGVt",
+            "ZW50Q29udGVudBI1Cg1vcGVuZWRfdmVjdG9yGAEgASgLMhwuZGVzaWduLmNv",
+            "bnRlbnQuT3BlbmVkVmVjdG9ySAASNQoNY2xvc2VkX3ZlY3RvchgCIAEoCzIc",
+            "LmRlc2lnbi5jb250ZW50LkNsb3NlZFZlY3RvckgAEiYKBWltYWdlGAMgASgL",
+            "MhUuZGVzaWduLmNvbnRlbnQuSW1hZ2VIAEIRCg9lbGVtZW50X2NvbnRlbnRC",
+            "F6oCFE1vZGVsLkRlc2lnbi5Db250ZW50YgZwcm90bzM="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Model.Design.Content.OpenedVectorReflection.Descriptor, global::Model.Design.Content.ClosedVectorReflection.Descriptor, global::Model.Design.Content.ImageReflection.Descriptor, global::Model.Design.Content.TextReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Model.Design.Content.OpenedVectorReflection.Descriptor, global::Model.Design.Content.ClosedVectorReflection.Descriptor, global::Model.Design.Content.ImageReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Model.Design.Content.ElementContent), global::Model.Design.Content.ElementContent.Parser, new[]{ "OpenedVector", "ClosedVector", "Image", "Text" }, new[]{ "ElementContent" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Model.Design.Content.ElementContent), global::Model.Design.Content.ElementContent.Parser, new[]{ "OpenedVector", "ClosedVector", "Image" }, new[]{ "ElementContent" }, null, null, null)
           }));
     }
     #endregion
@@ -91,9 +90,6 @@ namespace Model.Design.Content {
         case ElementContentOneofCase.Image:
           Image = other.Image.Clone();
           break;
-        case ElementContentOneofCase.Text:
-          Text = other.Text.Clone();
-          break;
       }
 
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
@@ -141,18 +137,6 @@ namespace Model.Design.Content {
       }
     }
 
-    /// <summary>Field number for the "text" field.</summary>
-    public const int TextFieldNumber = 4;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Model.Design.Content.Text Text {
-      get { return elementContentCase_ == ElementContentOneofCase.Text ? (global::Model.Design.Content.Text) elementContent_ : null; }
-      set {
-        elementContent_ = value;
-        elementContentCase_ = value == null ? ElementContentOneofCase.None : ElementContentOneofCase.Text;
-      }
-    }
-
     private object elementContent_;
     /// <summary>Enum of possible cases for the "element_content" oneof.</summary>
     public enum ElementContentOneofCase {
@@ -160,7 +144,6 @@ namespace Model.Design.Content {
       OpenedVector = 1,
       ClosedVector = 2,
       Image = 3,
-      Text = 4,
     }
     private ElementContentOneofCase elementContentCase_ = ElementContentOneofCase.None;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -194,7 +177,6 @@ namespace Model.Design.Content {
       if (!object.Equals(OpenedVector, other.OpenedVector)) return false;
       if (!object.Equals(ClosedVector, other.ClosedVector)) return false;
       if (!object.Equals(Image, other.Image)) return false;
-      if (!object.Equals(Text, other.Text)) return false;
       if (ElementContentCase != other.ElementContentCase) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -206,7 +188,6 @@ namespace Model.Design.Content {
       if (elementContentCase_ == ElementContentOneofCase.OpenedVector) hash ^= OpenedVector.GetHashCode();
       if (elementContentCase_ == ElementContentOneofCase.ClosedVector) hash ^= ClosedVector.GetHashCode();
       if (elementContentCase_ == ElementContentOneofCase.Image) hash ^= Image.GetHashCode();
-      if (elementContentCase_ == ElementContentOneofCase.Text) hash ^= Text.GetHashCode();
       hash ^= (int) elementContentCase_;
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -238,10 +219,6 @@ namespace Model.Design.Content {
         output.WriteRawTag(26);
         output.WriteMessage(Image);
       }
-      if (elementContentCase_ == ElementContentOneofCase.Text) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Text);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -264,10 +241,6 @@ namespace Model.Design.Content {
         output.WriteRawTag(26);
         output.WriteMessage(Image);
       }
-      if (elementContentCase_ == ElementContentOneofCase.Text) {
-        output.WriteRawTag(34);
-        output.WriteMessage(Text);
-      }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -286,9 +259,6 @@ namespace Model.Design.Content {
       }
       if (elementContentCase_ == ElementContentOneofCase.Image) {
         size += 1 + pb::CodedOutputStream.ComputeMessageSize(Image);
-      }
-      if (elementContentCase_ == ElementContentOneofCase.Text) {
-        size += 1 + pb::CodedOutputStream.ComputeMessageSize(Text);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -320,12 +290,6 @@ namespace Model.Design.Content {
             Image = new global::Model.Design.Content.Image();
           }
           Image.MergeFrom(other.Image);
-          break;
-        case ElementContentOneofCase.Text:
-          if (Text == null) {
-            Text = new global::Model.Design.Content.Text();
-          }
-          Text.MergeFrom(other.Text);
           break;
       }
 
@@ -371,15 +335,6 @@ namespace Model.Design.Content {
             Image = subBuilder;
             break;
           }
-          case 34: {
-            global::Model.Design.Content.Text subBuilder = new global::Model.Design.Content.Text();
-            if (elementContentCase_ == ElementContentOneofCase.Text) {
-              subBuilder.MergeFrom(Text);
-            }
-            input.ReadMessage(subBuilder);
-            Text = subBuilder;
-            break;
-          }
         }
       }
     #endif
@@ -420,15 +375,6 @@ namespace Model.Design.Content {
             }
             input.ReadMessage(subBuilder);
             Image = subBuilder;
-            break;
-          }
-          case 34: {
-            global::Model.Design.Content.Text subBuilder = new global::Model.Design.Content.Text();
-            if (elementContentCase_ == ElementContentOneofCase.Text) {
-              subBuilder.MergeFrom(Text);
-            }
-            input.ReadMessage(subBuilder);
-            Text = subBuilder;
             break;
           }
         }

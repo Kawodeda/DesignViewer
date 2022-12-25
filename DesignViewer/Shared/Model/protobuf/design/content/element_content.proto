@@ -6,7 +6,6 @@ package design.content;
 import "content/opened_vector.proto";
 import "content/closed_vector.proto";
 import "content/image.proto";
-import "content/text.proto";
 
 option csharp_namespace = "Model.Design.Content";
 
@@ -20,6 +19,5 @@ message ElementContent
     OpenedVector opened_vector = 1;
     ClosedVector closed_vector = 2;
     Image image = 3;
-    Text text = 4;
   }
 }
