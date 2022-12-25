@@ -27,15 +27,21 @@ namespace BlazorExtensions.Rendering.Strategies.Selection
                 return;
             }
 
-            Point position = _element.Position;
+            Point topLeftPos = _element.Position;
             Point scale = _element.Transform.ScaleFactor;
             float width = imageContent.Size.Width * scale.X;
             float height = imageContent.Size.Height * scale.Y;
+
+            if (_element.ReferencePoint == ReferencePointType.Center)
+            {
+                topLeftPos -= new Point(width, height) * 0.5f;
+            }
+
             float lineWidth = 1;
 
             await context.SetStrokeStyleAsync("yellow");
             await context.SetLineWidthAsync(lineWidth);
-            await context.StrokeRectAsync(position.X, position.Y, width, height);
+            await context.StrokeRectAsync(topLeftPos.X, topLeftPos.Y, width, height);
         }
     }
 }

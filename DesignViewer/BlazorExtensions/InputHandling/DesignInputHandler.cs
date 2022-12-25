@@ -5,15 +5,13 @@ using BlazorExtensions.Commands.Parameters;
 using Microsoft.AspNetCore.Components.Web;
 using BlazorExtensions.Services;
 using BlazorExtensions.Viewports;
-using System.ComponentModel.DataAnnotations;
 
 namespace BlazorExtensions.InputHandling
 {
     public enum DesignState
     {
         Default = 0,
-        Translate = 1,
-        ElementPlacing = 2
+        Translate = 1
     }
 
     public enum MouseButton
@@ -46,11 +44,6 @@ namespace BlazorExtensions.InputHandling
         public override ICommand OnMouseDown(MouseEventArgs e)
         {
             var mouse = new Point((float)e.OffsetX, (float)e.OffsetY);
-
-            if (_state == DesignState.ElementPlacing)
-            {
-                return HandleElementPlacing(mouse);
-            }
 
             Element? element = _designViewer.CurrentSurface.Layers
                     .SelectMany(x => x.Elements)
@@ -131,22 +124,6 @@ namespace BlazorExtensions.InputHandling
             return new ChangeSelectionCommand(_capturedElement);
         }
 
-        public override ICommand OnKeyPress(KeyboardEventArgs e)
-        {
-            if (_state != DesignState.Default)
-            {
-                return base.OnKeyPress(e);
-            }
-            if (e.Code != AddElementKeyCode)
-            {
-                return base.OnKeyPress(e);
-            }
-
-            _state = DesignState.ElementPlacing;
-
-            return new EmptyCommand();
-        }
-
         public override ICommand OnKeyDown(KeyboardEventArgs e)
         {
             if (e.Code == "Delete")
@@ -194,18 +171,6 @@ namespace BlazorExtensions.InputHandling
                         new TranslateElementCommandParams(
                             _designViewer.SelectedElement,
                             shift)));
-        }
-
-        private ICommand HandleElementPlacing(Point mouse)
-        {
-            _state = DesignState.Default;
-            Element element = _elementCreator.CreateRandomRectangle();
-            element.Position = ViewportToSurface(mouse, element, _designViewer.Transform) - element.Center;
-            StartTranslate(mouse);
-
-            return new CompositeCommand(
-                new AddElementCommand(element),
-                new ChangeSelectionCommand(element));
         }
 
         private void StartTranslate(Point mouse)

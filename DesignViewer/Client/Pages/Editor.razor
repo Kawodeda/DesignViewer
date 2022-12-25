@@ -23,8 +23,8 @@
 
 <AssetManager @ref="_assetManager" Header="@_assetManagerHeader" Closed="OnAssetManagerClosed"></AssetManager>
 
-<div id="editor" style="display: flex; flex-direction: row; justify-content: space-evenly;">
-    <div style="display: flex; flex-direction: column; margin-top: calc(2.25rem + 10px); width: 15%">
+<div id="editor" style="display: flex; flex-direction: row; justify-content: space-evenly">
+    <div style="display: flex; flex-direction: column; margin-top: calc(2.25rem + 10px); margin-right: 10px; width: 30%;">
         <ResizeInput @bind-Scale="ElementScale" AllowUnproportional="@AllowUnproportionalResize" IsVisible="@_isResizeInputVisible"></ResizeInput>
     </div>
     <div style="
@@ -34,8 +34,34 @@
             align-items: flex-start;
             flex-direction: column;
             justify-content: center;">
-        <Toolbar OnImageClick="OpenSelectImage" OnShapeClick="(args) => _viewerWidth += 10">
-            <ColorPicker Width="300" IsVisible="@_isColorPickerVisible" @bind-Color="Color"></ColorPicker>
+        <Toolbar OnImageClick="OpenSelectImage" OnRectangleClick="AddRectangle">
+            <LeftContent>
+                @if(DeleteElementVisible)
+                {
+                    <button class="btn btn-danger"
+                        style="margin: 0 5px 0 0; height: 2.25rem; padding: 0.2rem 0.75rem 0.175rem 0.75rem;"
+                        @onclick="(args) => DeleteElement()">
+                        <span class="oi oi-trash"></span>
+                    </button>
+                }
+            </LeftContent>
+            <CenterContent>
+                <ColorPicker Width="300" IsVisible="@_isColorPickerVisible" @bind-Color="Color"></ColorPicker>
+            </CenterContent>
+            <RightContent>
+                <button class="btn btn-light"
+                        style="margin: 0 5px 0 0; height: 2.25rem; padding: 0.2rem 0.75rem 0.175rem 0.75rem;"
+                        @onclick="(args) => OpenSelectMockup()">
+                    Select mockup
+                </button>
+                <button class="btn btn-danger"
+                        style="margin: 0 5px; height: 2.25rem; padding: 0.2rem 0.75rem 0.175rem 0.75rem;"
+                        @onclick="() => OnRemoveMockup()"
+                        disabled="@(!RemoveMockupEnabled)">
+                    <span class="oi oi-x"></span>
+                    Remove mockup
+                </button>
+            </RightContent>
         </Toolbar>
 
         <DesignViewer Width="@_viewerWidth"
@@ -43,22 +69,6 @@
                       AutoScrollMargin="true"
                       SelectedElementChangedParameter="@OnSelectedElementChanged"
                       @ref="_designViewer"></DesignViewer>
-
-        <div style="display: flex; justify-content: center; margin-top: 10px">
-            <button class="btn btn-primary"
-                    style="margin: 0 5px 0 0; height: 2.25rem; padding: 0.2rem 0.75rem 0.175rem 0.75rem;"
-                    type="submit"
-                    @onclick="(args) => OpenSelectMockup()">
-                Select mockup
-            </button>
-            <button class="btn btn-danger"
-                    style="margin: 0 5px; height: 2.25rem; padding: 0.2rem 0.75rem 0.175rem 0.75rem;"
-                    @onclick="() => OnRemoveMockup()"
-                    disabled="@(!RemoveMockupEnabled)">
-                <span class="oi oi-x"></span>
-                Remove mockup
-            </button>
-        </div>
     </div>
 </div>
 
@@ -70,7 +80,7 @@
 
         <div class="input-group">
             <InputText class="form-control" placeholder="Enter design name" @bind-Value="_saveDesignModel.Name" style="margin-right: 10px" />
-            <button class="btn btn-success" style="width: 20%" type="submit">
+            <button class="btn btn-primary" style="width: 20%" type="submit" disabled="@(!_isSaveEnabled)">
                 <span class="oi oi-check"></span>
                 Save
             </button>
@@ -94,6 +104,7 @@
     private SaveDesignModel _saveDesignModel = new();
     private bool _isColorPickerVisible = false;
     private bool _isResizeInputVisible = false;
+    private bool _isSaveEnabled = true;
     private Color _color;
     private Point _elementScale = new(1, 1);
     private string _assetManagerHeader = string.Empty;
@@ -113,6 +124,14 @@
             }
 
             return _designViewer?.CurrentSurface.Mockup != null;
+        }
+    }
+
+    private bool DeleteElementVisible
+    {
+        get
+        {
+            return _designViewer.SelectedElement != null;
         }
     }
 
@@ -262,6 +281,7 @@
     {
         _assetManagerHeader = SelectImageHeader;
         _assetManager.Submited += OnImageSelected;
+        _isSaveEnabled = false;
         _assetManager.Open(new AssetFetchOptions(AssetType.Image));
     }
 
@@ -269,6 +289,7 @@
     {
         _assetManagerHeader = SelectMockupHeader;
         _assetManager.Submited += OnMockupSelected;
+        _isSaveEnabled = false;
         _assetManager.Open(new AssetFetchOptions(AssetType.Mockup));
     }
 
@@ -276,13 +297,12 @@
     {
         Element image = _elementFactory.CreateImage(
             asset.Info.StorageId, 
-            new Point(0, 0),
+            (Point)_designViewer.CurrentSurface.Artboards.First().ActualSize * 0.5f,
             Affine2DMatrix.CreateScale(0.5f));
 
         _designViewer.ExecuteCommand(
-            new CompositeCommand(
-                new AddElementCommand(image),
-                new ChangeSelectionCommand(image)));
+            (ICommand)new AddElementCommand(image)
+            + new ChangeSelectionCommand(image));
     }
 
     private void OnMockupSelected(object? sender, Asset asset)
@@ -299,6 +319,24 @@
     {
         _assetManager.Submited -= OnImageSelected;
         _assetManager.Submited -= OnMockupSelected;
+        _isSaveEnabled = true;
+    }
+
+    private void AddRectangle()
+    {
+        Element rectangle = _elementFactory.CreateDefaultRectangle();
+        rectangle.Position = (Point)_designViewer.CurrentSurface.Artboards.First().ActualSize * 0.5f;
+
+        _designViewer.ExecuteCommand(
+            (ICommand)new AddElementCommand(rectangle) 
+            + new ChangeSelectionCommand(rectangle));
+    }
+
+    private void DeleteElement()
+    {
+        _designViewer.ExecuteCommand(
+            (ICommand)new DeleteElementCommand(_designViewer.SelectedElement)
+            + new ChangeSelectionCommand(null));
     }
 
     private void OnWindowResized(object? sender, Size args)
@@ -309,7 +347,7 @@
 
     private void UpdateViewerSize(Size windowSize)
     {
-        _viewerWidth = (long)(0.7f * (windowSize.Width - 250));
+        _viewerWidth = (long)(0.75f * (windowSize.Width - 250));
         _viewerHeight = (long)(0.75f * windowSize.Height);
     }
 }

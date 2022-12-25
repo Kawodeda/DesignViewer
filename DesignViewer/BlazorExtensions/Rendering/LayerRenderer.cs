@@ -6,29 +6,15 @@ using Model.Design.Math;
 
 namespace BlazorExtensions.Rendering
 {
-    public class LayerRenderer : ILayerRenderer
+    public class LayerRenderer : BaseRenderer, ILayerRenderer
     {
-        private const string ContextNotSetMessage = "Rendering context was not set";
-
         private IElementDrawStrategyFactory _factory;
-        private Canvas2DContext? _context;
 
         public LayerRenderer(IElementDrawStrategyFactory factory)
         {
             _factory = factory;
         }
 
-        public Canvas2DContext? Context
-        {
-            get
-            {
-                return _context;
-            }
-            set
-            {
-                _context = value;
-            }
-        }
 
         public async Task Render(Layer layer)
         {

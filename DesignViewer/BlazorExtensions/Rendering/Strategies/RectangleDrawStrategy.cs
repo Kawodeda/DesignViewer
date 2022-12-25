@@ -15,17 +15,15 @@ namespace BlazorExtensions.Rendering.Strategies
         {
             RectangleControls rectangle = _element.Content.ClosedVector.Controls.Rectangle;
             ProcessColor fillColor = _element.Content.ClosedVector.Fill.Solid.Color.Process;
-            Point position = _element.Position.Clone();
-            float x = position.X + rectangle.Corner1.X;
-            float y = position.Y + rectangle.Corner1.Y;
             var scale = _element.Transform.ScaleFactor;
+            Point topLeftPos = _element.Position + new Point(rectangle.Corner1.X * scale.X, rectangle.Corner1.Y * scale.Y);
             float width = rectangle.Width * scale.X;
             float height = rectangle.Height * scale.Y;
             RgbColor rgb = fillColor.Rgb;
             uint alpha = fillColor.Alpha;
 
             await context.SetFillStyleAsync(ColorConverter.ToHtml(rgb, alpha));
-            await context.FillRectAsync(x, y, width, height);
+            await context.FillRectAsync(topLeftPos.X, topLeftPos.Y, width, height);
         }
     }
 }

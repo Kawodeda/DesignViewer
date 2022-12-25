@@ -4,11 +4,10 @@
 <div class="resize-input" style="visibility: @_visibility">
     @if(_isVisible)
     {
-        <label id="proportional-switch" class="switch">
-            <input type="checkbox" value="" checked="@_proportionalResize" @oninput="OnProportionalResizeInput" disabled="@(!AllowUnproportional)">
-            <span class="switch-slider"></span>
-        </label>
-        <label for="proportional-switch">Proportional resize</label><br/>
+        <div class="form-check form-switch switch">
+            <input class="form-check-input" style="margin-right: 5px" type="checkbox" id="proportional-check" checked="@_proportionalResize" @oninput="OnProportionalResizeInput" disabled="@(!AllowUnproportional)">
+            <label class="form-check-label" for="proportional-check">Proportional resize</label>
+        </div>
         @if (_proportionalResize)
         {
             <label for="scale-x">Scale:</label>
@@ -46,7 +45,7 @@
     private int _defaultValue = 0;
     private int _valueX;
     private int _valueY;
-    private bool _proportionalResize = false;
+    private bool _proportionalResize = true;
     private bool _isVisible = true;
     private string _visibility = Visible;
 

@@ -6,6 +6,12 @@ html, body {
     overflow: hidden;
 }
 
+canvas {
+    border: none;
+    outline: none;
+    border-radius: 0;
+}
+
 canvas:focus {
     outline: none;
 }

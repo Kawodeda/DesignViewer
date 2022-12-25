@@ -5,3 +5,9 @@
 canvas:focus-visible {
     outline: none;
 }
+
+canvas {
+    border: none;
+    outline: none;
+    border-radius: 0;
+}

@@ -9,7 +9,7 @@ namespace BlazorExtensions.Services
 {
     public class ElementFactory : IElementFactory
     {
-        private Brush Lavender
+        private Brush Black
         {
             get
             {
@@ -24,9 +24,9 @@ namespace BlazorExtensions.Services
                                 Alpha = 255,
                                 Rgb = new RgbColor()
                                 {
-                                    R = 230,
-                                    G = 230,
-                                    B = 250
+                                    R = 0,
+                                    G = 0,
+                                    B = 0
                                 }
                             }
                         }
@@ -42,19 +42,19 @@ namespace BlazorExtensions.Services
             var rectangle = new Element()
             {
                 Position = new Point(0, 0),
-                ReferencePoint = ReferencePointType.TopLeftCorner,
+                ReferencePoint = ReferencePointType.Center,
                 Transform = Affine2DMatrix.CreateIdentity(),
                 Content = new ElementContent()
                 {
                     ClosedVector = new ClosedVector()
                     {
-                        Fill = Lavender,
+                        Fill = Black,
                         Controls = new ClosedVectorControls()
                         {
                             Rectangle = new RectangleControls()
                             {
-                                Corner1 = new Point(0, 0),
-                                Corner2 = new Point(48, 48)
+                                Corner1 = new Point(-50, -50),
+                                Corner2 = new Point(50, 50)
                             }
                         }
                     }
@@ -99,7 +99,7 @@ namespace BlazorExtensions.Services
             {
                 Position = position,
                 Transform = transform,
-                ReferencePoint = ReferencePointType.TopLeftCorner,
+                ReferencePoint = ReferencePointType.Center,
                 Content = new ElementContent
                 {
                     Image = new Image

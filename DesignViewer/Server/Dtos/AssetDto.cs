@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace DesignViewer.Server.Dtos
+﻿namespace DesignViewer.Server.Dtos
 {
     public class AssetDto
     {

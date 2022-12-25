@@ -21,8 +21,8 @@
 @inject IHitTestStrategyFactory _hitTestStrategyFactory
 @implements IDesignViewer
 
-<div style="width: @(Width)px; height: @(Height)px;">
-    <div class="canvas-container" style="background-color: whitesmoke; position: absolute; width: @(Width)px; height: @(Height)px">
+<div style="width: @(Width)px; height: @(Height)px; box-shadow: 0 0 2px 0 #555;">
+    <div class="canvas-container" style="background-color: white; position: absolute; width: @(Width)px; height: @(Height)px">
         <BECanvas Width="@Width" Height="@Height" @ref="_canvasReference"></BECanvas>
     </div>
 
@@ -371,7 +371,6 @@
 
     private async Task RedrawUiCanvasAsync(float timeStamp)
     {
-        await _uiCanvasContext.SetGlobalAlphaAsync(0.66f);
         await _uiCanvasContext.ClearRectAsync(0, 0, Width, Height);
 
         if(Viewport.IsHorizontalScrollbarShown)
@@ -388,14 +387,16 @@
     {
         float verticalScrollbarX = Width - Viewport.ScrollbarSize;
 
-        await _uiCanvasContext.SetFillStyleAsync("#F4D3FF");
+        await _uiCanvasContext.SetGlobalAlphaAsync(0.33f);
+        await _uiCanvasContext.SetFillStyleAsync("#1b6ec2");
         await _uiCanvasContext.FillRectAsync(
             verticalScrollbarX, 
             0, 
             Viewport.ScrollbarSize, 
             Height - Viewport.ScrollbarSize);
 
-        await _uiCanvasContext.SetFillStyleAsync("#C182D6");
+        await _uiCanvasContext.SetGlobalAlphaAsync(0.66f);
+        await _uiCanvasContext.SetFillStyleAsync("#1b6ec2");
         await _uiCanvasContext.FillRectAsync(
             verticalScrollbarX,
             Viewport.VerticalScrollbarBodyPos,
@@ -407,14 +408,16 @@
     {
         float horizontalScrollbarY = Height - Viewport.ScrollbarSize;
 
-        await _uiCanvasContext.SetFillStyleAsync("#F4D3FF");
+        await _uiCanvasContext.SetGlobalAlphaAsync(0.33f);
+        await _uiCanvasContext.SetFillStyleAsync("#1b6ec2");
         await _uiCanvasContext.FillRectAsync(
             0, 
             horizontalScrollbarY, 
             Width - Viewport.ScrollbarSize, 
             Viewport.ScrollbarSize);
 
-        await _uiCanvasContext.SetFillStyleAsync("#C182D6");
+        await _uiCanvasContext.SetGlobalAlphaAsync(0.66f);
+        await _uiCanvasContext.SetFillStyleAsync("#1b6ec2");
         await _uiCanvasContext.FillRectAsync(
             Viewport.HorizontalScrollbarBodyPos,
             horizontalScrollbarY,

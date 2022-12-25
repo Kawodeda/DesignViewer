@@ -26,12 +26,19 @@ namespace BlazorExtensions.InputHandling.HitTest
                 return false;
             }
 
-            Point elementPos = _element.Position;
+            Point topLeftPos = _element.Position;
             Point scale = _element.Transform.ScaleFactor;
-            Point corner1 = elementPos;
-            Point corner2 = elementPos + new Point(
-                imageContent.Size.Width * scale.X, 
+            Point size = new Point(
+                imageContent.Size.Width * scale.X,
                 imageContent.Size.Height * scale.Y);
+
+            if (_element.ReferencePoint == ReferencePointType.Center)
+            {
+                topLeftPos -= size * 0.5f;
+            }
+
+            Point corner1 = topLeftPos;
+            Point corner2 = topLeftPos + size;
             point *= _element.Transform.RotationMatrix * transform.Inverse();
 
             return point.X > corner1.X
