@@ -10,11 +10,13 @@ namespace BlazorExtensions.Rendering.Strategies.Selection
     public class ImageSelectionDrawStrategy : BaseElementDrawStrategy
     {
         private readonly IImageContentService _imageContentService;
+        private readonly Affine2DMatrix _basisTransform;
 
-        public ImageSelectionDrawStrategy(Element element, IImageContentService imageContentService) 
+        public ImageSelectionDrawStrategy(Element element, Affine2DMatrix basis, IImageContentService imageContentService) 
             : base(element)
         {
             _imageContentService = imageContentService;
+            _basisTransform = basis;
         }
 
         public override async Task Draw(Canvas2DContext context)
@@ -28,19 +30,19 @@ namespace BlazorExtensions.Rendering.Strategies.Selection
             }
 
             Point topLeftPos = _element.Position;
+            topLeftPos = topLeftPos.Scale(_basisTransform.ScaleFactor.X, _basisTransform.ScaleFactor.Y);
             Point scale = _element.Transform.ScaleFactor;
-            float width = imageContent.Size.Width * scale.X;
-            float height = imageContent.Size.Height * scale.Y;
+            float width = imageContent.Size.Width * scale.X * _basisTransform.ScaleFactor.X;
+            float height = imageContent.Size.Height * scale.Y * _basisTransform.ScaleFactor.Y;
 
             if (_element.ReferencePoint == ReferencePointType.Center)
             {
                 topLeftPos -= new Point(width, height) * 0.5f;
             }
 
-            float lineWidth = 1;
-
             await context.SetStrokeStyleAsync("yellow");
-            await context.SetLineWidthAsync(lineWidth);
+            await context.SetLineDashAsync(new[] { 6f, 5f });
+            await context.SetLineWidthAsync(2);
             await context.StrokeRectAsync(topLeftPos.X, topLeftPos.Y, width, height);
         }
     }

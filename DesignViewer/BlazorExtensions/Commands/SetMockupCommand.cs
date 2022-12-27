@@ -26,7 +26,7 @@ namespace BlazorExtensions.Commands
             var mockup = new Mockup()
             {
                 Position = artboardCenter,
-                Transform = Affine2DMatrix.CreateScale(0.4f),
+                Transform = Affine2DMatrix.CreateScale(0.6f),
                 Content = new Image()
                 {
                     StorageId = _mockupAsset.Info.StorageId

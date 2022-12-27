@@ -3,7 +3,6 @@ using BlazorExtensions.Extensions;
 using BlazorExtensions.Rendering.Exceptions;
 using Model.Design;
 using Model.Design.Appearance.Color;
-using Model.Design.Content;
 using Model.Design.Math;
 using Model.Utils;
 
@@ -71,11 +70,12 @@ namespace BlazorExtensions.Rendering
             }
 
             Affine2DMatrix elementTransform = element.Transform.RotationMatrix;
+            Affine2DMatrix basis = transform.RotationMatrix * transform.TranslationMatrix;
 
             await _context.SaveAsync();
 
-            await _context.TransformAsync(transform * elementTransform);
-            await _selectionDrawStrategyFactory.Create(element).Draw(_context);
+            await _context.SetTransformAsync(basis * elementTransform);
+            await _selectionDrawStrategyFactory.Create(element, transform).Draw(_context);
 
             await _context.RestoreAsync();
         }

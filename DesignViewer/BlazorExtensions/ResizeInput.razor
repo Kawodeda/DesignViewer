@@ -30,11 +30,9 @@
     private const string Visible = "visible";
     private const string Hidden = "hidden";
 
-    private float _defaultScale = 1;
     private float _minScale = 0.125f;
-    private float _maxScale = 5f;
-    private float _a;
-    private float _b;
+    private float _maxScale = 2f;
+    private float _zeroScale = 0.5f;
 
     private float _scaleX;
     private float _scaleY;
@@ -107,9 +105,7 @@
     protected override void OnInitialized()
     {
         _scale = new Point(_scaleX, _scaleY);
-        _a = (_maxScale - _minScale) / (_maxValue - _minValue);
-        _b = (_maxValue * _minScale - _minValue * _maxScale) / (_maxValue - _minValue);
-        _defaultValue = (int)((_defaultScale - _b) / _a);
+        _defaultValue = GetValue(1);
 
         base.OnInitialized();
     }
@@ -156,15 +152,40 @@
 
     private async Task UpdateScale()
     {
-        _scaleX = _valueX * _a + _b;
-        _scaleY = _valueY * _a + _b;
-        _scale = new Point(_scaleX, _scaleY);
+        _scale = new Point(
+            GetScale(_valueX),
+            GetScale(_valueY));
+
         await ScaleChanged.InvokeAsync(_scale);
     }
 
     private void UpdateValue()
     {
-        _valueX = (int)((_scaleX - _b) / _a);
-        _valueY = (int)((_scaleY - _b) / _a);
+        _valueX = GetValue(_scaleX);
+        _valueY = GetValue(_scaleY);
+    }
+
+    private float GetScale(float value)
+    {
+        if(value < 0)
+        {
+            return (_minScale - _zeroScale) / _minValue * value + _zeroScale;
+        }
+        else
+        {
+            return (_maxScale - _zeroScale) / _maxValue * value + _zeroScale;
+        }
+    }
+
+    private int GetValue(float scale)
+    {
+        if(scale < _zeroScale)
+        {
+            return (int)((scale - _zeroScale) * _minValue / (_minScale - _zeroScale));
+        }
+        else
+        {
+            return (int)((scale - _zeroScale) * _maxValue / (_maxScale - _zeroScale));
+        }
     }
 }
